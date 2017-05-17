@@ -241,7 +241,6 @@ int main( int  argc_ , char **argv_  )
     bool activate_any_coincidences = true;
     // bool activate_calorimeter_only = false;
 
-
     trigger_config.store("calo.circular_buffer_depth", calo_circular_buffer_depth);
     trigger_config.store("calo.total_multiplicity_threshold", calo_threshold);
     trigger_config.store("calo.inhibit_both_side",  inhibit_both_side_coinc);
