@@ -119,7 +119,7 @@ int main( int  argc_ , char **argv_  )
 
     if (is_display) debug = true;
 
-    std::clog << "Test program for class 'snemo::digitization::test_trigger_algorithm_test_time' !" << std::endl;
+    std::clog << "Test program for class ' !" << std::endl;
     int32_t seed = 314159;
     mygsl::rng random_generator;
     random_generator.initialize(seed);
