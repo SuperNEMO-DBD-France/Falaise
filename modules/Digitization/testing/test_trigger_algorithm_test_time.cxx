@@ -24,6 +24,11 @@
 #include "TH1F.h"
 #include "TH2F.h"
 
+// Boost :
+#include <boost/lexical_cast.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/program_options.hpp>
+
 // This project :
 #include <snemo/digitization/clock_utils.h>
 #include <snemo/digitization/mapping.h>
