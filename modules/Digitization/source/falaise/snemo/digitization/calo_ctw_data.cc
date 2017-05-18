@@ -11,7 +11,7 @@
 #include <datatools/exception.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     // Serial tag for datatools::serialization::i_serializable interface :
@@ -23,11 +23,11 @@ namespace snemo {
     }
 
     calo_ctw_data::~calo_ctw_data()
-    {   
+    {
       reset();
       return;
     }
-    
+
     unsigned int calo_ctw_data::get_clocktick_min_index() const
     {
       DT_THROW_IF(_calo_ctws_.size() == 0, std::logic_error, " Calorimeter CTW collection is empty ! ");
@@ -35,7 +35,7 @@ namespace snemo {
       unsigned int index_with_min = 0;
 
       uint32_t clocktick_min = _calo_ctws_[0].get().get_clocktick_25ns();
-      
+
       for (unsigned int i = 1; i < _calo_ctws_.size(); i++)
 				{
 					if (_calo_ctws_[i].get().get_clocktick_25ns() < clocktick_min)
@@ -46,7 +46,7 @@ namespace snemo {
 				}
       return index_with_min;
     }
-			
+
 		unsigned int calo_ctw_data::get_clocktick_max_index() const
     {
       DT_THROW_IF(_calo_ctws_.size() == 0, std::logic_error, " Calorimeter CTW collection is empty ! ");
@@ -54,7 +54,7 @@ namespace snemo {
       unsigned int index_with_max = 0;
 
       uint32_t clocktick_max = _calo_ctws_[0].get().get_clocktick_25ns();
-      
+
       for (unsigned int i = 1; i < _calo_ctws_.size(); i++)
 				{
 					if (_calo_ctws_[i].get().get_clocktick_25ns() > clocktick_max)
@@ -84,7 +84,7 @@ namespace snemo {
       DT_THROW_IF(_calo_ctws_.size() == 0, std::logic_error, " Calorimeter CTW collection is empty ! ");
       return get_clocktick_max() - get_clocktick_min();
     }
-			
+
     void calo_ctw_data::get_list_of_calo_ctw_per_clocktick(uint32_t clocktick_25ns_, calo_ctw_collection_type & ctws_) const
     {
       DT_THROW_IF(_calo_ctws_.size() == 0, std::logic_error, " Calorimeter CTW collection is empty ! ");
@@ -103,7 +103,7 @@ namespace snemo {
       _calo_ctws_.clear();
       return ;
     }
-		
+
     calo_ctw & calo_ctw_data::add()
     {
       {
@@ -119,13 +119,13 @@ namespace snemo {
     {
       return _calo_ctws_;
     }
-	 
+
 		bool calo_ctw_data::has_calo_ctw() const
 		{
 			if (_calo_ctws_.empty() == true) return false;
-			else return true;			
+			return true;
 		}
-		
+
     void calo_ctw_data::reset()
     {
       reset_ctws();
@@ -157,11 +157,11 @@ namespace snemo {
 						{
 							const calo_ctw & ctw_b = _calo_ctws_[j].get();
 
-							DT_THROW_IF(ctw_a.get_clocktick_25ns() == ctw_b.get_clocktick_25ns() 
+							DT_THROW_IF(ctw_a.get_clocktick_25ns() == ctw_b.get_clocktick_25ns()
 													&& ctw_a.get_geom_id() == ctw_b.get_geom_id(),
 													std::logic_error,
-													"Duplicate clocktick=" << ctw_a.get_clocktick_25ns() 
-													<< " * " 
+													"Duplicate clocktick=" << ctw_a.get_clocktick_25ns()
+													<< " * "
 													<< "GID=" << ctw_b.get_geom_id());
 						}
 				}
@@ -172,7 +172,7 @@ namespace snemo {
 
 } // end of namespace snemo
 
-/* 
+/*
 ** Local Variables: --
 ** mode: c++ --
 ** c-file-style: "gnu" --

@@ -5,6 +5,8 @@
 // Ourselves:
 #include <snemo/digitization/trigger_display_manager.h>
 #include <snemo/digitization/trigger_algorithm.h>
+#include <snemo/digitization/trigger_structures.h>
+#include <snemo/digitization/trigger_algorithm_test_time.h>
 
 namespace snemo {
 
@@ -517,45 +519,45 @@ namespace snemo {
       // check if matrix is not empty
 
       if (a_geiger_matrix.is_empty()) {}
-	// {
-	//   std::clog << "********************************************************************************" << std::endl;
-    	//   std::clog << "******************** Display Tracker trigger info @ 1600 ns ********************" << std::endl;
-    	//   std::clog << "******************** Clocktick 1600 ns = " << clocktick_1600ns_ << " ******************** " << std::endl << std::endl;
-	//   std::clog << "Bitset : [NSZL NSZR L M R O I] " << std::endl;
-	//   for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
-	//     {
-	//       std::clog << "Side = " << iside << " | ";
-	//       for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
-	// 	{
-	// 	  std::clog << "[" << a_tracker_record.finale_data_per_zone[iside][izone] << "] ";
-	// 	} // end of izone
-	//       std::clog << std::endl;
-	//     }
+      // {
+      //   std::clog << "********************************************************************************" << std::endl;
+      //   std::clog << "******************** Display Tracker trigger info @ 1600 ns ********************" << std::endl;
+      //   std::clog << "******************** Clocktick 1600 ns = " << clocktick_1600ns_ << " ******************** " << std::endl << std::endl;
+      //   std::clog << "Bitset : [NSZL NSZR L M R O I] " << std::endl;
+      //   for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
+      //     {
+      //       std::clog << "Side = " << iside << " | ";
+      //       for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
+      // 	{
+      // 	  std::clog << "[" << a_tracker_record.finale_data_per_zone[iside][izone] << "] ";
+      // 	} // end of izone
+      //       std::clog << std::endl;
+      //     }
 
-	//   for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
-	//     {
-	//       std::clog << "ZW pattern     : S" << iside << " : [";
-	//       for (unsigned int ibit = 0; ibit < a_tracker_record.zoning_word_pattern[0].size(); ibit++)
-	// 	{
-	// 	  std::clog << a_tracker_record.zoning_word_pattern[iside][ibit];
-	// 	}
-	//       std::clog << "] ";
-	//     }
-	//   std::clog << std::endl;
-	//   for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
-	//     {
-	//       std::clog << "ZW near source : S" << iside << " : [";
-	//       for (unsigned int ibit = 0; ibit < a_tracker_record.zoning_word_near_source[0].size(); ibit++)
-	// 	{
-	// 	  std::clog << a_tracker_record.zoning_word_near_source[iside][ibit];
-	// 	}
-	//       std::clog << "] ";
-	//     }
-	//   std::clog << std::endl;
+      //   for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
+      //     {
+      //       std::clog << "ZW pattern     : S" << iside << " : [";
+      //       for (unsigned int ibit = 0; ibit < a_tracker_record.zoning_word_pattern[0].size(); ibit++)
+      // 	{
+      // 	  std::clog << a_tracker_record.zoning_word_pattern[iside][ibit];
+      // 	}
+      //       std::clog << "] ";
+      //     }
+      //   std::clog << std::endl;
+      //   for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
+      //     {
+      //       std::clog << "ZW near source : S" << iside << " : [";
+      //       for (unsigned int ibit = 0; ibit < a_tracker_record.zoning_word_near_source[0].size(); ibit++)
+      // 	{
+      // 	  std::clog << a_tracker_record.zoning_word_near_source[iside][ibit];
+      // 	}
+      //       std::clog << "] ";
+      //     }
+      //   std::clog << std::endl;
 
-	//   std::clog << "Tracker level one decision : [" << a_tracker_record.finale_decision << "]" <<  std::endl << std::endl;
-	//   display_matrix();
-	// }
+      //   std::clog << "Tracker level one decision : [" << a_tracker_record.finale_decision << "]" <<  std::endl << std::endl;
+      //   display_matrix();
+      // }
 
       else
     	{
@@ -628,7 +630,6 @@ namespace snemo {
       }
       return;
     }
-
 
     void trigger_display_manager::display_coincidence_trigger_1600ns(trigger_algorithm & a_trigger_algo_, uint32_t clocktick_1600ns_)
     {
@@ -742,6 +743,424 @@ namespace snemo {
       return;
     }
 
+    void trigger_display_manager::display_ctw_fifo_trigger_implementation_1600ns(std::ofstream * calo_ofstreams_,
+										 std::ofstream * tracker_ofstreams_,
+										 const calo_ctw_data & a_calo_ctw_data_,
+										 const geiger_ctw_data & a_geiger_ctw_data_)
+
+    {
+      if (a_calo_ctw_data_.has_calo_ctw()) {
+	uint64_t ct_min_25 = a_calo_ctw_data_.get_clocktick_min();
+	uint64_t ct_max_25 = a_calo_ctw_data_.get_clocktick_max();
+
+	uint32_t fifo_depth = 4096;
+	std::size_t calo_fifo_width = 24;
+
+	std::bitset<13> binary_counter = 0x0;
+	uint32_t decimal_counter = 0;
+
+	for (uint64_t i = 0; i < ct_min_25; i++)
+	  {
+	    binary_counter = decimal_counter;
+	    calo_ofstreams_[0] << binary_counter << " : ";
+	    for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[0] << "0";
+	    calo_ofstreams_[0] << ';' << std::endl;
+
+	    calo_ofstreams_[1] << binary_counter << " : ";
+	    for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[1] << "0";
+	    calo_ofstreams_[1] << ';' << std::endl;
+
+	    calo_ofstreams_[2] << binary_counter << " : ";
+	    for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[2] << "0";
+	    calo_ofstreams_[2] << ';' << std::endl;
+
+	    decimal_counter++;
+	  }
+
+	for (std::size_t i = ct_min_25;
+	     i <= ct_max_25;
+	     i++)
+	  {
+	    binary_counter = decimal_counter;
+	    snemo::digitization::calo_ctw_data::calo_ctw_collection_type calo_ctw_collection;
+	    a_calo_ctw_data_.get_list_of_calo_ctw_per_clocktick(i, calo_ctw_collection);
+
+	    bool writed_calo_ctw_0 = false;
+	    bool writed_calo_ctw_1 = false;
+	    bool writed_calo_ctw_2 = false;
+
+	    for (auto ictw = calo_ctw_collection.begin();
+		 ictw != calo_ctw_collection.end();
+		 ictw++) {
+	      datatools::handle<calo_ctw> a_handle_calo_ctw = *ictw;
+
+	      std::size_t calo_ctw_number = a_handle_calo_ctw.get().get_geom_id().get(mapping::RACK_DEPTH);
+
+	      if (calo_ctw_number == 0) {
+		calo_ofstreams_[0] << binary_counter << " : ";
+		std::bitset<calo::ctw::FULL_BITSET_SIZE> ctw_zoning_word_0 = 0x0;
+	      	a_handle_calo_ctw.get().get_full_word(ctw_zoning_word_0);
+		for (std::size_t zero = 0; zero < 6; zero++) calo_ofstreams_[0] << "0";
+	      	calo_ofstreams_[0] << ctw_zoning_word_0 << ';' << std::endl;
+		writed_calo_ctw_0 = true;
+	      }
+	      else if (calo_ctw_number == 1) {
+		calo_ofstreams_[1] << binary_counter << " : ";
+	      	std::bitset<calo::ctw::FULL_BITSET_SIZE> ctw_zoning_word_1 = 0x0;
+	      	a_handle_calo_ctw.get().get_full_word(ctw_zoning_word_1);
+		for (std::size_t zero = 0; zero < 6; zero++) calo_ofstreams_[1] << "0";
+	      	calo_ofstreams_[1] << ctw_zoning_word_1 << ';' << std::endl;
+		writed_calo_ctw_1 = true;
+	      }
+	      else if (calo_ctw_number == 2) {
+		calo_ofstreams_[2] << binary_counter << " : ";
+	      	std::bitset<calo::ctw::FULL_BITSET_SIZE> ctw_zoning_word_2 = 0x0;
+	      	a_handle_calo_ctw.get().get_full_word(ctw_zoning_word_2);
+		for (std::size_t zero = 0; zero < 6; zero++) calo_ofstreams_[2] << "0";
+	      	calo_ofstreams_[2] << ctw_zoning_word_2 << ';' << std::endl;
+		writed_calo_ctw_2 = true;
+	      }
+
+	    } // end of ictw
+
+	    if (!writed_calo_ctw_0) {
+	      calo_ofstreams_[0] << binary_counter << " : ";
+	      for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[0] << "0";
+	      calo_ofstreams_[0] << ';' << std::endl;
+	    }
+	    if (!writed_calo_ctw_1) {
+	      calo_ofstreams_[1] << binary_counter << " : ";
+	      for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[1] << "0";
+	      calo_ofstreams_[1] << ';' << std::endl;
+	    }
+	    if (!writed_calo_ctw_2) {
+	      calo_ofstreams_[2] << binary_counter << " : ";
+	      for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[2] << "0";
+	      calo_ofstreams_[2] << ';' << std::endl;
+	    }
+
+	    decimal_counter++;
+	  }
+
+	for (uint64_t i = ct_max_25 + 1; i < fifo_depth; i++)
+	  {
+	    binary_counter = decimal_counter;
+	    calo_ofstreams_[0] << binary_counter << " : ";
+	    for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[0] << "0";
+	    calo_ofstreams_[0] << ';' << std::endl;
+
+	    calo_ofstreams_[1] << binary_counter << " : ";
+	    for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[1] << "0";
+	    calo_ofstreams_[1] << ';' << std::endl;
+
+	    calo_ofstreams_[2] << binary_counter << " : ";
+	    for (std::size_t zero = 0; zero < calo_fifo_width; zero++) calo_ofstreams_[2] << "0";
+	    calo_ofstreams_[2] << ';' << std::endl;
+
+	    decimal_counter++;
+	  }
+
+      } // end of has calo ctw
+
+      if (a_geiger_ctw_data_.has_geiger_ctw()) {
+	snemo::digitization::geiger_ctw_data geiger_ctw_data_1600ns = a_geiger_ctw_data_;
+
+	// Remove 1 of 2 gg ctw data due to data transfer limitation (CB to TB)
+	for (unsigned int i = 0; i < geiger_ctw_data_1600ns.get_geiger_ctws().size(); i++)
+	  {
+	    const geiger_ctw & a_gg_ctw = geiger_ctw_data_1600ns.get_geiger_ctws()[i].get();
+	    if (a_gg_ctw.get_clocktick_800ns() % 2 == 1) geiger_ctw_data_1600ns.grab_geiger_ctws().erase(geiger_ctw_data_1600ns.grab_geiger_ctws().begin() + i);
+	  }
+
+	// Double iteration because erase method shift the iterator and it skips some odd clockticks
+	for (unsigned int i = 0; i < geiger_ctw_data_1600ns.get_geiger_ctws().size(); i++)
+	  {
+	    const geiger_ctw & a_gg_ctw = geiger_ctw_data_1600ns.get_geiger_ctws()[i].get();
+	    if (a_gg_ctw.get_clocktick_800ns() % 2 == 1) geiger_ctw_data_1600ns.grab_geiger_ctws().erase(geiger_ctw_data_1600ns.grab_geiger_ctws().begin() + i);
+	  }
+
+	// Change clocktick 800 into clocktick 1600
+	for (unsigned int i = 0; i < geiger_ctw_data_1600ns.get_geiger_ctws().size(); i++)
+	  {
+	    geiger_ctw & a_gg_ctw = geiger_ctw_data_1600ns.grab_geiger_ctws()[i].grab();
+	    const uint32_t TRACKER_CLOCKTICK = 800;
+	    const uint32_t TRIGGER_CLOCKTICK = 1600;
+	    const uint32_t TRIGGER_COMPUTING_SHIFT_CLOCKTICK_1600NS = 1;
+	    uint32_t clocktick_1600ns = (a_gg_ctw.get_clocktick_800ns() * TRACKER_CLOCKTICK) / TRIGGER_CLOCKTICK;
+	    clocktick_1600ns = clocktick_1600ns + TRIGGER_COMPUTING_SHIFT_CLOCKTICK_1600NS;
+	    a_gg_ctw.set_clocktick_800ns(clocktick_1600ns);
+	  }
+
+	const uint32_t fifo_depth = 2048;
+	const std::size_t tracker_fifo_width = 36;
+	const std::size_t conversion_clocktick_25_1600 = 64;
+
+	const std::bitset<tracker_fifo_width> tracker_zero_bitset = 0x0;
+	std::bitset<13> binary_counter = 0x0;
+	uint32_t decimal_counter = 0;
+
+	uint64_t geiger_ct_min_1600 = geiger_ctw_data_1600ns.get_clocktick_min();
+	uint64_t geiger_ct_max_1600 = geiger_ctw_data_1600ns.get_clocktick_max();
+
+	std::clog << "GG ct min = " << geiger_ct_min_1600 << std::endl;
+
+	uint64_t geiger_ct_min_25 = conversion_clocktick_25_1600 * geiger_ct_min_1600;
+	uint64_t geiger_ct_max_25 = conversion_clocktick_25_1600 * (geiger_ct_max_1600 + 1);
+
+	for (uint64_t i = 0; i < geiger_ct_min_25; i++)
+	  {
+	    binary_counter = decimal_counter;
+
+	    tracker_ofstreams_[0] << binary_counter << " : ";
+	    tracker_ofstreams_[0] << tracker_zero_bitset << ';' << std::endl;
+
+	    tracker_ofstreams_[1] << binary_counter << " : ";
+	    tracker_ofstreams_[1] << tracker_zero_bitset << ';' << std::endl;
+
+	    tracker_ofstreams_[2] << binary_counter << " : ";
+	    tracker_ofstreams_[2] << tracker_zero_bitset << ';' << std::endl;
+
+	    decimal_counter++;
+	  }
+
+	for (std::size_t i = geiger_ctw_data_1600ns.get_clocktick_min();
+	     i <= geiger_ctw_data_1600ns.get_clocktick_max();
+	     i++)
+	  {
+	    binary_counter = decimal_counter;
+	    snemo::digitization::geiger_ctw_data::geiger_ctw_collection_type gg_ctw_collection;
+	    geiger_ctw_data_1600ns.get_list_of_geiger_ctw_per_clocktick(i, gg_ctw_collection);
+
+	    bool writed_tracker_ctw_0 = false;
+	    bool writed_tracker_ctw_1 = false;
+	    bool writed_tracker_ctw_2 = false;
+
+	    uint32_t initial_counter = decimal_counter;
+
+	    for (auto ictw = gg_ctw_collection.begin();
+		 ictw != gg_ctw_collection.end();
+		 ictw++) {
+
+	      datatools::handle<geiger_ctw> a_handle_gg_ctw = *ictw;
+	      std::size_t tracker_ctw_number = a_handle_gg_ctw.get().get_geom_id().get(mapping::RACK_DEPTH);
+
+	      if (tracker_ctw_number == 0)
+		{
+		  // Only 19 FEBs, 36 bits / clock25ns + 36 zero bits
+		  for (std::size_t iblock = 0; iblock < mapping::NUMBER_OF_FEBS_BY_CRATE; iblock++)
+		    {
+		      binary_counter = decimal_counter;
+		      tracker_ofstreams_[0] << binary_counter << " : ";
+		      std::bitset<geiger::tp::TP_THREE_WIRES_SIZE> gg_ctw_tp_word = 0x0;
+		      a_handle_gg_ctw.get().get_36_bits_in_ctw_word(iblock, gg_ctw_tp_word);
+		      tracker_ofstreams_[0] << gg_ctw_tp_word << ';' << std::endl;
+		      decimal_counter++;
+
+		      binary_counter = decimal_counter;
+		      tracker_ofstreams_[0] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+		      decimal_counter++;
+		    }
+		  // 19 * 2 clock 25, miss 26 to go for 1600 and begin a new CT1600
+		  for (std::size_t imiss = 0; imiss < 26; imiss++)
+		    {
+		      binary_counter = decimal_counter;
+		      tracker_ofstreams_[0] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+		      decimal_counter++;
+		    }
+		  writed_tracker_ctw_0 = true;
+		}
+
+	      decimal_counter = initial_counter;
+	      if (tracker_ctw_number == 1)
+		{
+		  // Only 19 FEBs, 36 bits / clock25ns + 36 zero bits
+		  for (std::size_t iblock = 0; iblock < mapping::NUMBER_OF_FEBS_BY_CRATE; iblock++)
+		    {
+		      binary_counter = decimal_counter;
+		      tracker_ofstreams_[1] << binary_counter << " : ";
+		      std::bitset<geiger::tp::TP_THREE_WIRES_SIZE> gg_ctw_tp_word = 0x0;
+		      a_handle_gg_ctw.get().get_36_bits_in_ctw_word(iblock, gg_ctw_tp_word);
+		      tracker_ofstreams_[1] << gg_ctw_tp_word << ';' << std::endl;
+		      decimal_counter++;
+
+		      binary_counter = decimal_counter;
+		      tracker_ofstreams_[1] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+
+		      decimal_counter++;
+		    }
+		  // 19 * 2 clock 25, miss 26 to go for 1600 and begin a new CT1600
+		  for (std::size_t imiss = 0; imiss < 26; imiss++)
+		    {
+		      binary_counter = decimal_counter;
+		      tracker_ofstreams_[1] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+		      decimal_counter++;
+		    }
+		  writed_tracker_ctw_1 = true;
+		}
+
+	      decimal_counter = initial_counter;
+	      if (tracker_ctw_number == 2)
+		{
+		  // Only 19 FEBs, 36 bits / clock25ns + 36 zero bits
+		  for (std::size_t iblock = 0; iblock < mapping::NUMBER_OF_FEBS_BY_CRATE; iblock++)
+		    {
+		      binary_counter = initial_counter;
+		      tracker_ofstreams_[2] << binary_counter << " : ";
+		      std::bitset<geiger::tp::TP_THREE_WIRES_SIZE> gg_ctw_tp_word = 0x0;
+		      a_handle_gg_ctw.get().get_36_bits_in_ctw_word(iblock, gg_ctw_tp_word);
+		      tracker_ofstreams_[2] << gg_ctw_tp_word << ';' << std::endl;
+		      decimal_counter++;
+
+		      binary_counter = decimal_counter;
+		      tracker_ofstreams_[2] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+
+		      decimal_counter++;
+		    }
+		  // 19 * 2 clock 25, miss 26 to go for 1600 and begin a new CT1600
+		  for (std::size_t imiss = 0; imiss < 26; imiss++)
+		    {
+		      binary_counter = decimal_counter;
+		      tracker_ofstreams_[2] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+		      decimal_counter++;
+		    }
+		  writed_tracker_ctw_2 = true;
+		}
+
+	    } // end of ictw
+
+	    initial_counter = decimal_counter;
+
+	    // If ctw are missing during a clocktick, have to fill 64*CT25 with 36 * 0
+	    if (!writed_tracker_ctw_0) {
+	      decimal_counter = initial_counter;
+	      for (std::size_t imiss = 0; imiss < 64; imiss++)
+		{
+		  binary_counter = decimal_counter;
+		  tracker_ofstreams_[0] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+		  decimal_counter++;
+		}
+	    }
+	    if (!writed_tracker_ctw_1) {
+	      decimal_counter = initial_counter;
+	      for (std::size_t imiss = 0; imiss < 64; imiss++)
+		{
+		  binary_counter = decimal_counter;
+		  tracker_ofstreams_[1] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+		  decimal_counter++;
+		}
+	    }
+	    if (!writed_tracker_ctw_2) {
+	      decimal_counter = initial_counter;
+	      for (std::size_t imiss = 0; imiss < 64; imiss++)
+		{
+		  binary_counter = decimal_counter;
+		  tracker_ofstreams_[2] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
+		  decimal_counter++;
+		}
+	    }
+
+	  } // end of CT 1600
+
+	for (uint64_t i = geiger_ct_max_25; i < fifo_depth; i++)
+	  {
+	    binary_counter = decimal_counter;
+
+	    tracker_ofstreams_[0] << binary_counter << " : ";
+	    tracker_ofstreams_[0] << tracker_zero_bitset << ';' << std::endl;
+
+
+	    tracker_ofstreams_[1] << binary_counter << " : ";
+	    tracker_ofstreams_[1] << tracker_zero_bitset << ';' << std::endl;
+
+	    tracker_ofstreams_[2] << binary_counter << " : ";
+	    tracker_ofstreams_[2] << tracker_zero_bitset << ';' << std::endl;
+
+	    decimal_counter++;
+	  }
+      }
+
+
+      return;
+    }
+
+    void trigger_display_manager::display_trigger_implementation_1600ns(std::ofstream & out_,
+    									const trigger_algorithm_test_time & a_trigger_algo_)
+    {
+      std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records = a_trigger_algo_.get_coincidence_records_vector();
+
+      std::size_t number_of_clocktick = coincidence_collection_records.size();
+      for (std::size_t i = 0; i < number_of_clocktick; i++)
+    	{
+    	  snemo::digitization::trigger_structures::coincidence_event_record a_CER = coincidence_collection_records[i];
+    	  out_ << "Clocktick " << a_CER.clocktick_1600ns << std::endl;
+
+    	  out_ << a_CER.xt_info_bitset << ' ';
+    	  out_ << a_CER.total_multiplicity_threshold << ' ';
+    	  out_ << a_CER.single_side_coinc << ' ';
+	  out_ << a_CER.LTO_gveto << ' ';
+    	  out_ << a_CER.total_multiplicity_gveto << ' ';
+    	  out_ << a_CER.LTO_side_1 << ' ';
+    	  out_ << a_CER.LTO_side_0 << ' ';
+    	  out_ << a_CER.total_multiplicity_side_1 << ' ';
+    	  out_ << a_CER.total_multiplicity_side_0 << ' ';
+    	  for (unsigned int iside = trigger_info::NSIDES-1; iside != (unsigned)0-1; iside--)
+    	    {
+    	      for (unsigned int izone = trigger_info::NZONES-1; izone != (unsigned)0-1 ; izone--)
+    		{
+    		  out_ << a_CER.calo_zoning_word[iside][izone];
+    		}
+    	      out_ << ' ';
+    	    }
+    	  out_ << std::endl;
+
+	  for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
+	    {
+	      out_ << "S" << iside << " ";
+	      for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
+		{
+		  out_ << a_CER.tracker_finale_data_per_zone[iside][izone] << ' ';
+		} // end of izone
+	      out_ << std::endl;
+	    }
+
+	  for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
+	    {
+	      out_ << "ZW_PAT_S" << iside << ' ';
+	      for (unsigned int ibit = 0; ibit < a_CER.tracker_zoning_word_pattern[0].size(); ibit++)
+		{
+		  out_ << a_CER.tracker_zoning_word_pattern[iside][ibit];
+		}
+	      out_ << ' ';
+	    }
+	  out_ << std::endl;
+
+	  for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
+	    {
+	      out_ << "ZW_NSZ_S" << iside << ' ';
+	      for (unsigned int ibit = 0; ibit < a_CER.tracker_zoning_word_near_source[0].size(); ibit++)
+		{
+		  out_ << a_CER.tracker_zoning_word_near_source[iside][ibit];
+		}
+	      out_ << ' ';
+	    }
+	  out_ << std::endl;
+
+	  for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
+	    {
+	      out_ << "ZW_COI_S" << iside << ' ';
+	      for (unsigned int ibit = 0; ibit < a_CER.coincidence_zoning_word[0].size(); ibit++)
+		{
+		  out_ << a_CER.coincidence_zoning_word[iside][ibit];
+		}
+	      out_ << ' ';
+	    }
+	  out_ << std::endl;
+
+	} // end of iclocktick
+
+      return;
+    }
+
     void trigger_display_manager::fill_matrix_pattern()
     {
       for (unsigned int j = 0; j < NUMBER_OF_HORIZONTAL_CHAR; j++)
@@ -838,7 +1257,7 @@ namespace snemo {
     	}
       std::clog << "     Zone0      Zone1       Zone2       Zone3       Zone4      Zone5       Zone6       Zone7      Zone 8     Zone9 " << std::endl;
       std::clog << std::endl;
-       }
+    }
 
   } // end of namespace digitization
 

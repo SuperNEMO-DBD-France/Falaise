@@ -604,6 +604,7 @@ namespace snemo {
 	    }
 	}
 
+      // Double iteration because erase method shift the iterator and it skips some odd clockticks
       for (unsigned int i = 0; i < geiger_ctw_data_1600ns.get_geiger_ctws().size(); i++)
 	{
 	  const geiger_ctw & a_gg_ctw = geiger_ctw_data_1600ns.get_geiger_ctws()[i].get();

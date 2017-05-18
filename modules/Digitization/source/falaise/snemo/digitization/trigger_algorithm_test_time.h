@@ -147,7 +147,7 @@ namespace snemo {
 			bool _activate_take_all_delayed_;
 			bool _activate_ape_dave_coincidence_;
 			bool _activate_ape_coincidence_only_;
-			bool _activate_any_coincidences_; //!< Boolean activating coincidence
+			bool _activate_any_coincidences_; //!< Boolean activating any coincidence
 
 			// Trigger algorithms :
 		  tracker_trigger_algorithm_test_time      _tracker_algo_; //!< Tracker trigger algorithm @ 1600ns
