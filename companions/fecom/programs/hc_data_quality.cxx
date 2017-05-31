@@ -100,15 +100,6 @@ int main(int argc_, char ** argv_)
       is_debug = true;
     }
 
-    std::size_t file_counter = 0;
-    for (auto file = input_filenames.begin();
-	 file != input_filenames.end();
-	 file++)
-      {
-	std::clog << "File #" << file_counter << ' ' << *file << std::endl;
-	file_counter++;
-      }
-
     datatools::logger::priority logging;
     if (is_debug) logging = datatools::logger::PRIO_DEBUG;
     else logging = datatools::logger::PRIO_INFORMATION;
@@ -133,10 +124,7 @@ int main(int argc_, char ** argv_)
     DT_LOG_INFORMATION(logging, "List of input file(s) : ");
     for (auto file = input_filenames.begin();
 	 file != input_filenames.end();
-	 file++)
-      {
-	std::clog << *file << ' ';
-      }
+	 file++) std::clog << *file << ' ';
     std::clog << std::endl;
 
     DT_LOG_INFORMATION(logging, "Data quality output file : " + output_filename);
