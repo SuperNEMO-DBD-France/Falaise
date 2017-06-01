@@ -894,6 +894,7 @@ namespace snemo {
 	const uint32_t fifo_depth = 2048;
 	const std::size_t tracker_fifo_width = 36;
 	const std::size_t conversion_clocktick_25_1600 = 64;
+	const std::size_t tracker_raster_fifo = 37; // 19 * 2,  19 utile (gg TP) (36 bits) + 19 zero (36 bits) en alternance
 
 	const std::bitset<tracker_fifo_width> tracker_zero_bitset = 0x0;
 	std::bitset<13> binary_counter = 0x0;
@@ -905,7 +906,7 @@ namespace snemo {
 	std::clog << "GG ct min = " << geiger_ct_min_1600 << std::endl;
 
 	uint64_t geiger_ct_min_25 = conversion_clocktick_25_1600 * geiger_ct_min_1600;
-	uint64_t geiger_ct_max_25 = conversion_clocktick_25_1600 * (geiger_ct_max_1600 + 1);
+	uint64_t geiger_begin_new_raster = tracker_raster_fifo * (geiger_ct_max_1600 + 1);
 
 	for (uint64_t i = 0; i < geiger_ct_min_25; i++)
 	  {
@@ -920,6 +921,12 @@ namespace snemo {
 	    tracker_ofstreams_[2] << binary_counter << " : ";
 	    tracker_ofstreams_[2] << tracker_zero_bitset << ';' << std::endl;
 
+	    if (i != 0 && i % tracker_raster_fifo == 0) {
+	      tracker_ofstreams_[0] << std::endl;
+	      tracker_ofstreams_[1] << std::endl;
+	      tracker_ofstreams_[2] << std::endl;
+	    }
+
 	    decimal_counter++;
 	  }
 
@@ -931,9 +938,12 @@ namespace snemo {
 	    snemo::digitization::geiger_ctw_data::geiger_ctw_collection_type gg_ctw_collection;
 	    geiger_ctw_data_1600ns.get_list_of_geiger_ctw_per_clocktick(i, gg_ctw_collection);
 
-	    bool writed_tracker_ctw_0 = false;
-	    bool writed_tracker_ctw_1 = false;
-	    bool writed_tracker_ctw_2 = false;
+	    for (auto ictw = gg_ctw_collection.begin();
+		 ictw != gg_ctw_collection.end();
+		 ictw++) {
+	      datatools::handle<geiger_ctw> a_handle_gg_ctw = *ictw;
+	      a_handle_gg_ctw.get().tree_dump(std::clog);
+	    }
 
 	    uint32_t initial_counter = decimal_counter;
 
@@ -946,7 +956,7 @@ namespace snemo {
 
 	      if (tracker_ctw_number == 0)
 		{
-		  // Only 19 FEBs, 36 bits / clock25ns + 36 zero bits
+		  // Only 19 FEBs, 36 bits / clock25ns + 19 * 36 zero bits
 		  for (std::size_t iblock = 0; iblock < mapping::NUMBER_OF_FEBS_BY_CRATE; iblock++)
 		    {
 		      binary_counter = decimal_counter;
@@ -960,14 +970,6 @@ namespace snemo {
 		      tracker_ofstreams_[0] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
 		      decimal_counter++;
 		    }
-		  // 19 * 2 clock 25, miss 26 to go for 1600 and begin a new CT1600
-		  for (std::size_t imiss = 0; imiss < 26; imiss++)
-		    {
-		      binary_counter = decimal_counter;
-		      tracker_ofstreams_[0] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
-		      decimal_counter++;
-		    }
-		  writed_tracker_ctw_0 = true;
 		}
 
 	      decimal_counter = initial_counter;
@@ -988,14 +990,6 @@ namespace snemo {
 
 		      decimal_counter++;
 		    }
-		  // 19 * 2 clock 25, miss 26 to go for 1600 and begin a new CT1600
-		  for (std::size_t imiss = 0; imiss < 26; imiss++)
-		    {
-		      binary_counter = decimal_counter;
-		      tracker_ofstreams_[1] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
-		      decimal_counter++;
-		    }
-		  writed_tracker_ctw_1 = true;
 		}
 
 	      decimal_counter = initial_counter;
@@ -1016,52 +1010,24 @@ namespace snemo {
 
 		      decimal_counter++;
 		    }
-		  // 19 * 2 clock 25, miss 26 to go for 1600 and begin a new CT1600
-		  for (std::size_t imiss = 0; imiss < 26; imiss++)
-		    {
-		      binary_counter = decimal_counter;
-		      tracker_ofstreams_[2] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
-		      decimal_counter++;
-		    }
-		  writed_tracker_ctw_2 = true;
 		}
 
 	    } // end of ictw
 
 	    initial_counter = decimal_counter;
 
-	    // If ctw are missing during a clocktick, have to fill 64*CT25 with 36 * 0
-	    if (!writed_tracker_ctw_0) {
-	      decimal_counter = initial_counter;
-	      for (std::size_t imiss = 0; imiss < 64; imiss++)
-		{
-		  binary_counter = decimal_counter;
-		  tracker_ofstreams_[0] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
-		  decimal_counter++;
-		}
-	    }
-	    if (!writed_tracker_ctw_1) {
-	      decimal_counter = initial_counter;
-	      for (std::size_t imiss = 0; imiss < 64; imiss++)
-		{
-		  binary_counter = decimal_counter;
-		  tracker_ofstreams_[1] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
-		  decimal_counter++;
-		}
-	    }
-	    if (!writed_tracker_ctw_2) {
-	      decimal_counter = initial_counter;
-	      for (std::size_t imiss = 0; imiss < 64; imiss++)
-		{
-		  binary_counter = decimal_counter;
-		  tracker_ofstreams_[2] << binary_counter << " : " << tracker_zero_bitset << ';' << std::endl;
-		  decimal_counter++;
-		}
-	    }
+	    tracker_ofstreams_[0] << std::endl;
+	    tracker_ofstreams_[1] << std::endl;
+	    tracker_ofstreams_[2] << std::endl;
 
 	  } // end of CT 1600
 
-	for (uint64_t i = geiger_ct_max_25; i < fifo_depth; i++)
+	decimal_counter--;
+	std::clog << "binary counter = " << binary_counter << std::endl;
+	std::clog << "decimal counter = " << decimal_counter << std::endl;
+	std::clog << "geiger_begin_new_raster " << geiger_begin_new_raster << std::endl;
+
+	for (uint64_t i = decimal_counter; i < fifo_depth; i++)
 	  {
 	    binary_counter = decimal_counter;
 
@@ -1074,6 +1040,12 @@ namespace snemo {
 
 	    tracker_ofstreams_[2] << binary_counter << " : ";
 	    tracker_ofstreams_[2] << tracker_zero_bitset << ';' << std::endl;
+
+	    if (i != geiger_begin_new_raster && i % tracker_raster_fifo == 0) {
+	      tracker_ofstreams_[0] << std::endl;
+	      tracker_ofstreams_[1] << std::endl;
+	      tracker_ofstreams_[2] << std::endl;
+	    }
 
 	    decimal_counter++;
 	  }
