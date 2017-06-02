@@ -98,6 +98,9 @@ int main(int  argc_, char ** argv_)
 
     // Algo take a list of calo tp to fill a list of calo ctw data
 
+    std::size_t crate_number = 0;
+
+    algo.set_crate_number(crate_number);
     algo.initialize();
     algo.process(my_calo_tp_data, my_calo_ctw_data);
 

@@ -24,6 +24,11 @@
 #include "TH1F.h"
 #include "TH2F.h"
 
+// Boost :
+#include <boost/lexical_cast.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/program_options.hpp>
+
 // This project :
 #include <snemo/digitization/clock_utils.h>
 #include <snemo/digitization/mapping.h>
@@ -44,77 +49,81 @@ int main( int  argc_ , char **argv_  )
   int error_code = EXIT_SUCCESS;
   datatools::logger::priority logging = datatools::logger::PRIO_FATAL;
 
-  // Parsing arguments
-  int iarg = 1;
-  bool is_input_file   = false;
-  bool is_event_number = false;
-  bool is_output_path  = false;
-  bool is_display      = false;
-  bool is_help         = false;
+  try {
+    // Parsing arguments
+    bool is_display      = false;
 
-  std::string input_filename;
-  std::string output_path;
-  int arg_event_number  = -1;
+    std::vector<std::string> input_filenames;
+    std::string output_path = "";
+    std::size_t max_events = 0;
 
-  while (iarg < argc_) {
-    std::string arg = argv_[iarg];
-    if (arg == "-i" || arg == "--input")
-      {
-	is_input_file = true;
-	input_filename = argv_[++iarg];
-      }
+    // Parse options:
+    namespace po = boost::program_options;
+    po::options_description opts("Allowed options");
+    opts.add_options()
+      ("help,h", "produce help message")
+      ("display,d", "display mode")
+      ("input,i",
+       po::value<std::vector<std::string> >(& input_filenames)->multitoken(),
+       "set a list of input files")
+      ("output-path,o",
+       po::value<std::string>(& output_path),
+       "set the output path where produced files are created")
+      ("event_number,n",
+       po::value<std::size_t>(& max_events)->default_value(10),
+       "set the maximum number of events")
+      ; // end of options description
 
-    else if (arg == "-op" || arg == "--output-path")
-      {
-	is_output_path = true;
-	output_path = argv_[++iarg];
-      }
+    // Describe command line arguments :
+    po::variables_map vm;
+    po::store(po::command_line_parser(argc_, argv_)
+              .options(opts)
+              .run(), vm);
+    po::notify(vm);
 
-    else if (arg == "-n" || arg == "--number")
-      {
-        is_event_number = true;
-	arg_event_number    = atoi(argv_[++iarg]);
-      }
-
-    else if (arg == "-d" || arg == "--display")
-      {
-	is_display = true;
-      }
-
-    else if (arg =="-h" || arg == "--help")
-      {
-	is_help = true;
-      }
-
-    iarg++;
-  }
-
-  if (is_help)
-    {
-      std::cerr << std::endl << "Usage :" << std::endl << std::endl
-		<< "$ BuildProducts/bin/falaisedigitizationplugin-test_trigger_algorithm_test_time [OPTIONS] [ARGUMENTS]" << std::endl << std::endl
-		<< "Allowed options: " << std::endl
-		<< "-h  [ --help ]           produce help message" << std::endl
-		<< "-i  [ --input ]          set an input file" << std::endl
-		<< "-op [ --output path ]    set a path where all files are stored" << std::endl
-		<< "-n  [ --number ]         set the number of events" << std::endl
-		<< "Example : " << std::endl << std::endl
-		<< "$ BuildProducts/bin/falaisedigitizationplugin-test_trigger_algorithm_test_time --input ${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio -op ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default"
-		<< " --number 5" << std::endl << std::endl
-		<< "If no options are set, programs have default values :" << std::endl << std::endl
-		<< "input file           = ${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio" << std::endl
-		<< "output path          = ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/" << std::endl
-		<< "number of events     = 10" << std::endl << std::endl;
-      return 0;
+    // Use command line arguments :
+    if (vm.count("help")) {
+      std::cout << "Usage : " << std::endl;
+      std::cout << opts << std::endl;
+      return(error_code);
     }
 
-  try {
+    // Use command line arguments :
+    else if (vm.count("display")) {
+      is_display = true;
+    }
+
+    std::clog << "Test program for class 'snemo::digitization::test_trigger_algorithm_test_time' !" << std::endl;
+
+    std::size_t file_counter = 0;
+    for (auto file = input_filenames.begin();
+	 file != input_filenames.end();
+	 file++)
+      {
+	std::clog << "File #" << file_counter << ' ' << *file << std::endl;
+	file_counter++;
+      }
+
+    if (input_filenames.size() == 0) {
+      DT_LOG_WARNING(logging, "No input file(s) !");
+
+      std::string input_default_file = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio";
+      input_filenames.push_back(input_default_file);
+
+      DT_LOG_WARNING(logging, "Default input file : " << input_filenames[0] << " !");
+    }
+
+    DT_LOG_INFORMATION(logging, "List of input file(s) : ");
+    for (auto file = input_filenames.begin();
+	 file != input_filenames.end();
+	 file++) std::clog << *file << ' ';
+
     // boolean for debugging (display etc)
     bool debug = false;
 
     if (is_display) debug = true;
 
-    std::clog << "Test program for class 'snemo::digitization::test_trigger_algorithm_test_time' !" << std::endl;
+    std::clog << "Test program for class ' !" << std::endl;
     int32_t seed = 314159;
     mygsl::rng random_generator;
     random_generator.initialize(seed);
@@ -139,36 +148,31 @@ int main( int  argc_ , char **argv_  )
     // Simulated Data "SD" bank label :
     std::string SD_bank_label = "SD";
 
-    datatools::fetch_path_with_env(input_filename);
-    if(is_input_file){
-      pipeline_simulated_data_filename = input_filename;
-    }else{
-      pipeline_simulated_data_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio";
-    }
-    datatools::fetch_path_with_env(pipeline_simulated_data_filename);
-
-    // Number of events :
-    int event_number = -1;
-    if (is_event_number)  event_number = arg_event_number;
-    else                 event_number = 10;
-
     // Event record :
     datatools::things ER;
+
+    // Number of events :
+    int max_record_total = static_cast<int>(max_events) * static_cast<int>(input_filenames.size());
+    std::clog << "max_record total = " << max_record_total << std::endl;
+    std::clog << "max_events       = " << max_events << std::endl;
 
     // Event reader :
     dpp::input_module reader;
     datatools::properties reader_config;
-    reader_config.store ("logging.priority", "debug");
-    reader_config.store ("max_record_total", event_number);
-    reader_config.store ("files.mode", "single");
-    reader_config.store ("files.single.filename", pipeline_simulated_data_filename);
-    reader.initialize_standalone (reader_config);
-    // reader.tree_dump(std::clog, "Simulated data reader module");
+    reader_config.store("logging.priority", "debug");
+    // reader_config.store ("files.mode", "single");
+    // reader_config.store_path("files.single.filename", input_filename);
+    reader_config.store("files.mode", "list");
+    reader_config.store("files.list.filenames", input_filenames);
+    reader_config.store("max_record_total", max_record_total);
+    reader_config.store("max_record_per_file", static_cast<int>(max_events));
+    reader_config.tree_dump(std::clog, "Input module configuration parameters: ");
+    reader.initialize_standalone(reader_config);
+    reader.tree_dump(std::clog, "Simulated data reader module");
 
     datatools::fetch_path_with_env(output_path);
-    if (is_output_path) output_path = output_path;
-    else output_path = "${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/";
-    datatools::fetch_path_with_env(output_path);
+    if (output_path.empty()) output_path = "/tmp/";
+    DT_LOG_INFORMATION(logging, "Output path : " + output_path);
 
     // Electronic mapping :
     snemo::digitization::electronic_mapping my_e_mapping;
@@ -235,7 +239,6 @@ int main( int  argc_ , char **argv_  )
     int previous_event_buffer_depth = 10; // Maximum number of PER record (with an internal counter of 1 ms)
     bool activate_any_coincidences = true;
     // bool activate_calorimeter_only = false;
-
 
     trigger_config.store("calo.circular_buffer_depth", calo_circular_buffer_depth);
     trigger_config.store("calo.total_multiplicity_threshold", calo_threshold);
@@ -306,8 +309,7 @@ int main( int  argc_ , char **argv_  )
     						      Form("delayed delayed_L2_trigger_mode_TH1F"),
     						      10, 0, 10);
 
-    // Internal counters
-    int psd_count = 0;         // Event counter
+    int psd_count = 0; // Event counter
 
     while (!reader.is_terminated())
       {
@@ -387,7 +389,7 @@ int main( int  argc_ , char **argv_  )
 	    // Creation of outputs collection structures for calo and tracker
 	    std::vector<snemo::digitization::trigger_structures::calo_summary_record> calo_collection_records;
 	    std::vector<snemo::digitization::trigger_structures::coincidence_calo_record> coincidence_collection_calo_records;
-	    std::vector<snemo::digitization::trigger_structures::tracker_record>   tracker_collection_records;
+	    std::vector<snemo::digitization::trigger_structures::tracker_record>  tracker_collection_records;
 	    std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records;
 
 	    std::vector<snemo::digitization::trigger_structures::L2_decision> L2_decision_record;
@@ -449,14 +451,12 @@ int main( int  argc_ , char **argv_  )
 	    // std::clog << "Delayed CT1600ns :      " << delayed_clocktick_1600ns << std::endl;
 	    // std::clog << "Delayed trigger mode :  " << delayed_trigger_mode << std::endl;
 
-
 	    my_trigger_algo.reset_data();
 
 	  } //end of if has bank label "SD"
 
 	ER.clear();
 	psd_count++;
-	std::clog << "\r" <<  "DEBUG : psd count " << psd_count << std::flush;
 	if (debug) std::clog << "DEBUG : psd count " << psd_count << std::endl;
 	DT_LOG_NOTICE(logging, "Simulated data #" << psd_count);
       } // end of reader is terminated

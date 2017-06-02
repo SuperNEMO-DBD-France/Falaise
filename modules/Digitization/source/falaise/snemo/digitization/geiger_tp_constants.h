@@ -6,13 +6,13 @@
 #define FALAISE_DIGITIZATION_PLUGIN_SNEMO_DIGITIZATION_GEIGER_TP_CONSTANTS_H
 
 namespace snemo {
-  
+
   namespace digitization {
-  
+
 		namespace geiger {
- 
+
 			namespace tp {
-				
+
 				/// Position of bits in the Geiger tracker TP bitset word (100 bits)
 				enum gg_tp_bit_pos {
 					TP_BEGIN           = 0,   //!< Trigger primitive beginning
@@ -27,7 +27,7 @@ namespace snemo {
 					TTM_BIT            = 59,  //!< Tracker trigger mode bit (0 is 3-wires mode; 1 is 2-wires mode)
 					THWS_END           = 59,  //!< Tracker hardware status ending
 					ADDRESS_BEGIN      = 60,  //!< Board address beginning (board ID [5 bits] , crate ID [2 bits] + Spare [3 bits])
-					BOARD_ID_BIT0      = 60,  //!< Board ID (bit 0) 
+					BOARD_ID_BIT0      = 60,  //!< Board ID (bit 0)
 					BOARD_ID_BIT1      = 61,  //!< Board ID (bit 1)
 					BOARD_ID_BIT2      = 62,  //!< Board ID (bit 2)
 					BOARD_ID_BIT3      = 63,  //!< Board ID (bit 3)
@@ -39,20 +39,21 @@ namespace snemo {
 					TTID_END           = 84,  //!< Tracker trigger ID ending
 					CONTROL_BEGIN      = 85,  //!< Control beginning
 					CONTROL_END        = 99   //!< Control ending
-				}; 
+				};
 
 				/// Size of bits word in the Geiger tracker TP bitset word (100 bits)
 				enum gg_tp_size {
-					TP_SIZE            = 55,
-					THWS_SIZE          = 5,
-					TRM_WORD_SIZE      = 3,
-					ADDRESS_SIZE       = 10,
-					BOARD_ID_WORD_SIZE = 5,
-					CRATE_ID_WORD_SIZE = 2,
-					SPARE_WORD_SIZE    = 3,
-					TTID_SIZE          = 15,
-					CONTROL_SIZE       = 15,
-					FULL_SIZE          = 100
+					TP_SIZE             = 55,
+					TP_THREE_WIRES_SIZE = 36,
+					THWS_SIZE           = 5,
+					TRM_WORD_SIZE       = 3,
+					ADDRESS_SIZE        = 10,
+					BOARD_ID_WORD_SIZE  = 5,
+					CRATE_ID_WORD_SIZE  = 2,
+					SPARE_WORD_SIZE     = 3,
+					TTID_SIZE           = 15,
+					CONTROL_SIZE        = 15,
+					FULL_SIZE           = 100
 				};
 
 			} // end of namespace tp
@@ -65,7 +66,7 @@ namespace snemo {
 
 #endif /* FALAISE_DIGITIZATION_PLUGIN_SNEMO_DIGITIZATION_MAPPING_TP_H */
 
-/* 
+/*
 ** Local Variables: --
 ** mode: c++ --
 ** c-file-style: "gnu" --

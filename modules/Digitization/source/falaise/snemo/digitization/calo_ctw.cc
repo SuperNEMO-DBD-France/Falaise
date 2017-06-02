@@ -13,7 +13,7 @@
 #include <snemo/digitization/clock_utils.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     // Serial tag for datatools::serialization::i_serializable interface :
@@ -42,21 +42,21 @@ namespace snemo {
       set_clocktick_25ns(clocktick_25ns_);
 
       unsigned int crate_id = electronic_id_.get(mapping::CRATE_INDEX);
-      if (crate_id == mapping::MAIN_CALO_SIDE_0_CRATE || crate_id == mapping::MAIN_CALO_SIDE_1_CRATE) 
+      if (crate_id == mapping::MAIN_CALO_SIDE_0_CRATE || crate_id == mapping::MAIN_CALO_SIDE_1_CRATE)
 	{
 	  _layout_ = calo::ctw::LAYOUT_MAIN_WALL;
 	}
       else if (crate_id == mapping::XWALL_GVETO_CALO_CRATE)
 	{
-	  _layout_ = calo::ctw::LAYOUT_XWALL_GVETO; 
+	  _layout_ = calo::ctw::LAYOUT_XWALL_GVETO;
 	}
-      else 
+      else
 	{
 	  _layout_ = calo::ctw::LAYOUT_UNDEFINED;
 	}
       return;
     }
-    
+
     bool calo_ctw::is_main_wall() const
     {
       if (_layout_ == calo::ctw::LAYOUT_MAIN_WALL) return true;
@@ -67,7 +67,7 @@ namespace snemo {
     {
       return _layout_;
     }
-    
+
     uint32_t calo_ctw::get_clocktick_25ns() const
     {
       return _clocktick_25ns_;
@@ -98,34 +98,34 @@ namespace snemo {
 
       switch (multiplicity_)
 	{
-	case 0 :	  
+	case 0 :
 	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT0, 0);
 	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT1, 0);
 	  break;
-	  
+
 	case 1 :
 	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT0, 1);
 	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT1, 0);
 	  break;
-	  
+
 	case 2 :
 	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT0, 0);
 	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT1, 1);
 	  break;
-	  
+
 	default :
 	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT0, 1);
-	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT1, 1); 
+	  _ctw_.set(calo::ctw::HTM_MAIN_WALL_BIT1, 1);
 	  break;
 	}
       _store |= STORE_CTW;
       return;
     }
-    
+
     unsigned int calo_ctw::get_htm_main_wall_info() const
     {
       if(_ctw_.test(calo::ctw::HTM_MAIN_WALL_BIT0) == 0 && _ctw_.test(calo::ctw::HTM_MAIN_WALL_BIT1) == 0)
-	{      
+	{
 	  return 0;
 	}
       else if(_ctw_.test(calo::ctw::HTM_MAIN_WALL_BIT0) == 1 && _ctw_.test(calo::ctw::HTM_MAIN_WALL_BIT1) == 0)
@@ -151,24 +151,24 @@ namespace snemo {
 
       switch (multiplicity_)
 	{
-	case 0 :	  
+	case 0 :
 	  _ctw_.set(calo::ctw::HTM_GVETO_BIT0, 0);
 	  _ctw_.set(calo::ctw::HTM_GVETO_BIT1, 0);
 	  break;
-	  
+
 	case 1 :
 	  _ctw_.set(calo::ctw::HTM_GVETO_BIT0, 1);
 	  _ctw_.set(calo::ctw::HTM_GVETO_BIT1, 0);
 	  break;
-	  
+
 	case 2 :
 	  _ctw_.set(calo::ctw::HTM_GVETO_BIT0, 0);
 	  _ctw_.set(calo::ctw::HTM_GVETO_BIT1, 1);
 	  break;
-	  
+
 	default :
 	  _ctw_.set(calo::ctw::HTM_GVETO_BIT0, 1);
-	  _ctw_.set(calo::ctw::HTM_GVETO_BIT1, 1); 
+	  _ctw_.set(calo::ctw::HTM_GVETO_BIT1, 1);
 	  break;
 	}
       _store |= STORE_CTW;
@@ -178,7 +178,7 @@ namespace snemo {
     unsigned int calo_ctw::get_htm_gveto_info() const
     {
       if(_ctw_.test(calo::ctw::HTM_GVETO_BIT0) == 0 && _ctw_.test(calo::ctw::HTM_GVETO_BIT1) == 0)
-	{      
+	{
 	  return 0;
 	}
       else if(_ctw_.test(calo::ctw::HTM_GVETO_BIT0) == 1 && _ctw_.test(calo::ctw::HTM_GVETO_BIT1) == 0)
@@ -191,7 +191,7 @@ namespace snemo {
 	}
       return 3;
     }
-    
+
     bool calo_ctw::is_htm_gveto() const
     {
       return get_htm_gveto_info() != 0;
@@ -205,24 +205,24 @@ namespace snemo {
 
       switch (multiplicity_)
 	{
-	case 0 :	  
+	case 0 :
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT0, 0);
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT1, 0);
 	  break;
-	  
+
 	case 1 :
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT0, 1);
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT1, 0);
 	  break;
-	  
+
 	case 2 :
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT0, 0);
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT1, 1);
 	  break;
-	  
+
 	default :
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT0, 1);
-	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT1, 1); 
+	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE0_BIT1, 1);
 	  break;
 	}
       _store |= STORE_CTW;
@@ -232,7 +232,7 @@ namespace snemo {
     unsigned int calo_ctw::get_htm_xwall_side_0_info() const
     {
       if(_ctw_.test(calo::ctw::HTM_XWALL_SIDE0_BIT0) == 0 && _ctw_.test(calo::ctw::HTM_XWALL_SIDE0_BIT1) == 0)
-	{      
+	{
 	  return 0;
 	}
       else if(_ctw_.test(calo::ctw::HTM_XWALL_SIDE0_BIT0) == 1 && _ctw_.test(calo::ctw::HTM_XWALL_SIDE0_BIT1) == 0)
@@ -244,7 +244,7 @@ namespace snemo {
 	  return 2;
 	}
       return 3;
-    }  
+    }
 
     bool calo_ctw::is_htm_xwall_side_0() const
     {
@@ -258,24 +258,24 @@ namespace snemo {
 
       switch (multiplicity_)
 	{
-	case 0 :	  
+	case 0 :
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT0, 0);
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT1, 0);
 	  break;
-	  
+
 	case 1 :
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT0, 1);
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT1, 0);
 	  break;
-	  
+
 	case 2 :
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT0, 0);
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT1, 1);
 	  break;
-	  
+
 	default :
 	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT0, 1);
-	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT1, 1); 
+	  _ctw_.set(calo::ctw::HTM_XWALL_SIDE1_BIT1, 1);
 	  break;
 	}
       _store |= STORE_CTW;
@@ -285,7 +285,7 @@ namespace snemo {
     unsigned int calo_ctw::get_htm_xwall_side_1_info() const
     {
       if(_ctw_.test(calo::ctw::HTM_XWALL_SIDE1_BIT0) == 0 && _ctw_.test(calo::ctw::HTM_XWALL_SIDE1_BIT1) == 0)
-	{      
+	{
 	  return 0;
 	}
       else if(_ctw_.test(calo::ctw::HTM_XWALL_SIDE1_BIT0) == 1 && _ctw_.test(calo::ctw::HTM_XWALL_SIDE1_BIT1) == 0)
@@ -297,13 +297,13 @@ namespace snemo {
 	  return 2;
 	}
       return 3;
-    }  
+    }
 
     bool calo_ctw::is_htm_xwall_side_1() const
     {
       return get_htm_xwall_side_1_info() != 0;
     }
-    
+
     void calo_ctw::get_main_zoning_word(std::bitset<calo::ctw::MAIN_ZONING_BITSET_SIZE> & zoning_word_) const
     {
       zoning_word_ = 0x0;
@@ -327,11 +327,11 @@ namespace snemo {
 	    {
 	      _ctw_.set(i + calo::ctw::W_ZW_BIT0, true);
 	    }
-	  else 
+	  else
 	    {
-	      _ctw_.set(i + calo::ctw::W_ZW_BIT0, false);	      
+	      _ctw_.set(i + calo::ctw::W_ZW_BIT0, false);
 	    }
-	}      
+	}
       _store |= STORE_CTW;
       return;
     }
@@ -348,7 +348,7 @@ namespace snemo {
 	}
       return;
     }
-			
+
     void calo_ctw::set_xwall_zoning_word(std::bitset<calo::ctw::XWALL_ZONING_BITSET_SIZE> & xwall_zoning_word_)
     {
       DT_THROW_IF(_layout_ == calo::ctw::LAYOUT_UNDEFINED || _layout_ == calo::ctw::LAYOUT_MAIN_WALL, std::logic_error, "Layout value [" << _layout_ << "] is not valid ! ");
@@ -359,11 +359,11 @@ namespace snemo {
 	    {
 	      _ctw_.set(i + calo::ctw::X_ZW_BIT0, true);
 	    }
-	  else 
+	  else
 	    {
-	      _ctw_.set(i + calo::ctw::X_ZW_BIT0, false);	      
+	      _ctw_.set(i + calo::ctw::X_ZW_BIT0, false);
 	    }
-	}      
+	}
       _store |= STORE_CTW;
       return;
     }
@@ -386,12 +386,12 @@ namespace snemo {
 	{
 	  if(_ctw_.test(i) == true)
 	    {
-	      active_zones_.insert(i - calo::ctw::W_ZW_BIT0); 
+	      active_zones_.insert(i - calo::ctw::W_ZW_BIT0);
 	      active_zone_counts++;
 	    }
 	}
       return active_zone_counts;
-    }  
+    }
 
     void calo_ctw::set_lto_main_wall_bit(bool value_)
     {
@@ -400,7 +400,7 @@ namespace snemo {
       _store |= STORE_CTW;
       return;
     }
-    
+
     bool calo_ctw::is_lto_main_wall() const
     {
       if (_ctw_.test(calo::ctw::LTO_MAIN_WALL_BIT) == true) return true;
@@ -415,7 +415,7 @@ namespace snemo {
       _store |= STORE_CTW;
       return;
     }
-    
+
     bool calo_ctw::is_lto_xwall_side_0() const
     {
       if (_ctw_.test(calo::ctw::LTO_XWALL_SIDE0_BIT) == true) return true;
@@ -429,7 +429,7 @@ namespace snemo {
       _store |= STORE_CTW;
       return;
     }
-    
+
     bool calo_ctw::is_lto_xwall_side_1() const
     {
       if (_ctw_.test(calo::ctw::LTO_XWALL_SIDE1_BIT) == true) return true;
@@ -443,7 +443,7 @@ namespace snemo {
       _store |= STORE_CTW;
       return;
     }
-    
+
     bool calo_ctw::is_lto_gveto() const
     {
       return _ctw_.test(calo::ctw::LTO_GVETO_BIT);
@@ -455,7 +455,7 @@ namespace snemo {
       _store |= STORE_CTW;
       return;
     }
-    
+
     bool calo_ctw::is_xt() const
     {
       return _ctw_.test(calo::ctw::XT_PC_BIT);
@@ -475,48 +475,49 @@ namespace snemo {
     }
 
     void calo_ctw::set_control_word(std::bitset<calo::ctw::CONTROL_BITSET_SIZE> & control_word_)
-    {    
+    {
       for (unsigned int i = 0; i < control_word_.size(); i++)
 	{
 	  if (control_word_.test(i) == true)
 	    {
 	      _ctw_.set(i + calo::ctw::CONTROL_BIT0,1);
 	    }
-	  else 
+	  else
 	    {
-	      _ctw_.set(i + calo::ctw::CONTROL_BIT0,0);	      
+	      _ctw_.set(i + calo::ctw::CONTROL_BIT0,0);
 	    }
-	}  
+	}
       _store |= STORE_CTW;
       return;
     }
 
     void calo_ctw::get_full_word(std::bitset<calo::ctw::FULL_BITSET_SIZE> & full_word_) const
     {
-      full_word_ = 0x0;
-      for (unsigned int i = calo::ctw::BEGIN_BIT; i <= calo::ctw::END_BIT; i++)
-	{
-	  if(_ctw_.test(i))
-	    {
-	      full_word_.set(i - calo::ctw::BEGIN_BIT,1);
-	    }
-	}
+      //full_word_ = 0x0;
+      // for (unsigned int i = calo::ctw::BEGIN_BIT; i <= calo::ctw::END_BIT; i++)
+      // 	{
+      // 	  if(_ctw_.test(i))
+      // 	    {
+      // 	      full_word_.set(i - calo::ctw::BEGIN_BIT,1);
+      // 	    }
+      // 	}
+      full_word_ = _ctw_;
       return ;
     }
 
     void calo_ctw::set_full_word(std::bitset<calo::ctw::FULL_BITSET_SIZE> & full_word_)
-    {    
+    {
       for (unsigned int i = 0; i < full_word_.size(); i++)
 	{
 	  if (full_word_.test(i) == true)
 	    {
 	      _ctw_.set(i + calo::ctw::BEGIN_BIT, 1);
 	    }
-	  else 
+	  else
 	    {
-	      _ctw_.set(i + calo::ctw::BEGIN_BIT, 0);	      
+	      _ctw_.set(i + calo::ctw::BEGIN_BIT, 0);
 	    }
-	}  
+	}
       _store |= STORE_CTW;
       return;
     }

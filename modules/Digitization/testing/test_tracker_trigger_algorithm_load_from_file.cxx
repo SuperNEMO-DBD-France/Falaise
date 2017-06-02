@@ -103,7 +103,7 @@ int main( int  argc_ , char **argv_  )
     std::clog << "Test tracker trigger algorithm from a loading file !" << std::endl;
     std::string manager_config_file;
 
-    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf";
+    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/4.0/manager.conf";
     std::clog << "manager_config_file = " << manager_config_file << std::endl;
     datatools::fetch_path_with_env(manager_config_file);
     std::clog << "manager_config_file = " << manager_config_file << std::endl;
@@ -124,15 +124,14 @@ int main( int  argc_ , char **argv_  )
       datatools::fetch_path_with_env(input_filename);
       data_filename = input_filename;
     }else{
-      data_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/100_events_tracker_matrix_output.data";
+      data_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/input_matrix_tracker.data";
+      datatools::fetch_path_with_env(data_filename);
+      std::clog << "Missing input filename ! " << std::endl;
     }
-    datatools::fetch_path_with_env(data_filename);
     std::clog << "data_filename  = " << data_filename << std::endl << std::endl;
 
-
     if (!is_output_path){
-      output_path = "${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/";
-      datatools::fetch_path_with_env(data_filename);
+      output_path = "/tmp/";
     }
     std::string output_file = output_path + "Tracker_matrix_response_from_loaded_file.log";
     std::clog << "Output file = " << output_file << std::endl;
@@ -170,7 +169,7 @@ int main( int  argc_ , char **argv_  )
     my_tracker_trigger_algo.set_electronic_mapping(my_e_mapping);
     // Open an output
     bool tmp_file_delete = true;
-    std::string path = "${FALAISE_DIGITIZATION_TESTING_DIR}/output_default";
+    std::string path = "/tmp/; //${FALAISE_DIGITIZATION_TESTING_DIR}/output_default";
     std::string prefix = "temp_";
     my_tracker_trigger_algo.set_tmp_file(path, prefix, tmp_file_delete);
     my_tracker_trigger_algo.initialize(tracker_config);

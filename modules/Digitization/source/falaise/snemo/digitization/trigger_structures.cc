@@ -9,7 +9,7 @@
 #include <snemo/digitization/clock_utils.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
    trigger_structures::calo_record::calo_record()
@@ -17,7 +17,7 @@ namespace snemo {
       calo_record::reset();
       return;
     }
-        
+
     void trigger_structures::calo_record::reset()
     {
       clocktick_25ns = clock_utils::INVALID_CLOCKTICK;
@@ -37,9 +37,9 @@ namespace snemo {
     }
 
     void trigger_structures::calo_record::display() const
-    {      
-      std::clog << "Calo Trigger info record : " << std::endl; 
-      std::clog << "CT |XTS|L|HG|L|L|H1|H0| ZONING S1| ZONING S0 " << std::endl; 
+    {
+      std::clog << "Calo Trigger info record : " << std::endl;
+      std::clog << "CT |XTS|L|HG|L|L|H1|H0| ZONING S1| ZONING S0 " << std::endl;
       std::clog << clocktick_25ns << ' ';
       std::clog << xt_info_bitset << ' ';
       std::clog << LTO_gveto << ' ';
@@ -60,11 +60,11 @@ namespace snemo {
       std::clog << std::endl << std::endl;
       return;
     }
-    
+
     trigger_structures::calo_summary_record::calo_summary_record()
     {
       calo_summary_record::reset();
-      return; 
+      return;
     }
 
     void trigger_structures::calo_summary_record::reset()
@@ -75,7 +75,7 @@ namespace snemo {
       calo_finale_decision = false;
       return;
     }
-    
+
     void trigger_structures::calo_summary_record::reset_summary_boolean_only()
     {
       single_side_coinc = false;
@@ -93,10 +93,10 @@ namespace snemo {
       std::clog << std::endl;
       return;
     }
-    
+
     bool trigger_structures::calo_summary_record::is_empty() const
     {
-      if (zoning_word[0].any() || zoning_word[1].any() 
+      if (zoning_word[0].any() || zoning_word[1].any()
 	  || total_multiplicity_side_0.any() || total_multiplicity_side_1.any() || total_multiplicity_gveto.any()
 	  || LTO_side_0 || LTO_side_1 || LTO_gveto || xt_info_bitset.any())
 	{
@@ -116,9 +116,9 @@ namespace snemo {
     void trigger_structures::tracker_record::reset()
     {
       clocktick_1600ns = clock_utils::INVALID_CLOCKTICK;
-      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++) 
+      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
-	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++) 
+	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
 	    {
 	      finale_data_per_zone[iside][izone].reset();
 	    }
@@ -145,8 +145,8 @@ namespace snemo {
 
     void trigger_structures::tracker_record::display()
     {
-      std::clog << "Tracker Trigger info record : " << std::endl; 
-      std::clog << "Clocktick 1600    : " << clocktick_1600ns << std::endl;;  
+      std::clog << "Tracker Trigger info record : " << std::endl;
+      std::clog << "Clocktick 1600    : " << clocktick_1600ns << std::endl;;
 
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
@@ -157,7 +157,7 @@ namespace snemo {
 	    } // end of izone
 	  std::clog << std::endl;
 	}
-      
+
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
 	  std::clog << "ZW pattern     : S" << iside << " : [";
@@ -166,7 +166,7 @@ namespace snemo {
 	      std::clog << zoning_word_pattern[iside][ibit];
 	    }
 	  std::clog << "] ";
-	}     
+	}
       std::clog << std::endl;
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
@@ -189,14 +189,14 @@ namespace snemo {
 	  for (unsigned int jlayer = 0; jlayer < trigger_info::NLAYERS; jlayer++)
 	    {
 	      for (unsigned int krow = 0; krow < trigger_info::NROWS; krow++)
-		{	
+		{
 		  matrix[iside][jlayer][krow] = false;
 		} // end of krow
 	    } // end of jlayer
 	} // end of iside
       clocktick_1600ns = clock_utils::INVALID_CLOCKTICK;
     }
-    
+
     void trigger_structures::geiger_matrix::display() const
     {
       std::clog << " CLOCKTICK 1600 ns = " << clocktick_1600ns << std::endl;
@@ -212,15 +212,15 @@ namespace snemo {
 		  for (unsigned int k = 0; k < trigger_info::NROWS; k++)
 		    {
 		      if( k == 0 )        std::clog<<"|";
-		  
+
 		      if (matrix[i][j][k] ) std::clog << "*";
-		  
-		      if(!matrix[i][j][k])  std::clog << ".";	  
+
+		      if(!matrix[i][j][k])  std::clog << ".";
 
 		      if( k == 112)     std::clog<<"|";
 
 		    } // end of row loop
-		  std::clog<<std::endl;	
+		  std::clog<<std::endl;
 
 		  if (j == 0)
 		    {
@@ -232,23 +232,23 @@ namespace snemo {
 	    } // end of if == 0
 
 	  if (i == 1)
-	    {  
+	    {
 	      for (unsigned int j = 0; j < trigger_info::NLAYERS; j++)
 		{
 		  std::clog << j << ' ' ;
 		  for (unsigned int k = 0; k < trigger_info::NROWS; k++)
 		    {
 		      if( k == 0 )        std::clog<<"|";
-		  
+
 		      if (matrix[i][j][k] ) std::clog << "*";
-		  
-		      if(!matrix[i][j][k])  std::clog << ".";	  
+
+		      if(!matrix[i][j][k])  std::clog << ".";
 
 		      if( k == 112)     std::clog<<"|";
 
 		    } // end of row loop
-		  std::clog<<std::endl;	    
-  
+		  std::clog<<std::endl;
+
 		} // end of layer loop
 
 	    } // end of if i==1
@@ -265,7 +265,7 @@ namespace snemo {
 
       return;
     }
-    
+
     void trigger_structures::geiger_matrix::reset()
     {
       clocktick_1600ns = clock_utils::INVALID_CLOCKTICK;
@@ -278,11 +278,11 @@ namespace snemo {
 		  matrix[iside][jlayer][krow] = false;
 		} // end of krow
 	    } // end of jlayer
-	} // end of iside  
-            
+	} // end of iside
+
       return;
     }
-    
+
     bool trigger_structures::geiger_matrix::is_empty() const
     {
       bool empty = true;
@@ -291,7 +291,7 @@ namespace snemo {
 	  for (unsigned int jlayer = 0; jlayer < trigger_info::NLAYERS; jlayer++)
 	    {
 	      for (unsigned int krow = 0; krow < trigger_info::NROWS; krow++)
-		{	
+		{
 		  if (matrix[iside][jlayer][krow] == true) empty = false;
 		} // end of krow
 	    } // end of jlayer
@@ -321,10 +321,10 @@ namespace snemo {
       decision = false;
       return;
     }
-    
+
     void trigger_structures::coincidence_base_record::display() const
     {
-      std::clog << "XTS|L|HG|L|L|H1|H0| ZONING S1| ZONING S0 " << std::endl; 
+      std::clog << "XTS|L|HG|L|L|H1|H0| ZONING S1| ZONING S0 " << std::endl;
       std::clog << xt_info_bitset << ' ';
       std::clog << LTO_gveto << ' ';
       std::clog << total_multiplicity_gveto << ' ';
@@ -339,13 +339,13 @@ namespace snemo {
       	      std::clog << calo_zoning_word[iside][izone];
       	    }
       	  std::clog << ' ';
-      	}      
+      	}
       std::clog << std::endl;
-      std::clog << "Single Side coinc : " << single_side_coinc 
-		<< "  |  Threshold total mult : "   << total_multiplicity_threshold << std::endl;     
+      std::clog << "Single Side coinc : " << single_side_coinc
+		<< "  |  Threshold total mult : "   << total_multiplicity_threshold << std::endl;
       return;
     }
-    
+
     trigger_structures::coincidence_calo_record::coincidence_calo_record()
     {
       coincidence_calo_record::reset();
@@ -358,7 +358,7 @@ namespace snemo {
       clocktick_1600ns = clock_utils::INVALID_CLOCKTICK;
       return;
     }
-    
+
     void trigger_structures::coincidence_calo_record::display() const
     {
       std::clog << "************************************************************************************" << std::endl;
@@ -372,7 +372,7 @@ namespace snemo {
 
     bool trigger_structures::coincidence_calo_record::is_empty() const
     {
-      if (calo_zoning_word[0].any() || calo_zoning_word[1].any() 
+      if (calo_zoning_word[0].any() || calo_zoning_word[1].any()
 	  || total_multiplicity_side_0.any() || total_multiplicity_side_1.any() || total_multiplicity_gveto.any()
 	  || LTO_side_0 || LTO_side_1 || LTO_gveto || xt_info_bitset.any() || total_multiplicity_threshold || decision)
 	{
@@ -393,17 +393,17 @@ namespace snemo {
       coincidence_base_record::reset();
       clocktick_1600ns = clock_utils::INVALID_CLOCKTICK;
       trigger_mode = INVALID;
-      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++) 
+      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
-	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++) 
+	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
 	    {
 	      tracker_finale_data_per_zone[iside][izone].reset();
 	    }
-	  
+
 	  coincidence_zoning_word[iside].reset();
 	  tracker_zoning_word_pattern[iside].reset();
 	  tracker_zoning_word_near_source[iside].reset();
-	}	       
+	}
       return;
     }
 
@@ -432,7 +432,7 @@ namespace snemo {
 	      std::clog << coincidence_zoning_word[iside][ibit];
 	    }
 	  std::clog << "] ";
-	} 
+	}
       std::clog << std::endl;
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
@@ -442,7 +442,7 @@ namespace snemo {
 	      std::clog << tracker_zoning_word_pattern[iside][ibit];
 	    }
 	  std::clog << "] ";
-	}    
+	}
       std::clog << std::endl;
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
@@ -457,11 +457,11 @@ namespace snemo {
       std::clog << "Coincidence trigger mode : [" << trigger_mode << "]" << std::endl;
       std::clog << "Coincidence event record decision : [" << decision << "]" << std::endl;
       return;
-    }  
+    }
 
     bool trigger_structures::coincidence_event_record::is_empty() const
     {
-      if (calo_zoning_word[0].any() || calo_zoning_word[1].any() 
+      if (calo_zoning_word[0].any() || calo_zoning_word[1].any()
 	  || total_multiplicity_side_0.any() || total_multiplicity_side_1.any() || total_multiplicity_gveto.any()
 	  || LTO_side_0 || LTO_side_1 || LTO_gveto || xt_info_bitset.any() || total_multiplicity_threshold || decision)
 	{
@@ -484,7 +484,7 @@ namespace snemo {
     trigger_structures::L2_decision::L2_decision()
     {
       L2_decision::reset();
-      return;      
+      return;
     }
 
     void trigger_structures::L2_decision::reset()
@@ -506,7 +506,7 @@ namespace snemo {
     trigger_structures::L1_calo_decision::L1_calo_decision()
     {
       L1_calo_decision::reset();
-      return;      
+      return;
     }
 
     void trigger_structures::L1_calo_decision::reset()
@@ -526,7 +526,7 @@ namespace snemo {
     trigger_structures::L1_tracker_decision::L1_tracker_decision()
     {
       L1_tracker_decision::reset();
-      return;      
+      return;
     }
 
     void trigger_structures::L1_tracker_decision::reset()
@@ -564,9 +564,9 @@ namespace snemo {
       xt_info_bitset.reset();
       single_side_coinc = true;
       total_multiplicity_threshold = false;
-      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++) 
+      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
-	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++) 
+	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
 	    {
 	      tracker_finale_data_per_zone[iside][izone].reset();
 	    }
@@ -577,7 +577,7 @@ namespace snemo {
 
       return;
     }
-    
+
     void trigger_structures::previous_event_record::display() const
     {
       std::clog << "************************************************************************************" << std::endl;
@@ -595,7 +595,7 @@ namespace snemo {
 	    } // end of izone
 	  std::clog << std::endl;
 	}
-      
+
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
 	  std::clog << "ZW coincidence : S" << iside << " : [";
@@ -604,7 +604,7 @@ namespace snemo {
 	      std::clog << coincidence_zoning_word[iside][ibit];
 	    }
 	  std::clog << "] ";
-	} 
+	}
       std::clog << std::endl;
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
@@ -614,7 +614,7 @@ namespace snemo {
 	      std::clog << tracker_zoning_word_pattern[iside][ibit];
 	    }
 	  std::clog << "] ";
-	}    
+	}
       std::clog << std::endl;
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
@@ -634,5 +634,5 @@ namespace snemo {
     }
 
   } // end of namespace digitization
-  
+
 } // end of namespace snemo
