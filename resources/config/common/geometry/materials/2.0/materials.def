@@ -89,7 +89,7 @@ composition.number_of_atoms : integer[3] =     8         4        1
 #      +    ,DHEETHYL/2.35E-4/  ! density by Vera Kovalenko from alpha track length
 #      +    ,DHEETHYL/2.231E-4/
 #
-##################################################
+###################################################
 [name="snemo::tracking_gas::nemo3" type="material"]
 #@config Gas in the SuperNEMO tracking chamber (to be checked)
 density          : real   = 2.35E-4
@@ -98,6 +98,17 @@ state            : string = "gas"
 composition.mode            : string    = "fraction_mass"
 composition.names           : string[5] = "Helium" "Hydrogen" "Carbon" "Oxygen" "Argon"
 composition.fraction_mass   : real[5]   =  1.      0.28176    0.09392  0.04696  0.01015
+
+
+################################################################
+[name="snemo::tracking_gas::half_commissioning" type="material"]
+#@config Gas in the SuperNEMO tracking chamber (to be checked)
+density          : real   = 2.35E-4
+density.unit     : string = "g/cm3"
+state            : string = "gas"
+composition.mode            : string    = "fraction_mass"
+composition.names           : string[4] = "Hydrogen" "Carbon" "Oxygen" "Argon"
+composition.fraction_mass   : real[4]   =  0.02334   0.00778  0.00388  0.965
 
 
 ###################################################
