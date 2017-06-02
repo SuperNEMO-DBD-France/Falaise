@@ -32,7 +32,7 @@
 
 namespace fecom {
 
-  //! \brief Commissioning event, contain a collection of calo_hits and tracker_channel_hits and can build associated tracker hits from channels
+  //! \brief Data statistics struct
   struct data_statistics
     : public datatools::i_serializable
     , public datatools::i_tree_dumpable
@@ -121,7 +121,6 @@ namespace fecom {
 		std::pair<double, std::size_t> mean_number_of_tracker_cells_if_2_calo_ht;
 		std::pair<double, std::size_t> mean_number_of_tracker_cells_if_3p_calo_ht;
     std::array<register_for_cell, fecom::tracker_constants::NUMBER_OF_LAYERS> cell_registers_if_calo_tracker{};
-
 
 		std::vector<std::string> unmapped_channels_in_raw_data;
 
