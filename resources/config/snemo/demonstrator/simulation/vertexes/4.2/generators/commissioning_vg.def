@@ -1,0 +1,110 @@
+# -*- mode: conf-unix; -*-
+# @falaise:config/snemo/demonstrator/simulation/vertexes/4.2/generators/generators/commissioning_vg.def
+# List of multi-properties (datatools::multi_properties):
+
+#@description A list of vertex generators
+#@key_label   "name"
+#@meta_label  "type"
+
+
+#############################################
+# Generate vertex from a commissioning spot #
+#############################################
+[name="commissioning_all_spots" type="genvtx::cylinder_model_vg"]
+
+#@config Vertex generation from a commissioning spot
+
+#@description Logging priority
+logging.priority  : string = "fatal"
+
+#@description Geometry version requirement (not working with version lower than 4.1)
+geometry.setup_requirement : string = "snemo::demonstrator(>=4)"
+
+#@description The geometry origin of vertex in term of geometry category and addresses (geom ID)
+origin : string  = "category='commissioning_source_spot' module={*} column={*} row={*}"
+
+#@description The generator mode
+mode   : string  = "bulk"
+
+
+
+
+#@variant_if geometry:layout/if_half_commissioning/granularity/if_low|true
+
+###########################################################################
+# Generate vertex from one unique commissioning spot with low granularity #
+###########################################################################
+[name="commissioning_single_spot" type="genvtx::cylinder_model_vg"]
+
+#@variant_section_only vertexes:generator/if_half_commissioning_single_spot|false
+
+#@config Vertex generation from a commissioning spot;variant=if_half_commissioning_single_spot
+
+#@description Logging priority
+logging.priority  : string = "fatal"
+
+#@description Geometry version requirement (not working with version lower than 4.1)
+geometry.setup_requirement : string = "snemo::demonstrator(>=4)"
+
+# The origin of vertex is described in term of geometry category and addresses (geom ID)
+
+#@description The origin geometry category
+origin.category : string = "commissioning_source_spot"
+
+#@description SuperNEMO module number
+origin.address.module : integer = 0
+
+#@description Commissioning source spot column number
+origin.address.column : integer = \
+  @variant(vertexes:generator/if_half_commissioning_single_spot/column|0)
+
+#@description Commissioning source spot row number
+origin.address.row    : integer = \
+  @variant(vertexes:generator/if_half_commissioning_single_spot/row|0)
+
+#@description The generator mode
+mode   : string  = "bulk"
+
+#@variant_endif geometry:layout/if_half_commissioning/granularity/if_low
+
+
+#@variant_if geometry:layout/if_half_commissioning/granularity/if_high|true
+
+############################################################################
+# Generate vertex from one unique commissioning spot with high granularity #
+############################################################################
+[name="commissioning_single_spot_high" type="genvtx::cylinder_model_vg"]
+
+#@variant_section_only vertexes:generator/if_half_commissioning_single_spot_high|false
+
+#@config Vertex generation from a commissioning spot;variant=if_half_commissioning_single_spot_high
+
+#@description Logging priority
+logging.priority  : string = "fatal"
+
+#@description Geometry version requirement (not working with version lower than 4.1)
+geometry.setup_requirement : string = "snemo::demonstrator(>=4)"
+
+# The origin of vertex is described in term of geometry category and addresses (geom ID)
+
+#@description The origin geometry category
+origin.category : string = "commissioning_source_spot"
+
+#@description SuperNEMO module number
+origin.address.module : integer = 0
+
+#@description Commissioning source spot column number
+origin.address.column : integer = \
+  @variant(vertexes:generator/if_half_commissioning_single_spot_high/column|0)
+
+#@description Commissioning source spot row number
+origin.address.row    : integer = \
+  @variant(vertexes:generator/if_half_commissioning_single_spot_high/row|0)
+
+#@description The generator mode
+mode   : string  = "bulk"
+
+#@variant_endif geometry:layout/if_half_commissioning/granularity/if_high
+
+
+# end of @falaise:config/snemo/demonstrator/simulation/vertexes/4.2/generators/commissioning_vg.def
