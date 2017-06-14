@@ -1,5 +1,5 @@
 # -*- mode: conf-unix -*-
-# @falaise:config/snemo/demonstrator/simulation/vertexes/4.1/variants/models/vertexes.def
+# @falaise:config/snemo/demonstrator/simulation/vertexes/4.2/variants/models/vertexes.def
 # Description of variants for the definition of the vertex generation (format: datatools::multi_properties)
 
 #@description The definitions for variant parameters related to the vertex generation
@@ -94,4 +94,4 @@ parameters.generator.model       : string = "vertexes.generator.PM"
 parameters.generator.description : string = "The selected primary vertex generator"
 
 
-# end of @falaise:config/snemo/demonstrator/simulation/vertexes/4.1/variants/models/vertexes.def
+# end of @falaise:config/snemo/demonstrator/simulation/vertexes/4.2/variants/models/vertexes.def

@@ -156,6 +156,56 @@ with the ``--vertex-generator`` switch. Here we use the variant GUI interface:
      --visu-spot-color "magenta"
 ..
 
+With variant support, we do not specify the vertex generator from the command line
+with the ``--vertex-generator`` switch. We use an already created variant profile:
+
+.. raw:: sh
+
+   $ LD_LIBRARY_PATH="$(pwd)/BuildProducts/lib:${LD_LIBRARY_PATH}" \
+     bxgenvtx_production \
+     --logging "warning" \
+     --load-dll Falaise \
+     --datatools::resource-path "falaise@$(pwd)/BuildProducts/share/Falaise-3.0.0/resources" \
+     --variant-config "@falaise:config/snemo/demonstrator/simulation/vertexes/4.2/variants/repository.conf" \
+     --variant-set "geometry:layout=HalfCommissioning" \
+     --variant-set "vertexes:generator=commissioning_single_spot_high" \
+     --variant-set "vertexes:generator/if_half_commissioning_single_spot_high/column=48" \
+     --variant-set "vertexes:generator/if_half_commissioning_single_spot_high/row=10" \
+     --variant-gui \
+     --variant-store "hc_profile.rep" \
+     --geometry-manager         "@falaise:config/snemo/demonstrator/geometry/4.1/manager.conf" \
+     --vertex-generator-manager "@falaise:config/snemo/demonstrator/simulation/vertexes/4.2/manager.conf" \
+     --shoot \
+     --prng-seed 314159 \
+     --number-of-vertices 10000 \
+     --vertex-modulo 20 \
+     --visu-spot-zoom 1.0 \
+     --visu-spot-size "1 mm" \
+     --visu-spot-color "red" \
+     --visu-output-file "hc_vertices-visu-dd.data.gz"
+..
+
+Visualization :
+
+.. raw:: sh
+
+   $ LD_LIBRARY_PATH="$(pwd)/BuildProducts/lib:${LD_LIBRARY_PATH}" \
+     bxgeomtools_inspector \
+     --logging "warning" \
+     --load-dll Falaise \
+     --datatools::resource-path "falaise@$(pwd)/BuildProducts/share/Falaise-3.0.0/resources" \
+     --variant-config "@falaise:config/snemo/demonstrator/simulation/vertexes/4.2/variants/repository.conf" \
+     --variant-load "hc_profile.rep" \
+     --manager-config "@falaise:config/snemo/demonstrator/geometry/4.1/manager.conf"
+   geomtools> ldd vtx hc_vertices-visu-dd.data.gz
+   geomtools> G --with-category commissioning_source_plane
+   List of available GIDs :
+   [1500:0] as 'commissioning_source_plane'
+   geomtools> display -yz [1500:0]
+..
+
+
+
 Generate 10000 vertexes from the internal surface of the shielding walls
 ---------------------------------------------------------------------------------
 
