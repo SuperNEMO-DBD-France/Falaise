@@ -27,10 +27,6 @@ origin : string  = "category='commissioning_source_spot' module={*} column={*} r
 mode   : string  = "bulk"
 
 
-
-
-#@variant_if geometry:layout/if_half_commissioning/granularity/if_low|true
-
 ###########################################################################
 # Generate vertex from one unique commissioning spot with low granularity #
 ###########################################################################
@@ -65,10 +61,6 @@ origin.address.row    : integer = \
 #@description The generator mode
 mode   : string  = "bulk"
 
-#@variant_endif geometry:layout/if_half_commissioning/granularity/if_low
-
-
-#@variant_if geometry:layout/if_half_commissioning/granularity/if_high|true
 
 ############################################################################
 # Generate vertex from one unique commissioning spot with high granularity #
@@ -103,8 +95,6 @@ origin.address.row    : integer = \
 
 #@description The generator mode
 mode   : string  = "bulk"
-
-#@variant_endif geometry:layout/if_half_commissioning/granularity/if_high
 
 
 # end of @falaise:config/snemo/demonstrator/simulation/vertexes/4.2/generators/commissioning_vg.def

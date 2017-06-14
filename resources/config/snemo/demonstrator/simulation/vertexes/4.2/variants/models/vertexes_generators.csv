@@ -43,6 +43,6 @@ shielding_all_internal_surfaces : Vertex generation from internal surfaces of th
 source_calibration_all_spots : Vertex generation from the bulk volume of all source calibration spots : Calibration :
 source_calibration_single_spot : Vertex generation from the bulk volume of all source calibration spots : Calibration : if_source_calibration_single_spot
 commissioning_all_spots : Vertex generation from from a commissioning spot : HalfCommissioning :
-commissioning_single_spot : Vertex generation from from a commissioning spot : HalfCommissioning : if_half_commissioning_single_spot
-commissioning_single_spot_high : Vertex generation from from a commissioning spot : HalfCommissioning : if_half_commissioning_single_spot_high
+commissioning_single_spot : Vertex generation from from a commissioning spot : HalfCommissioningSpotLow : if_half_commissioning_single_spot
+commissioning_single_spot_high : Vertex generation from from a commissioning spot : HalfCommissioningSpotHigh : if_half_commissioning_single_spot_high
 free_spot : Vertex generation from an arbitrary spot in the geometry :  : if_free_spot

@@ -1,5 +1,5 @@
 # -*- mode: conf-unix; -*-
-# @falaise:config/snemo/demonstrator/geometry/4.0/models/half_commissioning_setup_geom_models.lis
+# @falaise:config/snemo/demonstrator/geometry/4.1/models/half_commissioning_setup_geom_models.lis
 # List of geometry models definition files for the SuperNEMO Demonstrator
 
 
@@ -10,4 +10,4 @@
 @falaise:config/snemo/demonstrator/geometry/4.0/models/setup.geom
 
 
-# end of @falaise:config/snemo/demonstrator/geometry/4.0/models/half_commissioning_setup_geom_models.lis
+# end of @falaise:config/snemo/demonstrator/geometry/4.1/models/half_commissioning_setup_geom_models.lis

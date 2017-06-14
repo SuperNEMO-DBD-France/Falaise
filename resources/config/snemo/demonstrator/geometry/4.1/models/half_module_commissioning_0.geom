@@ -11,6 +11,7 @@ z                : real as length = 4000.0 mm
 material.ref     : string = "lab_air"
 visibility.color : string = "blue"
 
+
 ##############################################################################
 [name="commissioning_source_spot.model" type="geomtools::simple_shaped_model"]
 shape_type       : string = "cylinder"
