@@ -138,7 +138,7 @@ description : string = "SuperNEMO demonstrator simulation setup (version 2.2)"
 
 topics : string[5] = "expsetup" "vertexes" "decays" "variants" "services"
 
-topic.expsetup.component   : string = "urn:snemo:demonstrator:setup:1.0"
+topic.expsetup.component   : string = "urn:snemo:demonstrator:setup:1.1"
 topic.vertexes.component   : string = "urn:snemo:demonstrator:simulation:vertexes:4.2"
 topic.decays.component     : string = "urn:snemo:demonstrator:simulation:decays:1.2"
 topic.variants.component   : string = "urn:snemo:demonstrator:simulation:2.2:variants"
