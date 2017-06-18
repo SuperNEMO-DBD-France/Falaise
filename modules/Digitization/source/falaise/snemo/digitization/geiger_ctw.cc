@@ -9,12 +9,12 @@
 // - Bayeux/datatools:
 #include <datatools/exception.h>
 
-// This project : 
+// This project :
 #include <snemo/digitization/geiger_tp.h>
 #include <snemo/digitization/clock_utils.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     // Serial tag for datatools::serialization::i_serializable interface :
@@ -85,8 +85,8 @@ namespace snemo {
 	  else
 	    {
 	      my_bitset_.set(i, false);
-	    }	  
-	}     
+	    }
+	}
       return;
     }
 
@@ -99,15 +99,15 @@ namespace snemo {
 	    {
 	      _gg_ctw_.set(i + block_index_ * my_bitset_.size(), true);
 	    }
-	  else 
+	  else
 	    {
 	      _gg_ctw_.set(i + block_index_ * my_bitset_.size(), false);
-	    }	  
+	    }
 	}
       _store |= STORE_GG_CTW;
       return;
     }
-    
+
     void geiger_ctw::get_55_bits_in_ctw_word(unsigned int block_index_, std::bitset<geiger::tp::TP_SIZE> & my_bitset_) const
     {
       DT_THROW_IF(block_index_ > mapping::NUMBER_OF_FEBS_BY_CRATE, std::logic_error, "Block index out of range (should be [0;19])  ! ");
@@ -120,8 +120,8 @@ namespace snemo {
 	  else
 	    {
 	      my_bitset_.set(i, false);
-	    }	  
-	}     
+	    }
+	}
       return;
     }
 
@@ -134,12 +134,29 @@ namespace snemo {
 	    {
 	      _gg_ctw_.set(i + block_index_ * 100, true);
 	    }
-	  else 
+	  else
 	    {
 	      _gg_ctw_.set(i + block_index_ * 100, false);
-	    }	  
+	    }
 	}
       _store |= STORE_GG_CTW;
+      return;
+    }
+
+    void geiger_ctw::get_36_bits_in_ctw_word(unsigned int block_index_, std::bitset<geiger::tp::TP_THREE_WIRES_SIZE> & my_bitset_) const
+    {
+      DT_THROW_IF(block_index_ > mapping::NUMBER_OF_FEBS_BY_CRATE, std::logic_error, "Block index out of range (should be [0;19])  ! ");
+      for (unsigned int i = 0; i < my_bitset_.size(); i++)
+	{
+	  if (_gg_ctw_.test(i + block_index_ * geiger::tp::FULL_SIZE) == true)
+	    {
+	      my_bitset_.set(i, true);
+	    }
+	  else
+	    {
+	      my_bitset_.set(i, false);
+	    }
+	}
       return;
     }
 
@@ -174,7 +191,7 @@ namespace snemo {
 	    }
 	  board_id ++;
 	}
-      
+
       return;
     }
 
@@ -192,7 +209,7 @@ namespace snemo {
 	}
       return;
     }
-    
+
     bool geiger_ctw::has_trigger_primitive_values() const
     {
       bool has_value = false;
@@ -205,7 +222,7 @@ namespace snemo {
 	}
       return has_value;
     }
-    
+
     void geiger_ctw::reset_tw_bitset()
     {
       _gg_ctw_ = 0x0;

@@ -7,11 +7,14 @@
 // Standard library :
 #include <string>
 #include <bitset>
+#include <iostream>
 
 // This project :
 #include <snemo/digitization/electronic_mapping.h>
 #include <snemo/digitization/mapping.h>
 #include <snemo/digitization/trigger_info.h>
+#include <snemo/digitization/calo_ctw_data.h>
+#include <snemo/digitization/geiger_ctw_data.h>
 
 
 namespace datatools {
@@ -19,13 +22,14 @@ namespace datatools {
 }
 
 namespace snemo {
-  
+
   namespace digitization {
 
-		class trigger_algorithm;	
-	
+		class trigger_algorithm;
+		class trigger_algorithm_test_time;
+
     /// \brief This is the trigger display manager
-    /// It can display : 
+    /// It can display :
 		/// - Calorimeter zones each 25ns or 1600ns
 		/// - Geiger matrix each 1600ns
 		/// - Coincidences between calorimeter zones and Geiger matrix each 1600ns
@@ -34,13 +38,13 @@ namespace snemo {
     class trigger_display_manager
     {
     public :
-			
+
 			/// Number of horizontal characters for display
 			static const uint32_t NUMBER_OF_HORIZONTAL_CHAR = 117;
 
 			/// Number of vertical characters for display
 			static const uint32_t NUMBER_OF_VERTICAL_CHAR = 21;
-			
+
       /// Default constructor
       trigger_display_manager();
 
@@ -53,33 +57,33 @@ namespace snemo {
       /// Initializing
       void initialize(const datatools::properties & config_);
 
-      /// Check if the algorithm is initialized 
+      /// Check if the algorithm is initialized
       bool is_initialized() const;
-      
+
       /// Reset the object
       void reset();
-			
-			/// Check if the calorimeter 25ns config is activated 
+
+			/// Check if the calorimeter 25ns config is activated
 			bool is_calo_25ns() const;
 
-			/// Check if the calorimeter 1600ns config is activated 
+			/// Check if the calorimeter 1600ns config is activated
 			bool is_calo_1600ns() const;
 
-			/// Check if the tracker 1600ns config is activated 
+			/// Check if the tracker 1600ns config is activated
 			bool is_tracker_1600ns() const;
 
-			/// Check if the coincidence 1600ns config is activated 
+			/// Check if the coincidence 1600ns config is activated
 			bool is_coinc_1600ns() const;
 
-			/// Check if the decision trigger config is activated 
+			/// Check if the decision trigger config is activated
 			bool is_decision_trigger() const;
 
 			/// Fill calorimeter zones for 25ns
 			void fill_calo_trigger_matrix_25ns(std::bitset<10> zoning_word_[trigger_info::NSIDES]);
-			
+
 			/// Fill calorimeter zones for 1600ns
 			void fill_calo_trigger_matrix_1600ns(std::bitset<10> zoning_word_[trigger_info::NSIDES]);
-						
+
 			/// Fill tracker matrix for 1600ns
 			void fill_tracker_trigger_matrix_1600ns(bool geiger_matrix_[trigger_info::NSIDES][trigger_info::NLAYERS][trigger_info::NROWS]);
 			// Fill matrix for coincidences for 1600ns
@@ -89,14 +93,14 @@ namespace snemo {
 			void display_calo_trigger_25ns(trigger_algorithm & a_trigger_algo_, uint32_t clocktick_25ns_);
 
 			/// Display calorimeter zones each 25ns for all available clocktick
-			void display_calo_trigger_25ns(trigger_algorithm & a_trigger_algo_); 
+			void display_calo_trigger_25ns(trigger_algorithm & a_trigger_algo_);
 
 			/// Display calorimeter zones each 1600 for a given clocktick
 			void display_calo_trigger_1600ns(trigger_algorithm & a_trigger_algo_, uint32_t clocktick_1600ns_);
 
-			/// Display calorimeter zones each 1600ns for all available clocktick 
+			/// Display calorimeter zones each 1600ns for all available clocktick
 			void display_calo_trigger_1600ns(trigger_algorithm & a_trigger_algo_);
-			
+
 			/// Display tracker matrix each 1600 for a given clocktick
 			void display_tracker_trigger_1600ns(trigger_algorithm & a_trigger_algo_, uint32_t clocktick_1600ns_);
 
@@ -108,28 +112,38 @@ namespace snemo {
 
 			/// Display calorimeter zones and tracker matrix each 1600 for all available clocktick
 			void display_coincidence_trigger_1600ns(trigger_algorithm & a_trigger_algo_);
-			
+
 			/// Display calorimeter zones and tracker matrix each 1600 for the clocktick decision
-			void display_decision_trigger();			
-			
-			/// Fill display matrix with the initial pattern 
+			void display_decision_trigger();
+
+			/// Display few clockticks for a coincidence event 1600ns for trigger board implementation at LAL
+			void display_ctw_fifo_trigger_implementation_1600ns(std::ofstream * calo_ofstreams_,
+																													std::ofstream * tracker_ofstreams_,
+																													const calo_ctw_data & a_calo_ctw_data_,
+																													const geiger_ctw_data & a_geiger_ctw_data_);
+
+			/// Display few clockticks for a coincidence event 1600ns for trigger board implementation at LAL
+			void display_trigger_implementation_1600ns(std::ofstream & out_,
+																								 const trigger_algorithm_test_time & a_trigger_algo_);
+
+			/// Fill display matrix with the initial pattern
 			void fill_matrix_pattern();
-		 
+
 			/// Reset matrix with the constructed pattern
 			void reset_matrix_pattern();
-			
+
 			/// Reset calorimeter zones display
 			void reset_calo_display();
 
 			/// Reset tracker matrix display
 			void reset_tracker_display();
-						
+
 			/// Display the total matrix
 			void display_matrix();
 
     private :
-      
-      // Configuration : 
+
+      // Configuration :
       bool _initialized_;      //!< Initialization
       bool _calo_25ns_;        //!< Configuration to display calo@25ns
       bool _calo_1600ns_;      //!< Configuration to display calo@1600ns
@@ -138,16 +152,16 @@ namespace snemo {
 			bool _decision_trigger_; //!< Configuration to display the moment when the trigger decision is true
 
 			// Data :
-			char _char_matrix_[NUMBER_OF_VERTICAL_CHAR][NUMBER_OF_HORIZONTAL_CHAR]; //!< Matrix of characters representing calorimeter zones and geiger matrix			
+			char _char_matrix_[NUMBER_OF_VERTICAL_CHAR][NUMBER_OF_HORIZONTAL_CHAR]; //!< Matrix of characters representing calorimeter zones and geiger matrix
     };
-					
+
   } // end of namespace digitization
-	
+
 } // end of namespace snemo
 
 #endif // FALAISE_DIGITIZATION_PLUGIN_SNEMO_DIGITIZATION_COINCDIDENCE_TRIGGER_ALGORITHM_H
 
-/* 
+/*
 ** Local Variables: --
 ** mode: c++ --
 ** c-file-style: "gnu" --
