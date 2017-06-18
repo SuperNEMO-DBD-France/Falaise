@@ -43,7 +43,7 @@ int main(int argc_, char ** argv_)
 
   std::vector<std::string> input_filenames;// = "";
   // std::string input_filename = "";
-  std::string output_filename = "";
+  std::string output_path = "";
   std::string input_tracker_mapping_file = "";
   std::string input_calo_mapping_file = "";
   std::size_t max_events     = 0;
@@ -62,8 +62,8 @@ int main(int argc_, char ** argv_)
        po::value<std::vector<std::string> >(& input_filenames)->multitoken(),
        "set a list of input files")
       ("output,o",
-       po::value<std::string>(& output_filename),
-       "set the output filename")
+       po::value<std::string>(& output_path),
+       "set the output path")
       ("max-events,M",
        po::value<std::size_t>(& max_events)->default_value(10),
        "set the maximum number of events")
@@ -105,29 +105,22 @@ int main(int argc_, char ** argv_)
     else logging = datatools::logger::PRIO_INFORMATION;
     DT_LOG_INFORMATION(logging, "Entering hc_data_quality.cxx...");
 
-    if (input_filenames.size() == 0) DT_LOG_WARNING(logging, "No input file(s) !");
-
-    DT_THROW_IF(output_filename.empty(),
-		std::logic_error,
-		"The output filename is empty, set a value for the -o option, for the text file (statistics) !");
-
-    std::string output_path = "";
-    if (output_path.empty()) {
-      boost::filesystem::path p(output_filename);
-      output_path = p.parent_path().string();
-      if (output_path.empty()) {
-	output_path = ".";
-      }
-    }
-    datatools::fetch_path_with_env(output_filename);
-
     DT_LOG_INFORMATION(logging, "List of input file(s) : ");
     for (auto file = input_filenames.begin();
 	 file != input_filenames.end();
 	 file++) std::clog << *file << ' ';
-    std::clog << std::endl;
+    DT_THROW_IF(input_filenames.size() == 0, std::logic_error, "No input file(s) ! ");
 
-    DT_LOG_INFORMATION(logging, "Data quality output file : " + output_filename);
+    DT_LOG_INFORMATION(logging, "Output path for files = " + output_path);
+    if (output_path.empty()) {
+      output_path = ".";
+      DT_LOG_INFORMATION(logging, "No output path, default output path is = " + output_path);
+    }
+    datatools::fetch_path_with_env(output_path);
+
+    std::string output_stat_filename = output_path + "output_data.stat";
+
+    DT_LOG_INFORMATION(logging, "Data quality output file : " + output_stat_filename);
     DT_LOG_INFORMATION(logging, "Output path              : " + output_path);
 
     int max_record_total = static_cast<int>(max_events) * static_cast<int>(input_filenames.size());
@@ -165,7 +158,7 @@ int main(int argc_, char ** argv_)
 
 
     // Calo tracker output module event (1 Calo + >1 tracker)
-    std::string calo_tracker_events_filename = output_path + "/calo_tracker_events.brio";
+    std::string calo_tracker_events_filename = output_path + "/output_calo_tracker_events.brio";
     dpp::output_module serializer;
     datatools::properties writer_config;
     writer_config.store ("logging.priority", "debug");
@@ -174,7 +167,7 @@ int main(int argc_, char ** argv_)
     serializer.initialize_standalone(writer_config);
 
     // Calo tracker statistics :
-    std::string output_data_root_filename = output_path + "/hc_data.root";
+    std::string output_data_root_filename = output_path + "/output_rootfile.root";
     DT_LOG_INFORMATION(logging, "Output filename for data in root format :" + output_data_root_filename);
     TFile * data_root_file = new TFile(output_data_root_filename.c_str(), "RECREATE");
     TTree * root_tree = new TTree("HC_data_tree","Half commissioning data");
@@ -702,7 +695,7 @@ int main(int argc_, char ** argv_)
     cts.save_in_root_file(histogram_file);
     histogram_file->Close();
 
-    std::ofstream ofstat(output_filename.c_str());
+    std::ofstream ofstat(output_stat_filename.c_str());
     cts.print(ofstat);
     ofstat.close();
 
