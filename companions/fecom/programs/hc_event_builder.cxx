@@ -8,6 +8,7 @@
 // - Boost:
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/program_options.hpp>
 
 // - Bayeux/datatools:
 #include <datatools/logger.h>
@@ -99,107 +100,84 @@ public :
 
 };
 
-
 int main(int argc_, char ** argv_)
 {
   int error_code = EXIT_SUCCESS;
   datatools::logger::priority logging = datatools::logger::PRIO_INFORMATION;
-  std::string input_filename = "";
-  std::string output_filename = "";
-  std::string input_path = "";
-  std::string output_path = "";
-  std::string input_tracker_mapping_file = "";
-  std::string input_calo_mapping_file = "";
-  int32_t     run_number = 0;
-  int32_t     first_event_number = 0;
-  bool        is_debug       = false;
-  bool        is_help        = false;
-  double      l1_build_gate  = event_builder::EVENT_BUILDING_CALO_L1_GATE_IN_NS;
-  double      l2_build_gate  = event_builder::EVENT_BUILDING_CALO_TRACKER_L2_GATE_IN_NS;
-  std::size_t min_nb_calo    = 0;
-  std::size_t min_nb_tracker = 0;
-  std::size_t max_events     = 0;
 
   try {
 
-    // Parsing arguments:
-    int iarg = 1;
-    while (iarg < argc_) {
-      std::string arg = argv_[iarg];
+    bool        is_debug       = false;
+    std::string input_filename = "";
+    std::string output_path = "";
+    std::size_t max_events     = 0;
+    std::string input_tracker_mapping_file = "";
+    std::string input_calo_mapping_file = "";
+    int32_t     run_number = 0;
+    std::size_t first_event_number = 0;
+    std::size_t min_nb_calo    = 0;
+    std::size_t min_nb_tracker = 0;
+    double      l1_build_gate  = event_builder::EVENT_BUILDING_CALO_L1_GATE_IN_NS;
+    double      l2_build_gate  = event_builder::EVENT_BUILDING_CALO_TRACKER_L2_GATE_IN_NS;
 
-      if (arg == "-i" || arg == "--input") {
-        input_filename = argv_[++iarg];
-      }
+    // Parse options:
+    namespace po = boost::program_options;
+    po::options_description opts("Allowed options");
+    opts.add_options()
+      ("help,h", "produce help message")
+      ("debug,d", "debug mode")
+      ("input,i",
+       po::value<std::string>(& input_filename),
+       "set an input file")
+      ("output,o",
+       po::value<std::string>(& output_path),
+       "set the output path")
+      ("max-events,M",
+       po::value<std::size_t>(& max_events)->default_value(10),
+       "set the maximum number of events")
+      ("calo-map,c",
+       po::value<std::string>(& input_calo_mapping_file),
+       "set the calorimeter map")
+      ("tracker-map,t",
+       po::value<std::string>(& input_tracker_mapping_file),
+       "set the tracker map")
+      ("run-number,r",
+       po::value<int32_t>(& run_number)->default_value(-1),
+       "set the run number")
+      ("first-event-number,e",
+       po::value<std::size_t>(& first_event_number)->default_value(0),
+       "set the first event number")
+      ("min-calo-hits,C",
+       po::value<std::size_t>(& min_nb_calo)->default_value(0),
+       "set the minimum number of calo hits in an event to record in a brio file")
+      ("min-tracker-hits,T",
+       po::value<std::size_t>(& min_nb_tracker)->default_value(0),
+       "set the minimum number of tracker hits in an event to record in a brio file")
+      ("l1-gate-value",
+       po::value<double>(& l1_build_gate),
+       "set the size (double) of the L1 gate (calo) for the event building")
+      ("l2-gate-value",
+       po::value<double>(& l2_build_gate),
+       "set the size (double) of the L2 gate (tracker) for the event building")
+      ; // end of options description
 
-      else if (arg == "-o" || arg == "--output") {
-        output_filename = argv_[++iarg];
-      }
+    // Describe command line arguments :
+    po::variables_map vm;
+    po::store(po::command_line_parser(argc_, argv_)
+              .options(opts)
+              .run(), vm);
+    po::notify(vm);
 
-      else if (arg == "-op" || arg == "--output-path") {
-        output_path = argv_[++iarg];
-      }
-
-      else if (arg == "-cm" || arg == "--calo-map") {
-	input_calo_mapping_file = argv_[++iarg];
-      }
-
-      else if (arg == "-tm" || arg == "--tracker-map") {
-	input_tracker_mapping_file = argv_[++iarg];
-      }
-
-      else if (arg == "-g1" || arg == "--build-gate-l1") {
-        l1_build_gate = std::stod(argv_[++iarg]);
-      }
-
-      else if (arg == "-g2" || arg == "--build-gate-l2") {
-        l2_build_gate = std::stod(argv_[++iarg]);
-      }
-
-      else if (arg == "-r" || arg == "--run-number") {
-        run_number = boost::lexical_cast<std::size_t>(argv_[++iarg]);
-      }
-
-      else if (arg == "-e" || arg == "--event-number") {
-        first_event_number = boost::lexical_cast<std::size_t>(argv_[++iarg]);
-      }
-
-      else if (arg == "-C" || arg == "--min-calo-hits") {
-        min_nb_calo = boost::lexical_cast<std::size_t>(argv_[++iarg]);
-      }
-
-      else if (arg == "-T" || arg == "--min-tracker-hits") {
-        min_nb_tracker = boost::lexical_cast<std::size_t>(argv_[++iarg]);
-      }
-
-      else if (arg == "-M" || arg == "--max-events") {
-        max_events = boost::lexical_cast<std::size_t>(argv_[++iarg]);
-      }
-
-      else if (arg == "-d" || arg == "--debug") {
-        is_debug = true;
-      }
-
-      else if (arg == "-h" || arg == "--help") {
-        is_help = true;
-      }
-
-      else {
-        DT_THROW(std::logic_error, "Unrecognised argument '" << arg << "'!");
-      }
-
-      iarg++;
+    // Use command line arguments :
+    if (vm.count("help")) {
+      std::cout << "Usage : " << std::endl;
+      std::cout << opts << std::endl;
+      return(1);
     }
 
-    if (is_help) {
-      std::cerr << std::endl << "Usage :" << std::endl << std::endl
-                << "fecom-hc_event_builder [OPTIONS]" << std::endl << std::endl
-                << "Allowed options: " << std::endl
-                << "-h    [ --help ]        produce help message" << std::endl
-                << "-i    [ --input ] file  set an input file" << std::endl
-                << "-o    [ --output ] file set an output file" << std::endl
-                << "-op   [ --output ] path set a path where all files are store" << std::endl
-                << "-d    [ --debug ]       debug mode" << std::endl << std::endl;
-      return 0;
+    // Use command line arguments :
+    if (vm.count("debug")) {
+      is_debug = true;
     }
 
     if (is_debug) logging = datatools::logger::PRIO_DEBUG;
@@ -207,22 +185,13 @@ int main(int argc_, char ** argv_)
 
     // Set the input file :
     DT_THROW_IF(input_filename.empty(), std::logic_error, "Missing input file!");
-    // if (input_filename.empty()) input_filename = "${FECOM_RESOURCES_DIR}/data/samples/fake_run/toto.xml";
     datatools::fetch_path_with_env(input_filename);
 
-    if (input_path.empty()) {
-      boost::filesystem::path p(input_filename);
-      input_path = p.parent_path().string();
-      if (input_path.empty()) {
-        input_path = ".";
-      }
-    }
     DT_LOG_INFORMATION(logging, "Input filename      : " + input_filename);
-    DT_LOG_INFORMATION(logging, "Input path          : " + input_path);
 
     // Default output path in input path :
     if (output_path.empty()) {
-      output_path = input_path;
+      output_path = ".";
       DT_LOG_WARNING(logging, "The output path is empty, did you forget it in the option ? Default directory for output :" + output_path);
     }
     datatools::fetch_path_with_env(output_path);
@@ -231,11 +200,8 @@ int main(int argc_, char ** argv_)
     DT_LOG_INFORMATION(logging, "Serialization input file :" + input_filename);
     datatools::data_reader deserializer(input_filename, datatools::using_multiple_archives);
 
-    if (output_filename.empty()) {
-      output_filename = output_path + '/' + "hc_event_builder_serialized.brio";
-    }
+    std::string output_filename = output_path + '/' + "hc_event_builder_serialized.brio";
     DT_LOG_INFORMATION(logging, "Serialization output file :" + output_filename);
-
 
     // Event serializer module :
     dpp::output_module serializer;
@@ -246,15 +212,7 @@ int main(int argc_, char ** argv_)
     serializer.initialize_standalone(writer_config);
     serializer.tree_dump(std::clog, "HC Event builder writer module");
 
-
-    if (input_tracker_mapping_file.empty()) {
-      input_tracker_mapping_file = input_path + "/" + "mapping_tracker.csv";
-    }
-    datatools::fetch_path_with_env(input_tracker_mapping_file);
-    if (input_calo_mapping_file.empty()) {
-      input_calo_mapping_file = input_path + "/" + "mapping_calo.csv";
-    }
-    datatools::fetch_path_with_env(input_calo_mapping_file);
+    DT_THROW_IF(input_calo_mapping_file.empty() || input_tracker_mapping_file.empty(), std::logic_error, "Missing calo or tracker mapping config file ! ");
 
     DT_LOG_INFORMATION(logging, "Mapping calo file    :" + input_calo_mapping_file);
     DT_LOG_INFORMATION(logging, "Mapping tracker file :" + input_tracker_mapping_file);
@@ -280,7 +238,7 @@ int main(int argc_, char ** argv_)
     int modulo = 10000;
 
     while (deserializer.has_record_tag()) {
-      //DT_LOG_DEBUG(logging, "Entering has record tag...");
+      DT_LOG_DEBUG(logging, "Entering has record tag...");
       chit.reset();
       tchit.reset();
       if ((hit_counter % modulo) == 0){
@@ -342,8 +300,6 @@ int main(int argc_, char ** argv_)
 	  event_id.set_run_number(run_number);
 	  event_id.set_event_number(event_number++);
 	  CE.set_event_id(event_id);
-	  //serializer2.store(CE);
-	  // std::cout.precision(15);
 	  // CE.print(std::cout);
 	  // CE.tree_dump(std::clog, "A com event to serialize");
           serializer.process(commissioning_event_record);

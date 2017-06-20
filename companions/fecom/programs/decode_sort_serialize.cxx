@@ -9,9 +9,6 @@
 // - Boost:
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/operations.hpp>
-// Code dedicated to the serialization of the ``std::set`` template class :
-// #include <boost/serialization/serialization.hpp>
-// #include <boost/serialization/set.hpp>
 #include <boost/program_options.hpp>
 
 // - Bayeux/datatools:
@@ -97,93 +94,73 @@ int main(int argc_, char ** argv_)
 {
   int error_code = EXIT_SUCCESS;
   datatools::logger::priority logging = datatools::logger::PRIO_INFORMATION;
-  std::string input_filename = "";
-  std::string output_filename = "";
-  std::string input_path  = "";
-  std::string output_path = "";
-  std::size_t max_hits = 0;
-  bool        is_debug = false;
-  bool        is_help  = false;
-  int         modulo   = 10000;
 
-  // Parsing arguments:
-  int iarg = 1;
-  while (iarg < argc_) {
-    std::string arg = argv_[iarg];
+  try {
 
-    if (arg == "-i" || arg == "--input") {
-      input_filename = argv_[++iarg];
+    bool        is_debug = false;
+    std::string input_filename = "";
+    std::string output_path = "";
+    std::size_t max_hits = 0;
+    int         modulo   = 10000;
+
+    // Parse options:
+    namespace po = boost::program_options;
+    po::options_description opts("Allowed options");
+    opts.add_options()
+      ("help,h", "produce help message")
+      ("debug,d", "debug mode")
+      ("input,i",
+       po::value<std::string>(& input_filename),
+       "set an input file")
+      ("output,o",
+       po::value<std::string>(& output_path),
+       "set the output path")
+      ("max-events,M",
+       po::value<std::size_t>(& max_hits)->default_value(10),
+       "set the maximum number of hits")
+      ; // end of options description
+
+    // Describe command line arguments :
+    po::variables_map vm;
+    po::store(po::command_line_parser(argc_, argv_)
+              .options(opts)
+              .run(), vm);
+    po::notify(vm);
+
+    // Use command line arguments :
+    if (vm.count("help")) {
+      std::cout << "Usage : " << std::endl;
+      std::cout << opts << std::endl;
+      return(1);
     }
 
-    else if (arg == "-o" || arg == "--output") {
-      output_filename = argv_[++iarg];
-    }
-
-    else if (arg == "-op" || arg == "--output-path") {
-      output_path = argv_[++iarg];
-    }
-
-    else if (arg == "-M" || arg == "--max-hits") {
-      max_hits = boost::lexical_cast<std::size_t>(argv_[++iarg]);
-    }
-
-    else if (arg == "-d" || arg == "--debug") {
+    // Use command line arguments :
+    if (vm.count("debug")) {
       is_debug = true;
     }
 
-    else if (arg == "-h" || arg == "--help") {
-      is_help = true;
-    }
+    if (is_debug) logging = datatools::logger::PRIO_DEBUG;
 
-    else {
-      DT_THROW(std::logic_error, "Unrecognised argument '" << arg << "'!");
-    }
-
-    iarg++;
-  }
-
-  if (is_help) {
-    std::cerr << std::endl << "Usage :" << std::endl << std::endl
-              << "fecom-decode_sort_serialize [OPTIONS] " << std::endl << std::endl
-              << "Allowed options: " << std::endl
-              << "-h         [ --help ]        produce help message" << std::endl
-              << "-i         [ --input ]       set an input file" << std::endl
-              << "-o         [ --output ]      set a path where all files are store" << std::endl
-              << "-d         [ --display ]     display things for debug" << std::endl << std::endl;
-    return 0;
-  }
-
-  if (is_debug) logging = datatools::logger::PRIO_DEBUG;
-
-  try {
     DT_LOG_INFORMATION(logging, "Starting...");
 
     // Set the input file from Jihane's DAQ :
-    DT_THROW_IF(input_filename.empty(), std::logic_error, "Missing input file!");
+    DT_THROW_IF(input_filename.empty(), std::logic_error, "Missing input file ! ");
     datatools::fetch_path_with_env(input_filename);
 
-    if (input_path.empty()) {
-      boost::filesystem::path p(input_filename);
-      input_path = p.parent_path().string();
-      if (input_path.empty()) {
-        input_path = ".";
-      }
-    }
     DT_LOG_INFORMATION(logging, "Input filename      : " + input_filename);
-    DT_LOG_INFORMATION(logging, "Input path          : " + input_path);
 
     // Default output path in input path :
     if (output_path.empty()){
-      output_path = input_path;
+      output_path = ".";
       DT_LOG_WARNING(logging, "The output path is empty, did you forget it in the option ? Default directory for output :" + output_path);
     }
     datatools::fetch_path_with_env(output_path);
     DT_LOG_INFORMATION(logging, "Output path : " + output_path);
 
-    if (output_filename.empty()) {
-      output_filename = output_path + '/' + "decode_sort-output.data.bz2";
-    }
+    std::string output_filename = output_path + '/' + "decode_sort-output.data.bz2";
+
     DT_LOG_INFORMATION(logging, "Serialization output file :" + output_filename);
+
     datatools::data_writer serializer(output_filename,
                                       datatools::using_multiple_archives);
 
@@ -197,7 +174,6 @@ int main(int argc_, char ** argv_)
     DT_LOG_INFORMATION(logging, "File [" << input_filename << "]   header : ");
     header.tree_dump(std::clog, "Run header:");
 
-    //    std::size_t event_serialized = 0;
     hit_list hl;
     hl.make_new_calo_hit();
     hl.make_new_tracker_channel_hit();

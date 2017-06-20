@@ -28,7 +28,6 @@
 #include "TTree.h"
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TGraph.h"
 
 // This project:
 #include <fecom/commissioning_event.hpp>
@@ -41,17 +40,18 @@ int main(int argc_, char ** argv_)
 
   gErrorAbortLevel = 2000;
 
-  std::vector<std::string> input_filenames;// = "";
-  // std::string input_filename = "";
-  std::string output_path = "";
-  std::string input_tracker_mapping_file = "";
-  std::string input_calo_mapping_file = "";
-  std::size_t max_events     = 0;
-  std::size_t min_calo_hits  = 0;
-  std::size_t min_tracker_hits  = 0;
-  bool        is_debug       = false;
-
   try {
+
+    bool is_debug = false;
+    std::vector<std::string> input_filenames;// = "";
+    // std::string input_filename = "";
+    std::string output_path = "";
+    std::size_t max_events     = 0;
+    std::string input_tracker_mapping_file = "";
+    std::string input_calo_mapping_file = "";
+    std::size_t min_calo_hits  = 0;
+    std::size_t min_tracker_hits  = 0;
+
     // Parse options:
     namespace po = boost::program_options;
     po::options_description opts("Allowed options");
@@ -96,7 +96,7 @@ int main(int argc_, char ** argv_)
     }
 
     // Use command line arguments :
-    else if (vm.count("debug")) {
+    if (vm.count("debug")) {
       is_debug = true;
     }
 
