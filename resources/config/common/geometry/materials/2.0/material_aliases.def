@@ -117,7 +117,8 @@ material : string = "snemo::air::lsm"
 [name="tracking_gas" type="alias"]
 #@config The alias for tracking gas
 #@description The name of the referenced material
-material : string = "snemo::tracking_gas::nemo3"
+#material : string = "snemo::tracking_gas::nemo3"
+material : string = "snemo::tracking_gas::half_commissioning"
 
 
 # end of @falaise:config/common/geometry/materials/2.0/material_aliases.def
