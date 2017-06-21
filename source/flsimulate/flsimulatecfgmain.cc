@@ -24,6 +24,7 @@
 // Third Party
 // - Boost
 #include "boost/program_options.hpp"
+#include "boost/algorithm/string.hpp"
 // - Bayeux
 #include "bayeux/datatools/logger.h"
 #include "bayeux/datatools/urn.h"
@@ -35,6 +36,7 @@
 #include "falaise/falaise.h"
 #include "falaise/version.h"
 #include "falaise/exitcodes.h"
+#include "falaise/configuration_db.h"
 #include "FLSimulateErrors.h"
 #include "FLSimulateUtils.h"
 
@@ -331,46 +333,60 @@ namespace FLSimulateConfig {
     if (flSimCfgParameters.simulationSetupUrn.empty()) {
       flSimCfgParameters.simulationSetupUrn = FLSimulate::default_simulation_setup();
     }
-
-    datatools::kernel & dtk = datatools::kernel::instance();
-    const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
-    datatools::urn_info simSetupUrnInfo;
-    datatools::urn_info variantConfigUrnInfo;
-    // Check URN registration from the system URN query service:
+    falaise::configuration_db cfgdb;
+    //datatools::urn_info simSetupUrnInfo;
+    //datatools::urn_info variantConfigUrnInfo;
+    // Check URN registration from the configuration DB utility:
     {
-      DT_THROW_IF(!dtkUrnQuery.check_urn_info(flSimCfgParameters.simulationSetupUrn, "simsetup"),
+      DT_THROW_IF(!cfgdb.check_with_category(flSimCfgParameters.simulationSetupUrn, "simsetup"),
                   std::logic_error,
                   "Cannot query simulation setup URN='" << flSimCfgParameters.simulationSetupUrn << "'!");
     }
-    simSetupUrnInfo = dtkUrnQuery.get_urn_info(flSimCfgParameters.simulationSetupUrn);
+    //simSetupUrnInfo = cfgdb.get_urn_info(flSimCfgParameters.simulationSetupUrn);
 
     // Variant setup:
     if (flSimCfgParameters.variantConfigUrn.empty()) {
       // Automatically determine the variants configuration component:
+      DT_THROW_IF(!cfgdb.find_direct_unique_dependee_with_category_from(flSimCfgParameters.simulationSetupUrn,
+                                                                        "variant",
+                                                                        flSimCfgParameters.variantConfigUrn),
+                  std::logic_error,
+                  "Cannot query unique variant setup URN from '" << flSimCfgParameters.simulationSetupUrn << "'!");
+      /*
       if (simSetupUrnInfo.has_topic("variants") &&
           simSetupUrnInfo.get_components_by_topic("variants").size() == 1) {
         flSimCfgParameters.variantConfigUrn = simSetupUrnInfo.get_component("variants");
       }
+      */
     }
     if (!flSimCfgParameters.variantConfigUrn.empty()) {
       // Check URN registration from the system URN query service:
       {
-        DT_THROW_IF(!dtkUrnQuery.check_urn_info(flSimCfgParameters.variantConfigUrn, "variant"),
+        DT_THROW_IF(!cfgdb.check_with_category(flSimCfgParameters.variantConfigUrn, "variant"),
                     std::logic_error,
                     "Cannot query variant setup URN='" << flSimCfgParameters.variantConfigUrn << "'!");
+        // DT_THROW_IF(!dtkUrnQuery.check_urn_info(flSimCfgParameters.variantConfigUrn, "variant"),
+        //             std::logic_error,
+        //             "Cannot query variant setup URN='" << flSimCfgParameters.variantConfigUrn << "'!");
       }
-      variantConfigUrnInfo = dtkUrnQuery.get_urn_info(flSimCfgParameters.variantConfigUrn);
+      // variantConfigUrnInfo = dtkUrnQuery.get_urn_info(flSimCfgParameters.variantConfigUrn);
 
       // Resolve variant configuration file:
       std::string conf_variants_category = "configuration";
       std::string conf_variants_mime;
       std::string conf_variants_path;
-      DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flSimCfgParameters.variantConfigUrn,
-                                                   conf_variants_category,
-                                                   conf_variants_mime,
-                                                   conf_variants_path),
+      DT_THROW_IF(!cfgdb.resolve(flSimCfgParameters.variantConfigUrn,
+                                 conf_variants_category,
+                                 conf_variants_mime,
+                                 conf_variants_path),
                   std::logic_error,
                   "Cannot resolve URN='" << flSimCfgParameters.variantConfigUrn << "'!");
+      // DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flSimCfgParameters.variantConfigUrn,
+      //                                              conf_variants_category,
+      //                                              conf_variants_mime,
+      //                                              conf_variants_path),
+      //             std::logic_error,
+      //             "Cannot resolve URN='" << flSimCfgParameters.variantConfigUrn << "'!");
       flSimCfgParameters.variantServiceConfig.config_filename = conf_variants_path;
     }
     DT_THROW_IF(flSimCfgParameters.variantServiceConfig.config_filename.empty(),
@@ -380,8 +396,28 @@ namespace FLSimulateConfig {
     // No variant profile is set:
     if (flSimCfgParameters.variantServiceConfig.profile_load.empty()) {
       if (flSimCfgParameters.inputVariantProfileUrn.empty()) {
-        DT_LOG_DEBUG(flSimCfgParameters.logLevel, "No input variant profile URN is set.");
         // No variant profile URN is set:
+        DT_LOG_DEBUG(flSimCfgParameters.logLevel, "No input variant profile URN is set.");
+        // We try to find a default one from the list of variant profiles attached on the variant service:
+        std::set<std::string> varprofile_dependers;
+        // First we extract this list of depender variant profiles:
+        if (cfgdb.find_direct_dependers_with_category_from(flSimCfgParameters.variantConfigUrn,
+                                                           "varprofile",
+                                                           varprofile_dependers)) {
+          // Scan dependers variant profiles and search for one which has an alias dependee used as the default one:
+          for (auto vp : varprofile_dependers) {
+            std::string vdpef;
+            if (cfgdb.find_direct_unique_depender_with_category_from(vp, "varprofile", vdpef)) {
+              if (cfgdb.is_alias_of(vdpef, vp)) {
+                if (boost::algorithm::ends_with(vdpef,":variants:profiles:default")) {
+                  flSimCfgParameters.inputVariantProfileUrn = vdpef;
+                  break;
+                }
+              }
+            }
+          }
+        }
+        /*
         if (variantConfigUrnInfo.is_valid()) {
           DT_LOG_DEBUG(flSimCfgParameters.logLevel, "Trying to find a default one from the current variant setup...");
           // Try to find a default one from the current variant setup:
@@ -394,18 +430,25 @@ namespace FLSimulateConfig {
                          << " associated to variant configuration '" << variantConfigUrnInfo.get_urn() << "'.");
           }
         }
+        */
       }
       if (!flSimCfgParameters.inputVariantProfileUrn.empty()) {
         // Determine the variant profile path from a blessed variant profile URN:
         std::string conf_variantsProfile_category = "configuration";
         std::string conf_variantsProfile_mime;
         std::string conf_variantsProfile_path;
-        DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flSimCfgParameters.inputVariantProfileUrn,
-                                                     conf_variantsProfile_category,
-                                                     conf_variantsProfile_mime,
-                                                     conf_variantsProfile_path),
+        DT_THROW_IF(!cfgdb.resolve(flSimCfgParameters.inputVariantProfileUrn,
+                                   conf_variantsProfile_category,
+                                   conf_variantsProfile_mime,
+                                   conf_variantsProfile_path),
                     std::logic_error,
                     "Cannot resolve variant profile URN='" << flSimCfgParameters.inputVariantProfileUrn << "'!");
+        // DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flSimCfgParameters.inputVariantProfileUrn,
+        //                                              conf_variantsProfile_category,
+        //                                              conf_variantsProfile_mime,
+        //                                              conf_variantsProfile_path),
+        //             std::logic_error,
+        //             "Cannot resolve variant profile URN='" << flSimCfgParameters.inputVariantProfileUrn << "'!");
         flSimCfgParameters.variantServiceConfig.profile_load = conf_variantsProfile_path;
       }
     }
@@ -415,7 +458,8 @@ namespace FLSimulateConfig {
                 "No variant service input profile path is set!");
 
     DT_LOG_DEBUG(flSimCfgParameters.logLevel, "Simulation setup tag      : [" << flSimCfgParameters.simulationSetupUrn << ']');
-    DT_LOG_DEBUG(flSimCfgParameters.logLevel, "Variant configuration tag : [" << variantConfigUrnInfo.get_urn() << ']');
+    DT_LOG_DEBUG(flSimCfgParameters.logLevel, "Variant configuration tag : [" << flSimCfgParameters.variantConfigUrn << ']');
+    // DT_LOG_DEBUG(flSimCfgParameters.logLevel, "Variant configuration tag : [" << variantConfigUrnInfo.get_urn() << ']');
     DT_LOG_DEBUG(flSimCfgParameters.logLevel, "Variant configuration     : '" << flSimCfgParameters.variantServiceConfig.config_filename << "'");
     DT_LOG_DEBUG(flSimCfgParameters.logLevel, "Input variant profile tag : [" << flSimCfgParameters.inputVariantProfileUrn << ']');
     DT_LOG_DEBUG(flSimCfgParameters.logLevel, "Input variant profile     : '" << flSimCfgParameters.variantServiceConfig.profile_load << "'");

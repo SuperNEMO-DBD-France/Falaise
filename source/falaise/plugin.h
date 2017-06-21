@@ -28,9 +28,6 @@
 // Standard Library
 #include <string>
 
-// Third Party
-// - A
-
 // This Project
 #include <falaise/resource.h>
 #endif // FALAISE_PLUGIN_H

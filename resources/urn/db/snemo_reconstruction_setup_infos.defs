@@ -33,7 +33,7 @@
 
 description : string = "SuperNEMO Demonstrator reconstruction setup (version 1.0.0)"
 
-topics : string[2] = "setup" "pipeline"
+topics : string[2] = "expsetup" "pipeline"
 
 topic.setup.component      : string = "urn:snemo:demonstrator:setup:1.0"
 topic.pipeline.component   : string = "urn:snemo:demonstrator:reconstruction:1.0.0:pipeline"
@@ -58,7 +58,7 @@ description : string = "Processing pipeline modules for the SuperNEMO reconstruc
 
 description : string = "SuperNEMO Demonstrator Half-Commissioning reconstruction setup (version 1.0.0)"
 
-topics : string[2] = "setup" "pipeline"
+topics : string[2] = "expsetup" "pipeline"
 
 topic.setup.component    : string = "urn:snemo:demonstrator:setup:1.0"
 topic.pipeline.component : string = "urn:snemo:demonstrator:reconstruction:hc-1.0.0:pipeline"

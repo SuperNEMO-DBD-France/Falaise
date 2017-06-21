@@ -31,6 +31,7 @@ set(FalaiseLibrary_HEADERS
   version.h.in
   property_reader.h
   detail/falaise_sys.h
+  configuration_db.h
 )
 
 #-----------------------------------------------------------------------
@@ -53,6 +54,7 @@ set(FalaiseLibrary_SOURCES
   falaise_binreloc.c
   property_reader.cc
   detail/falaise_sys.cc
+  configuration_db.cc
  )
 
 set(FalaiseLibrary_TESTS)
