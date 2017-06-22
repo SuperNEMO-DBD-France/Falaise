@@ -306,8 +306,8 @@ int main(int argc_, char ** argv_)
           event_serialized++;
         }
         eb.reset_serialization();
-        if (max_events > 0 && (event_number >= max_events)) {
-          DT_LOG_INFORMATION(logging, "Maximum number of events is reached.");
+        if (max_events > 0 && (event_serialized >= max_events)) {
+          DT_LOG_INFORMATION(logging, "Maximum number of serialized events is reached.");
           break;
         }
       } // end of ready for serialization
@@ -449,7 +449,7 @@ int main(int argc_, char ** argv_)
     std::cout << "min_nb_calo="    << min_nb_calo << std::endl;
     std::cout << "min_nb_tracker=" << min_nb_tracker << std::endl;
 
-    std::string sname = "last_event_number.txt";
+    std::string sname = output_path + "/last_event_number.txt";
     std::ofstream offile(sname.c_str());
     offile << event_number << std::endl;
     offile.close();
