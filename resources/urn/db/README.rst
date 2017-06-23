@@ -7,9 +7,9 @@ Registered tags
 The configuration tag system in Falaise
 =======================================
 
-The blessed  configurations of software components  used for SuperNEMO
+The blessed configurations for  software components used for SuperNEMO
 data processing is  addressed through a *configuration  tag* system. A
-*tag*  is   an  unique  identifier   which  allows  to   describe  the
+*tag*  is an  unique identifier  which allows  to describe  a specific
 configuration of a given  subsystem (geometry model, simulation setup,
 reconstruction pipeline...)  and to locate (*resolve*) the path of its
 associated  resource configuration  file  distributed  by the  Falaise
@@ -25,14 +25,22 @@ Examples:
    urn:snemo:demonstrator:simulation:2.1
 ..
 
-A configuration item may be a  standalone resource which depends on no
-external resource and  is associated to an  unique configuration file,
-typically  using   the  Bayeux/datatools   (multi-)properties  format.
-However,  some  configuration  systems  used  to  setup  complex  data
-processing components (simulation, reconstruction), are built from the
-aggregation  of several  configuration subsystems.   The configuration
-tag system  allows to describe the  *dependency* relationships between
-such items.
+The leading ``urn`` prefix is  mandatory.  Then comes a mandatory URN
+*namespace* ``snemo:demonstrator``.  The last part  of the URN tag is
+arbitrary and  can be considered  as the  identifier of the  item with
+respect  to the  namespace. This  identifier typically  consists in  a
+sequence of some  alphabetical tokens, separated by  the colon (``:``)
+and  followed by  a version  identifier (``3.14``)  and possibly  more
+specialized tokens.
+
+A configuration  item may  be a standalone  resource or  concept which
+depends on no external resource and  is simply associated to an unique
+configuration    file,    typically   using    the    Bayeux/datatools
+(multi-)properties format.   However, some configuration  systems used
+to   setup    complex   data   processing    components   (simulation,
+reconstruction),   are  built   from   the   aggregation  of   several
+configuration  subsystems.  The  configuration  tag  system allows  to
+describe the *dependency/composition* relationships between such items.
 
 For example, a  *simulation setup* (for ``flsimulate``)  is built from
 an  *experimental  setup*,  a  *vertex  generation  setup*,  a  *decay
@@ -43,7 +51,7 @@ devices,   including   electronics,   cabling...).  This   implies   a
 *dependency  graph*   that  must  be  traversed   properly  to  pickup
 unambiguously  the  configuration  of  a  given  data  processing  and
 associate it  to the  output data  (real data  collection, simulation,
-reconstruction...).  More a  configuration setup can be  reused, or at
+reconstruction...).  More, a  configuration setup can be  reused, or at
 least part  of it, by  sequenced data processing  algorithms.
 
 Example:
@@ -57,15 +65,30 @@ setup, typically using the same geometry model and associated options.
 Dependencies between tags
 =========================
 
+.. code::
 
-
+   [urn3]
+      | "depender"
+      |
+ "dependency"
+      |
+      v "dependee"
+   [urn2]
+      |\ "depender"
+      | \
+  "dependency"
+      |   \
+      v    v "dependees"
+   [urn0] [urn1]
+..
 
 
 
 Categories of URN tags
 ======================
 
-There are different categories of configuration items that are supported in Falaise published tags:
+There  are  different  categories  of  configuration  items  that  are
+supported in Falaise published tags:
 
   * ``experiment`` : Identifier/tag associated to a specific *experiment*,
   * ``configuration`` : Identifier/tag associated to the configuration of a generic system (geometry...).
@@ -92,27 +115,27 @@ Example: four different tags used to address four experiment.
 
 .. code::
 
-  [urn::snemo:demonstrator]  [urn:bipo3]  [urn:atlas]  [urn:lhcb]
+  [urn:snemo:demonstrator]  [urn:bipo3]  [urn:atlas]  [urn:lhcb]
   ..
 
 Configuration
 -------------
 
-The ``configuration`` category is used for a tag associated to the
-configuration of some generic system or service (geometry model,
+The ``configuration``  category is  used for a  tag associated  to the
+configuration  of  some generic  system  or  service (geometry  model,
 device model, set of reconstruction modules, pipeline...)
 
-Example: three distinct ``configuration`` tags of the geometry setup are associated
-to the different ``experiment`` tags:
+Example: three  distinct ``configuration`` tags of  the geometry setup
+are associated to different ``experiment`` tags:
 
 .. code::
 
-   [urn::snemo:demonstrator:geometry:4.0]  [urn::snemo:demonstrator:geometry:5.0]  [urn:bipo3:geometry:1.0]
+   [urn:snemo:demonstrator:geometry:4.0]  [urn:snemo:demonstrator:geometry:5.0]  [urn:bipo3:geometry:1.0]
       |                                       |                                       |
       +---------------------------------------+                                       |
       |                                                                               |
       v                                                                               v
-   [urn::snemo:demonstrator]                                                       [urn:bipo3]
+   [urn:snemo:demonstrator]                                                       [urn:bipo3]
 ..
 
 Additional geometry  configurations can  be added  in parallel  to the
@@ -138,35 +161,36 @@ SuperNEMO demonstrator experiment.
 
 .. code::
 
-   [urn::snemo:demonstrator:setup:2.0]
+   [urn:snemo:demonstrator:setup:2.0]
       |
       +---------------------------------------+
       |                                       |
       v                                       v
-   [urn::snemo:demonstrator:geometry:4.0]  [urn::snemo:demonstrator:device:1.0]
+   [urn:snemo:demonstrator:geometry:4.0]  [urn:snemo:demonstrator:device:1.0]
       |                                       |
       +---------------------------------------+
       |
       v
-   [urn::snemo:demonstrator]
+   [urn:snemo:demonstrator]
 ..
 
    A new *experimental setup* can be published using the same geometry model but a refined
-   *device model*:
+   *device model*. In such case, the new *experimental setup* must be associated with a new
+   tag:
 
 .. code::
 
-   [urn::snemo:demonstrator:setup:3.0]
+   [urn:snemo:demonstrator:setup:3.0]
       |
       +---------------------------------------+
       |                                       |
       v                                       v
-   [urn::snemo:demonstrator:geometry:4.0]  [urn::snemo:demonstrator:device:2.0]
+   [urn:snemo:demonstrator:geometry:4.0]  [urn:snemo:demonstrator:device:2.0]
       |                                       |
       +---------------------------------------+
       |
       v
-   [urn::snemo:demonstrator]
+   [urn:snemo:demonstrator]
 ..
 
    Or course, both geometry and device models could be modified to build a new experimental setup
@@ -175,17 +199,17 @@ SuperNEMO demonstrator experiment.
 
 .. code::
 
-   [urn::snemo:demonstrator:setup:4.0]
+   [urn:snemo:demonstrator:setup:4.0]
       |
       +---------------------------------------+
       |                                       |
       v                                       v
-   [urn::snemo:demonstrator:geometry:5.0]  [urn::snemo:demonstrator:device:2.0]
+   [urn:snemo:demonstrator:geometry:5.0]  [urn:snemo:demonstrator:device:2.0]
       |                                       |
       +---------------------------------------+
       |
       v
-   [urn::snemo:demonstrator]
+   [urn:snemo:demonstrator]
 ..
 
 * ``simsetup`` : Identifier/tag associated to a *simulation setup* which implies:
@@ -199,48 +223,54 @@ SuperNEMO demonstrator experiment.
 
 .. code::
 
-   [urn::snemo:demonstrator:simulation:2.1]
+   [urn:snemo:demonstrator:simulation:2.1]
       |
       +------------------------------------+--------------------------------------------------+
       |                                    |                                                  |
       v                                    v                                                  v
-   [urn::snemo:demonstrator:setup:1.0]  [urn::snemo:demonstrator:simulation:vertexes:4.1]  [urn::snemo:demonstrator:simulation:decays:1.2]
+   [urn:snemo:demonstrator:setup:1.0]  [urn:snemo:demonstrator:simulation:vertexes:4.1]  [urn:snemo:demonstrator:simulation:decays:1.2]
       |                                    |
       +------------------------------------+
       |
       v
-   [urn::snemo:demonstrator:geometry:4.0]
+   [urn:snemo:demonstrator:geometry:4.0]
       |
       |
       |
       v
-   [urn::snemo:demonstrator]
+   [urn:snemo:demonstrator]
 ..
 
-   Suppose we decide to enrich the vertex generation setup with additional vertex generators not implemented in the
-   ``urn::snemo:demonstrator:simulation:vertexes:4.1`` configuration. We can create a new ``urn::snemo:demonstrator:simulation:vertexes:4.2``
-   configuration setup. As the simulation setup depends on the vertex generation setup, it is necessary to publish a new
-   ``urn::snemo:demonstrator:simulation:3.0`` simulation setup. This will preserve the existing one (backward compatibility)
-   and make possible to use the new one independently of which the dependency scheme is:
+   Suppose  we  decide to  enrich  the  vertex generation  setup  with
+   additional    vertex   generators    not    implemented   in    the
+   ``urn:snemo:demonstrator:simulation:vertexes:4.1``   configuration.
+   We             can             create             a             new
+   ``urn:snemo:demonstrator:simulation:vertexes:4.2``    configuration
+   setup. As  the simulation  setup depends  on the  vertex generation
+   setup,     it     is     necessary     to     publish     a     new
+   ``urn:snemo:demonstrator:simulation:3.0``  simulation setup.   This
+   will preserve  the existing  one (backward compatibility)  and make
+   possible to  use the new  one independently. The  dependency scheme
+   is:
 
 .. code::
 
-   [urn::snemo:demonstrator:simulation:3.0]
+   [urn:snemo:demonstrator:simulation:3.0]
       |
       +------------------------------------+--------------------------------------------------+
       |                                    |                                                  |
       v                                    v                                                  v
-   [urn::snemo:demonstrator:setup:1.0]  [urn::snemo:demonstrator:simulation:vertexes:4.2]  [urn::snemo:demonstrator:simulation:decays:1.2]
+   [urn:snemo:demonstrator:setup:1.0]  [urn:snemo:demonstrator:simulation:vertexes:4.2]  [urn:snemo:demonstrator:simulation:decays:1.2]
       |                                    |
       +------------------------------------+
       |
       v
-   [urn::snemo:demonstrator:geometry:4.0]
+   [urn:snemo:demonstrator:geometry:4.0]
       |
       |
       |
       v
-   [urn::snemo:demonstrator]
+   [urn:snemo:demonstrator]
 ..
 
 
@@ -249,27 +279,27 @@ SuperNEMO demonstrator experiment.
   * an *experimental setup* (see above)
   * the setup of the reconstruction chain (*pipeline*)
 
-  Example: The following reconstruction setup is built by the aggregation of a experimental setup configuration
+  Example: The following reconstruction setup is built by the aggregation of an experimental setup configuration
   and a specific data processing pipeline (sequence of processing modules):
 
 .. code::
 
-   [urn::snemo:demonstrator:reconstruction:1.0.0]
+   [urn:snemo:demonstrator:reconstruction:1.0.0]
       |
       +------------------------------------+
       |                                    |
       v                                    v
-   [urn::snemo:demonstrator:setup:1.0]  [urn:snemo:demonstrator:reconstruction:1.0.0:pipeline]
+   [urn:snemo:demonstrator:setup:1.0]  [urn:snemo:demonstrator:reconstruction:1.0.0:pipeline]
       |
       |
       |
       v
-   [urn::snemo:demonstrator:geometry:4.0]
+   [urn:snemo:demonstrator:geometry:4.0]
       |
       |
       |
       v
-   [urn::snemo:demonstrator]
+   [urn:snemo:demonstrator]
 ..
 
 * ``anasetup`` : Identifier/tag associated to an *analysis setup* (not used yet) which implies:
@@ -277,29 +307,29 @@ SuperNEMO demonstrator experiment.
   * an *experimental setup* with:
   * an *reconstruction setup* with:
 
-* ``variant`` : Identifier/tag associated to the configuration of a variant service
+* ``variant`` : Identifier/tag associated to the configuration of a *variant service*
 * ``varprofile`` : Identifier/tag associated to a variant profile. Variant profile depends
   on a given variant service
 * ``service`` : Identifier/tag associated to the configuration of a *services management system*
 
+
+Configuration of the simulation
+=============================================
+
+As mentionned above, flsimulate needs two specific tags to describe unambiguously
+the configuration of a given simulation session/run:
+
+* The *static* part of the configuration is provided through the *simulation setup* tag.
+  This setup is associated to a *variant service* which provides the definition
+  of a set of possible variant parameters/options that are tweakable by the operator.
+* The *dynamic* part of the configuration of the simulation run is provided through a tag associated to a specific
+  *variant profile* which is compatible with the variant service and explicitely set the effective parameters
+  chosen by the operator.
+
+
+
+
 Organization of  configuration resource files
 =============================================
 
-SuperNEMO experimental setup
-----------------------------
-
-
-
-SuperNEMO Simulation
---------------------
-
-
-
-SuperNEMO Reconstruction
-------------------------
-
-
-
-
-SuperNEMO Analysis
-------------------
+WIP
