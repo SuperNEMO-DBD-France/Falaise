@@ -37,7 +37,8 @@ namespace FLSimulate {
     std::string outputMetadataFile;       //!< Path for saving metadata
     bool        embeddedMetadata;         //!< Flag to embed metadata in the output data file
     std::string outputFile;               //!< Path for the output module
-   static FLSimulateCommandLine makeDefault();
+    std::string variantReportFile;        //!< Path to the output variant report file
+    static FLSimulateCommandLine makeDefault();
   };
 
   //! Handle printing of version information to given ostream

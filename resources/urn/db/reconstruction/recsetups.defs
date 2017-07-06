@@ -26,17 +26,19 @@
 #   - "urn:snemo:demonstrator:reconstruction:1.0.0:pipeline"
 #
 
-############################################################################
-[urn="urn:snemo:demonstrator:reconstruction:1.0.0" category="configuration"]
+########################################################################
+[urn="urn:snemo:demonstrator:reconstruction:1.0.0" category="recscript"]
 
 #@config URN registration of the flreconstruct script for the SuperNEMO reconstruction (version 1.0.0)
 
 description : string = "SuperNEMO Demonstrator reconstruction setup (version 1.0.0)"
 
-topics : string[2] = "expsetup" "pipeline"
+topics : string[2] = "context" "dependency"
 
-topic.setup.component      : string = "urn:snemo:demonstrator:setup:1.0"
-topic.pipeline.component   : string = "urn:snemo:demonstrator:reconstruction:1.0.0:pipeline"
+topic.context.component     : string    = "urn:snemo:demonstrator"
+topic.dependency.components : string[2] = \
+			    "urn:snemo:demonstrator:setup:1.0" \
+			    "urn:snemo:demonstrator:reconstruction:1.0.0:pipeline"
 
 
 ################################################################################
@@ -51,17 +53,19 @@ description : string = "Processing pipeline modules for the SuperNEMO reconstruc
 # Half-Commissioning #
 ######################
 
-###############################################################################
-[urn="urn:snemo:demonstrator:reconstruction:hc-1.0.0" category="configuration"]
+###########################################################################
+[urn="urn:snemo:demonstrator:reconstruction:hc-1.0.0" category="recscript"]
 
 #@config URN registration of the flreconstruct script for the SuperNEMO reconstruction (Half-Commissioning version 1.0.0)
 
 description : string = "SuperNEMO Demonstrator Half-Commissioning reconstruction setup (version 1.0.0)"
 
-topics : string[2] = "expsetup" "pipeline"
+topics : string[2] = "context" "dependency"
 
-topic.setup.component    : string = "urn:snemo:demonstrator:setup:1.0"
-topic.pipeline.component : string = "urn:snemo:demonstrator:reconstruction:hc-1.0.0:pipeline"
+topic.context.component     : string    = "urn:snemo:demonstrator"
+topic.dependency.components : string[2] = \
+			    "urn:snemo:demonstrator:setup:1.0" \
+			    "urn:snemo:demonstrator:reconstruction:hc-1.0.0:pipeline"
 
 
 ###################################################################################
@@ -72,8 +76,9 @@ topic.pipeline.component : string = "urn:snemo:demonstrator:reconstruction:hc-1.
 description : string = "Processing pipeline modules for the SuperNEMO reconstruction setup (Half-Commissioning version 1.0.0)"
 
 # Only works with Half-Commissioning geometry setup variant profile
-topics : string[1] = "profile"
+topics : string[1] = "dependency"
 
-topic.profile.component  : string = "urn:snemo:demonstrator:setup:1.0:variants:profiles:hc-1.0.0"
+topic.dependency.components : string[1] = "urn:snemo:demonstrator:setup:1.0:variants:profiles:hc-1.0.0"
+
 
 # end

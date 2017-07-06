@@ -8,12 +8,12 @@
 #include <bayeux/datatools/utils.h>
 #include <bayeux/datatools/urn.h>
 #include <bayeux/datatools/kernel.h>
-#include <bayeux/datatools/urn_query_service.h>
 #include <bayeux/datatools/library_info.h>
 #include <bayeux/mygsl/random_utils.h>
 
 // This Project:
 #include "falaise/property_reader.h"
+#include "falaise/configuration_db.h"
 #include "FLSimulateCommandLine.h"
 #include "FLSimulateErrors.h"
 #include "FLSimulateUtils.h"
@@ -72,6 +72,7 @@ namespace FLSimulate {
     params.variantConfigUrn = "";
     params.variantProfileUrn = "";
     params.variantSubsystemParams.config_filename = "";
+    params.variantSubsystemParams.reporting_filename = "";
     params.saveVariantSettings = true;
 
     // Service support:
@@ -107,6 +108,7 @@ namespace FLSimulate {
     flSimParameters.embeddedMetadata   = args.embeddedMetadata;
     flSimParameters.outputFile         = args.outputFile;
     flSimParameters.mountPoints        = args.mountPoints;
+    flSimParameters.variantSubsystemParams.reporting_filename = args.variantReportFile;
 
     if (flSimParameters.mountPoints.size()) {
       // Apply mount points as soon as possible, because manually set file path below
@@ -385,8 +387,9 @@ namespace FLSimulate {
   void do_postprocess(FLSimulateArgs & flSimParameters)
   {
     DT_LOG_TRACE_ENTERING(flSimParameters.logLevel);
-    datatools::kernel & dtk = datatools::kernel::instance();
-    const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
+    // datatools::kernel & dtk = datatools::kernel::instance();
+    // const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
+    falaise::configuration_db cfgdb;
 
     if (flSimParameters.simulationManagerParams.input_prng_seeds_file.empty()) {
       if (!flSimParameters.saveRngSeeding &&
@@ -419,45 +422,36 @@ namespace FLSimulate {
 
       } else {
         DT_THROW(std::logic_error, "Missing simulation setup configuration file!");
-
-        //   // Default simulation setup:
-        //   if (flSimParameters.simulationManagerParams.manager_config_filename.empty()) {
-        //     flSimParameters.simulationSetupUrn = default_simulation_setup();
-        //     DT_LOG_WARNING(flSimParameters.logLevel, "Use default simulation setup '" << flSimParameters.simulationSetupUrn << "'.");
-        //   }
-
       }
     }
 
-    datatools::urn_info simSetupUrnInfo;
-    datatools::urn_info variantConfigUrnInfo;
     if (!flSimParameters.simulationSetupUrn.empty()) {
-      // Check URN registration from the system URN query service:
+      // Check URN registration from the configuration DB:
       {
-        DT_THROW_IF(!dtkUrnQuery.check_urn_info(flSimParameters.simulationSetupUrn, "simsetup"),
+        DT_THROW_IF(!cfgdb.check_with_category(flSimParameters.simulationSetupUrn, "simsetup"),
                     std::logic_error,
-                    "Cannot query simulation setup URN='" << flSimParameters.simulationSetupUrn << "'!");
+                    "Cannot find simulation setup URN='" << flSimParameters.simulationSetupUrn << "'!");
       }
-      simSetupUrnInfo = dtkUrnQuery.get_urn_info(flSimParameters.simulationSetupUrn);
 
       if (flSimParameters.experimentalSetupUrn.empty()) {
-        // Automatically determine the experimental setup component:
-        if (simSetupUrnInfo.has_topic("expsetup") &&
-            simSetupUrnInfo.get_components_by_topic("expsetup").size() == 1) {
-          flSimParameters.experimentalSetupUrn = simSetupUrnInfo.get_component("expsetup");
-        }
+        // Automatically determine the experimental setup component associated to this simulation setup:
+        DT_THROW_IF(!cfgdb.find_direct_unique_dependee_with_category_from(flSimParameters.experimentalSetupUrn,
+                                                                          flSimParameters.simulationSetupUrn,
+                                                                          falaise::configuration_db::category::experimental_setup_label()),
+                    std::logic_error,
+                    "Cannot query unique experimental setup URN from '" << flSimParameters.simulationSetupUrn << "'!");
       }
 
       // Simulation:
       {
-        // Resolve simulation config file path:
+        // Resolve the path of the main simulation configuration file:
         std::string conf_simu_category = "configuration";
         std::string conf_simu_mime;
         std::string conf_simu_path;
-        DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flSimParameters.simulationSetupUrn,
-                                                     conf_simu_category,
-                                                     conf_simu_mime,
-                                                     conf_simu_path),
+        DT_THROW_IF(!cfgdb.resolve(flSimParameters.simulationSetupUrn,
+                                   conf_simu_category,
+                                   conf_simu_mime,
+                                   conf_simu_path),
                     std::logic_error,
                     "Cannot resolve URN='" << flSimParameters.simulationSetupUrn << "'!");
         flSimParameters.simulationManagerParams.manager_config_filename = conf_simu_path;
@@ -466,28 +460,29 @@ namespace FLSimulate {
       // Variant setup:
       if (flSimParameters.variantConfigUrn.empty()) {
         // Automatically determine the variants configuration component:
-        if (simSetupUrnInfo.has_topic("variants") &&
-            simSetupUrnInfo.get_components_by_topic("variants").size() == 1) {
-          flSimParameters.variantConfigUrn = simSetupUrnInfo.get_component("variants");
-        }
+        DT_THROW_IF(!cfgdb.find_direct_unique_dependee_with_category_from(flSimParameters.variantConfigUrn,
+                                                                          flSimParameters.simulationSetupUrn,
+                                                                          falaise::configuration_db::category::variants_service_label()),
+                    std::logic_error,
+                    "Cannot find unique variant setup URN from '" << flSimParameters.simulationSetupUrn << "'!");
       }
       if (!flSimParameters.variantConfigUrn.empty()) {
         // Check URN registration from the system URN query service:
         {
-          DT_THROW_IF(!dtkUrnQuery.check_urn_info(flSimParameters.variantConfigUrn, "variant"),
+          DT_THROW_IF(!cfgdb.check_with_category(flSimParameters.variantConfigUrn,
+                                                 falaise::configuration_db::category::variants_service_label()),
                       std::logic_error,
-                      "Cannot query variant setup URN='" << flSimParameters.variantConfigUrn << "'!");
+                      "Cannot find variant setup URN='" << flSimParameters.variantConfigUrn << "'!");
         }
-        variantConfigUrnInfo = dtkUrnQuery.get_urn_info(flSimParameters.variantConfigUrn);
 
         // Resolve variant configuration file:
         std::string conf_variants_category = "configuration";
         std::string conf_variants_mime;
         std::string conf_variants_path;
-        DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flSimParameters.variantConfigUrn,
-                                                     conf_variants_category,
-                                                     conf_variants_mime,
-                                                     conf_variants_path),
+        DT_THROW_IF(!cfgdb.resolve(flSimParameters.variantConfigUrn,
+                                   conf_variants_category,
+                                   conf_variants_mime,
+                                   conf_variants_path),
                     std::logic_error,
                     "Cannot resolve URN='" << flSimParameters.variantConfigUrn << "'!");
         flSimParameters.variantSubsystemParams.config_filename = conf_variants_path;
@@ -501,23 +496,24 @@ namespace FLSimulate {
                     "Service configuration URN='" << flSimParameters.servicesSubsystemConfigUrn << "' conflicts with services configuration path='"
                     << flSimParameters.servicesSubsystemConfig << "'!");
       } else {
-        // Try to set the services setup from a blessed services configuration URN:
         if (flSimParameters.servicesSubsystemConfigUrn.empty()) {
-          if (simSetupUrnInfo.has_topic("services") &&
-              simSetupUrnInfo.get_components_by_topic("services").size() == 1) {
-            // If the simulation setup URN implies a "services" component, fetch it!
-            flSimParameters.servicesSubsystemConfigUrn = simSetupUrnInfo.get_component("services");
-          }
+          // Automatically determine the variants configuration component:
+          DT_THROW_IF(!cfgdb.find_direct_unique_dependee_with_category_from(flSimParameters.servicesSubsystemConfigUrn,
+                                                                            flSimParameters.simulationSetupUrn,
+                                                                            falaise::configuration_db::category::services_manager_label()),
+                      std::logic_error,
+                      "Cannot find unique service setup URN from '" << flSimParameters.simulationSetupUrn << "'!");
         }
+
         if (!flSimParameters.servicesSubsystemConfigUrn.empty()) {
-          // Resolve services file:
+          // Resolve path of the service manager configuration file:
           std::string conf_services_category = "configuration";
           std::string conf_services_mime;
           std::string conf_services_path;
-          DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flSimParameters.servicesSubsystemConfigUrn,
-                                                       conf_services_category,
-                                                       conf_services_mime,
-                                                       conf_services_path),
+          DT_THROW_IF(!cfgdb.resolve(flSimParameters.servicesSubsystemConfigUrn,
+                                     conf_services_category,
+                                     conf_services_mime,
+                                     conf_services_path),
                       std::logic_error,
                       "Cannot resolve URN='" << flSimParameters.servicesSubsystemConfigUrn << "'!");
           flSimParameters.servicesSubsystemConfig = conf_services_path;
@@ -536,20 +532,32 @@ namespace FLSimulate {
                   "Variant profile URN='" << flSimParameters.variantProfileUrn << "' conflicts with variant profile path='"
                   << flSimParameters.variantSubsystemParams.profile_load << "'!");
     } else {
-      DT_LOG_DEBUG(flSimParameters.logLevel, "No variant profile is set.");
+      DT_LOG_DEBUG(flSimParameters.logLevel, "No variant profile path is set.");
       if (flSimParameters.variantProfileUrn.empty()) {
-        DT_LOG_DEBUG(flSimParameters.logLevel, "No variant profile URN is set.");
         // No variant profile URN is set:
-        if (variantConfigUrnInfo.is_valid()) {
-          DT_LOG_DEBUG(flSimParameters.logLevel, "Trying to find a default one from the current variant setup...");
-          // Try to find a default one from the current variant setup:
-          if (variantConfigUrnInfo.has_topic("__default_profile__") &&
-              variantConfigUrnInfo.get_components_by_topic("__default_profile__").size() == 1) {
-            // If the simulation setup URN implies a "services" component, fetch it!
-            flSimParameters.variantProfileUrn = variantConfigUrnInfo.get_component("__default_profile__");
-            DT_LOG_DEBUG(flSimParameters.logLevel,
-                         "Using the default variant profile '" << flSimParameters.variantProfileUrn << "'"
-                         << " associated to variant configuration '" << variantConfigUrnInfo.get_urn() << "'.");
+        DT_LOG_DEBUG(flSimParameters.logLevel, "No variant profile URN is set.");
+        // We try to find a default one from the list of variant profiles attached on the variant service:
+        std::set<std::string> varprofile_dependers;
+        // First we extract this list of depender variant profiles:
+        if (cfgdb.find_direct_dependers_with_category_from(varprofile_dependers,
+                                                           flSimParameters.variantConfigUrn,
+                                                           falaise::configuration_db::category::variants_profile_label())) {
+          // Scan dependers variant profiles and search for one which has an alias dependee used as the default one:
+          for (auto vp : varprofile_dependers) {
+            std::string vdpef;
+            if (cfgdb.find_direct_unique_depender_with_category_from(vdpef,
+                                                                     vp,
+                                                                     falaise::configuration_db::category::variants_profile_label())) {
+              if (cfgdb.is_alias_of(vdpef, vp)) {
+                if (boost::algorithm::ends_with(vdpef,
+                                                falaise::configuration_db::category::default_urn_suffix())) {
+                  // Pickup the real URN, not the alias:
+                  flSimParameters.variantProfileUrn = vp;
+                  // std::cerr << "[devel] flSimParameters.variantProfileUrn = " << flSimParameters.variantProfileUrn << std::endl;
+                  break;
+                }
+              }
+            }
           }
         }
       }
@@ -558,10 +566,10 @@ namespace FLSimulate {
         std::string conf_variantsProfile_category = "configuration";
         std::string conf_variantsProfile_mime;
         std::string conf_variantsProfile_path;
-        DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flSimParameters.variantProfileUrn,
-                                                     conf_variantsProfile_category,
-                                                     conf_variantsProfile_mime,
-                                                     conf_variantsProfile_path),
+        DT_THROW_IF(!cfgdb.resolve(flSimParameters.variantProfileUrn,
+                                   conf_variantsProfile_category,
+                                   conf_variantsProfile_mime,
+                                   conf_variantsProfile_path),
                     std::logic_error,
                     "Cannot resolve variant profile URN='" << flSimParameters.variantProfileUrn << "'!");
         flSimParameters.variantSubsystemParams.profile_load = conf_variantsProfile_path;

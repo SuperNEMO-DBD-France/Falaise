@@ -1,6 +1,6 @@
 # -*- mode: conf-unix; -*-
 
-#@description Definition list of URNs associated to experiments in the SuperNEMO collaboration
+#@description Definition of URNs associated to experiments in the SuperNEMO collaboration
 #@key_label  "urn"
 #@meta_label "category"
 

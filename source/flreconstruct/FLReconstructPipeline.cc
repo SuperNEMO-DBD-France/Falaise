@@ -19,12 +19,11 @@
 #include "bayeux/geomtools/manager.h"
 #include "bayeux/geomtools/geometry_service.h"
 #include "bayeux/datatools/library_loader.h"
-#include <bayeux/datatools/kernel.h>
-#include <bayeux/datatools/urn_query_service.h>
 
 // This Project:
 #include "falaise/resource.h"
 #include "falaise/snemo/processing/services.h"
+#include "falaise/configuration_db.h"
 #include "FLReconstructImpl.h"
 
 namespace FLReconstruct {
@@ -270,8 +269,9 @@ namespace FLReconstruct {
                                           datatools::service_manager & recServices)
   {
     DT_LOG_TRACE_ENTERING(recParams.logLevel);
-    datatools::kernel & dtk = datatools::kernel::instance();
-    const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
+    falaise::configuration_db cfgdb;
+    // datatools::kernel & dtk = datatools::kernel::instance();
+    // const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
 
     // Geometry is a fundamental service, try to set one if missing:
     std::string geoServiceName = snemo::processing::service_info::default_geometry_service_label();
@@ -279,19 +279,19 @@ namespace FLReconstruct {
         !recServices.is_a<geomtools::geometry_service>(geoServiceName)) {
       std::string geometrySetupUrn;
       std::string geometrySetupConfig;
-      const datatools::urn_info & expSetupUrnInfo =
-        dtkUrnQuery.get_urn_info(recParams.experimentalSetupUrn);
-      if (expSetupUrnInfo.has_topic("geometry") &&
-          expSetupUrnInfo.get_components_by_topic("geometry").size() == 1) {
-        geometrySetupUrn = expSetupUrnInfo.get_component("geometry");
+      std::string dependee;
+      if (cfgdb.find_direct_unique_dependee_with_category_from(dependee,
+                                                               recParams.experimentalSetupUrn,
+                                                               "geometry")) {
+        geometrySetupUrn = dependee;
         // Resolve geometry file:
         std::string conf_variants_category = "configuration";
         std::string conf_variants_mime;
         std::string conf_variants_path;
-        DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(geometrySetupUrn,
-                                                     conf_variants_category,
-                                                     conf_variants_mime,
-                                                     conf_variants_path),
+        DT_THROW_IF(!cfgdb.resolve(geometrySetupUrn,
+                                   conf_variants_category,
+                                   conf_variants_mime,
+                                   conf_variants_path),
                     std::logic_error,
                     "Cannot resolve URN='" << geometrySetupUrn << "'!");
         geometrySetupConfig = conf_variants_path;

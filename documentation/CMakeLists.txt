@@ -122,6 +122,7 @@ set(FALAISE_MARKDOWN_DOCS
   Mainpage.md
   ${PROJECT_SOURCE_DIR}/source/Falaise.1.md
   ${PROJECT_SOURCE_DIR}/README.md
+  fltags/FLTags.md
   flsimulate/FLSimulate.md
   flsimulate/FLSimulateOutput.md
   flreconstruct/FLReconstruct.md
@@ -149,7 +150,7 @@ endforeach()
 
 # - Image paths
 set(FALAISE_DOXYGEN_IMAGE_DIRS
-  "${CMAKE_CURRENT_SOURCE_DIR}/flsimulate/images ${CMAKE_CURRENT_SOURCE_DIR}/flreconstruct/images ${CMAKE_CURRENT_SOURCE_DIR}/flvisualize/images"
+  "${CMAKE_CURRENT_SOURCE_DIR}/flsimulate/images ${CMAKE_CURRENT_SOURCE_DIR}/flreconstruct/images ${CMAKE_CURRENT_SOURCE_DIR}/flvisualize/images ${CMAKE_CURRENT_SOURCE_DIR}/fltags/images"
   )
 
 #-----------------------------------------------------------------------

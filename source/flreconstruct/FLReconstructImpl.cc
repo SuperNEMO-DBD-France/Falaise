@@ -13,8 +13,8 @@
 #include "bayeux/datatools/logger.h"
 #include "bayeux/datatools/factory_macros.h"
 #include <bayeux/datatools/urn.h>
-#include <bayeux/datatools/kernel.h>
-#include <bayeux/datatools/urn_query_service.h>
+// #include <bayeux/datatools/kernel.h>
+// #include <bayeux/datatools/urn_query_service.h>
 #include "bayeux/dpp/base_module.h"
 #include "bayeux/dpp/input_module.h"
 
@@ -23,6 +23,7 @@
 #include "falaise/resource.h"
 #include "falaise/property_reader.h"
 #include "falaise/exitcodes.h"
+#include "falaise/configuration_db.h"
 #include <falaise/app/metadata_utils.h>
 #include "FLReconstructParams.h"
 #include "FLReconstructCommandLine.h"
@@ -389,25 +390,26 @@ namespace FLReconstruct {
   void do_postprocess(FLReconstructParams & flRecParameters)
   {
     DT_LOG_TRACE_ENTERING(flRecParameters.logLevel);
-    datatools::kernel & dtk = datatools::kernel::instance();
-    const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
+    falaise::configuration_db cfgdb;
+    // datatools::kernel & dtk = datatools::kernel::instance();
+    // const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
 
     // Process input metadata:
     do_postprocess_input_metadata(flRecParameters);
 
     if (!flRecParameters.reconstructionPipelineUrn.empty()) {
       // Check URN registration from the system URN query service:
-      DT_THROW_IF(!dtkUrnQuery.check_urn_info(flRecParameters.reconstructionPipelineUrn, "recsetup"),
+      DT_THROW_IF(!cfgdb.check_with_category(flRecParameters.reconstructionPipelineUrn, "recsetup"),
                   std::logic_error,
                   "Cannot query reconstruction setup URN='" << flRecParameters.reconstructionPipelineUrn << "'!");
       // Resolve reconstruction config file path:
       std::string conf_rec_category = "configuration";
       std::string conf_rec_mime;
       std::string conf_rec_path;
-      DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flRecParameters.reconstructionPipelineUrn,
-                                                   conf_rec_category,
-                                                   conf_rec_mime,
-                                                   conf_rec_path),
+      DT_THROW_IF(!cfgdb.resolve(flRecParameters.reconstructionPipelineUrn,
+                                 conf_rec_category,
+                                 conf_rec_mime,
+                                 conf_rec_path),
                   std::logic_error,
                   "Cannot resolve URN='" << flRecParameters.reconstructionPipelineUrn << "'!");
       flRecParameters.reconstructionPipelineConfig = conf_rec_path;
@@ -451,19 +453,24 @@ namespace FLReconstruct {
       // Check URN registration from the system URN query service:
       {
         std::string conf_category = "expsetup";
-        DT_THROW_IF(!dtkUrnQuery.check_urn_info(flRecParameters.experimentalSetupUrn, conf_category),
+        DT_THROW_IF(!cfgdb.check_with_category(flRecParameters.experimentalSetupUrn, conf_category),
                     std::logic_error,
-                    "Cannot query URN='" << flRecParameters.experimentalSetupUrn << "'!");
+                    "Cannot find URN='" << flRecParameters.experimentalSetupUrn << "' with category '" << conf_category << "'!");
       }
-      const datatools::urn_info & expSetupUrnInfo =
-        dtkUrnQuery.get_urn_info(flRecParameters.experimentalSetupUrn);
+      // const datatools::urn_info & expSetupUrnInfo =
+      //   dtkUrnQuery.get_urn_info(flRecParameters.experimentalSetupUrn);
 
       // Variants:
-      // Automatically determine the variants configuration component:
+      // XXX
       std::string variantConfigUrn;
-      if (expSetupUrnInfo.has_topic("variants") &&
-          expSetupUrnInfo.get_components_by_topic("variants").size() == 1) {
-        variantConfigUrn = expSetupUrnInfo.get_component("variants");
+      {
+        // Automatically determine the variants configuration component:
+        std::string variant_dependee;
+        if (cfgdb.find_direct_unique_dependee_with_category_from(variant_dependee,
+                                                                 flRecParameters.experimentalSetupUrn,
+                                                                 falaise::configuration_db::category::variants_service_label())) {
+           variantConfigUrn = variant_dependee;
+        }
       }
       if (!flRecParameters.variantConfigUrn.empty()) {
         DT_THROW_IF(flRecParameters.variantConfigUrn != variantConfigUrn,
@@ -479,10 +486,10 @@ namespace FLReconstruct {
         std::string conf_variants_category = "configuration";
         std::string conf_variants_mime;
         std::string conf_variants_path;
-        DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flRecParameters.variantConfigUrn,
-                                                     conf_variants_category,
-                                                     conf_variants_mime,
-                                                     conf_variants_path),
+        DT_THROW_IF(!cfgdb.resolve(flRecParameters.variantConfigUrn,
+                                   conf_variants_category,
+                                   conf_variants_mime,
+                                   conf_variants_path),
                     std::logic_error,
                     "Cannot resolve URN='" << flRecParameters.variantConfigUrn << "'!");
         flRecParameters.variantSubsystemParams.config_filename = conf_variants_path;
@@ -490,7 +497,8 @@ namespace FLReconstruct {
 
       // Services:
       if (!flRecParameters.servicesSubsystemConfig.empty()) {
-        // Force the services config path:
+        // Cannot explicitely set the services config path which must be resolved
+        // through the Urn:
         DT_THROW_IF(!flRecParameters.servicesSubsystemConfigUrn.empty(),
                     std::logic_error,
                     "Service configuration URN='" << flRecParameters.servicesSubsystemConfigUrn << "' "
@@ -500,10 +508,11 @@ namespace FLReconstruct {
         // Try to set the services setup from a blessed services configuration URN:
         std::string servicesSubsystemConfigUrn;
         if (flRecParameters.servicesSubsystemConfigUrn.empty()) {
-          if (expSetupUrnInfo.has_topic("services") &&
-              expSetupUrnInfo.get_components_by_topic("services").size() == 1) {
-            // If the experimental setup URN implies a "services" component, fetch it!
-            servicesSubsystemConfigUrn = expSetupUrnInfo.get_component("services");
+          std::string services_dependee;
+          if (cfgdb.find_direct_unique_dependee_with_category_from(services_dependee,
+                                                                   flRecParameters.experimentalSetupUrn,
+                                                                   falaise::configuration_db::category::services_manager_label())) {
+            servicesSubsystemConfigUrn = services_dependee;
           }
         }
         if (!flRecParameters.servicesSubsystemConfigUrn.empty()) {
@@ -520,10 +529,10 @@ namespace FLReconstruct {
           std::string conf_services_category = "configuration";
           std::string conf_services_mime;
           std::string conf_services_path;
-          DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flRecParameters.servicesSubsystemConfigUrn,
-                                                       conf_services_category,
-                                                       conf_services_mime,
-                                                       conf_services_path),
+          DT_THROW_IF(!cfgdb.resolve(flRecParameters.servicesSubsystemConfigUrn,
+                                     conf_services_category,
+                                     conf_services_mime,
+                                     conf_services_path),
                       std::logic_error,
                       "Cannot resolve URN='" << flRecParameters.servicesSubsystemConfigUrn << "'!");
           flRecParameters.servicesSubsystemConfig = conf_services_path;
@@ -544,10 +553,10 @@ namespace FLReconstruct {
       std::string conf_variantsProfile_category = "configuration";
       std::string conf_variantsProfile_mime;
       std::string conf_variantsProfile_path;
-      DT_THROW_IF(!dtkUrnQuery.resolve_urn_to_path(flRecParameters.variantProfileUrn,
-                                                   conf_variantsProfile_category,
-                                                   conf_variantsProfile_mime,
-                                                   conf_variantsProfile_path),
+      DT_THROW_IF(!cfgdb.resolve(flRecParameters.variantProfileUrn,
+                                 conf_variantsProfile_category,
+                                 conf_variantsProfile_mime,
+                                 conf_variantsProfile_path),
                   std::logic_error,
                   "Cannot resolve variants profile URN='" << flRecParameters.variantProfileUrn << "'!");
       flRecParameters.variantSubsystemParams.profile_load = conf_variantsProfile_path;

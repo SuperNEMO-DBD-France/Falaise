@@ -1,12 +1,11 @@
 set(Falaise_RESOURCES
 ${PROJECT_SOURCE_DIR}/resources/README.rst
-${PROJECT_SOURCE_DIR}/resources/urn/db/README.rst
-${PROJECT_SOURCE_DIR}/resources/urn/db/snemo_reconstruction_setup_infos.defs
-${PROJECT_SOURCE_DIR}/resources/urn/db/experimental_setup_infos.defs
-${PROJECT_SOURCE_DIR}/resources/urn/db/experiment_infos.defs
-${PROJECT_SOURCE_DIR}/resources/urn/db/snemo_simulation_setup_infos.defs
+${PROJECT_SOURCE_DIR}/resources/urn/db/reconstruction/recsetups.defs
+${PROJECT_SOURCE_DIR}/resources/urn/db/experimental_setup/expsetups.defs
+${PROJECT_SOURCE_DIR}/resources/urn/db/geometry/geomsetups.defs
+${PROJECT_SOURCE_DIR}/resources/urn/db/simulation/simsetups.defs
 ${PROJECT_SOURCE_DIR}/resources/urn/db/snemo_setup_db.conf
-${PROJECT_SOURCE_DIR}/resources/urn/db/snemo_geometry_setup_infos.defs
+${PROJECT_SOURCE_DIR}/resources/urn/db/experiment/experiments.defs
 ${PROJECT_SOURCE_DIR}/resources/urn/resolvers/snemo_setup_resource_map.conf
 ${PROJECT_SOURCE_DIR}/resources/urn/resolvers/snemo_resource_path_resolver.conf
 ${PROJECT_SOURCE_DIR}/resources/urn/resolvers/snemo_simulation_resource_map.conf

@@ -5,12 +5,23 @@
 #@meta_label "category"
 
 
-#######################################################################
-[urn="urn:snemo:demonstrator:geometry:4.0:variants" category="variant"]
+####################################################################################
+[urn="urn:snemo:demonstrator:geometry:4.0:variants:registry" category="varregistry"]
+
+#@config URN registration of SuperNEMO demonstrator geometry variants registry (version 4.0)
+
+description : string = "SuperNEMO demonstrator geometry variants registry (version 4.0)"
+
+
+########################################################################
+[urn="urn:snemo:demonstrator:geometry:4.0:variants" category="variants"]
 
 #@config URN registration of SuperNEMO demonstrator geometry variants setup (version 4.0)
 
 description : string = "SuperNEMO demonstrator geometry variants setup (version 4.0)"
+
+topics : string[1] = "dependency"
+topic.dependency.components: string[1] = "urn:snemo:demonstrator:geometry:4.0:variants:registry"
 
 
 ###########################################################################################
@@ -31,8 +42,8 @@ topic.alias.component: string = "urn:snemo:demonstrator:geometry:4.0:variants:pr
 
 description : string = "Basic layout (1.0.0) variant profile for the SuperNEMO demonstrator geometry (version 4.0)"
 
-topics : string[1] = "variant"
-topic.variant.component: string = "urn:snemo:demonstrator:geometry:4.0:variants"
+topics : string[1] = "dependency"
+topic.dependency.components: string[1] = "urn:snemo:demonstrator:geometry:4.0:variants"
 
 
 ############################################################################################
@@ -42,21 +53,21 @@ topic.variant.component: string = "urn:snemo:demonstrator:geometry:4.0:variants"
 
 description : string = "Half-commissioning variant profile for the SuperNEMO demonstrator geometry (version 4.0)"
 
-topics : string[1] = "variant"
-topic.variant.component: string = "urn:snemo:demonstrator:geometry:4.0:variants"
+topics : string[1] = "dependency"
+topic.dependency.components: string[1] = "urn:snemo:demonstrator:geometry:4.0:variants"
 
 
-####################################################################
-[urn="urn:snemo:demonstrator:geometry:4.0" category="configuration"]
+##############################################################################
+[urn="urn:snemo:demonstrator:geometry:4.0" category="geometry"]
 
 #@config URN registration of SuperNEMO demonstrator geometry setup (version 4.0)
 
 description : string = "SuperNEMO demonstrator geometry setup (version 4.0)"
 
-topics : string[2] = "experiment" "variants"
+topics : string[2] = "context" "dependency"
 
-topic.experiment.component : string = "urn:snemo:demonstrator"
-topic.variants.component   : string = "urn:snemo:demonstrator:geometry:4.0:variants"
+topic.context.component     : string    = "urn:snemo:demonstrator"
+topic.dependency.components : string[1] = "urn:snemo:demonstrator:geometry:4.0:variants"
 
 
 # end

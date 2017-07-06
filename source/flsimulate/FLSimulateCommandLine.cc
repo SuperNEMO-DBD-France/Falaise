@@ -29,6 +29,7 @@ namespace FLSimulate {
     flClarg.embeddedMetadata = true;
     flClarg.outputFile = "";
     flClarg.userProfile = "normal";
+    flClarg.variantReportFile = "";
     return flClarg;
   }
 
@@ -171,6 +172,10 @@ namespace FLSimulate {
        "  -o \"example.brio\" \n"
        "  -o \"${WORKER_DIR}/data/run_1.xml\""
        )
+
+      ("variant-report,r",
+       bpo::value<std::string>(&clArgs.variantReportFile)->value_name("file"),
+       "file to store a usage report of the variants")
 
       ;
 

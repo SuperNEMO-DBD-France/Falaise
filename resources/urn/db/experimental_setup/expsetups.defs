@@ -17,32 +17,35 @@
 
 description : string = "SuperNEMO demonstrator detector setup (version 1.0)"
 
-topics : string[3] = "experiment" "services" "variants" "geometry"
+topics : string[2] = "context" "dependency"
 
-topic.experiment.component : string = "urn:snemo:demonstrator"
-topic.services.component   : string = "urn:snemo:demonstrator:setup:1.0:services"
-topic.variants.component   : string = "urn:snemo:demonstrator:setup:1.0:variants"
-topic.geometry.component   : string = "urn:snemo:demonstrator:geometry:4.0"
+topic.context.component     : string = "urn:snemo:demonstrator"
+topic.dependency.components : string[2] = \
+			    "urn:snemo:demonstrator:setup:1.0:services" \
+			    "urn:snemo:demonstrator:setup:1.0:variants"
 
 
-####################################################################
-[urn="urn:snemo:demonstrator:setup:1.0:services" category="service"]
+#####################################################################
+[urn="urn:snemo:demonstrator:setup:1.0:services" category="services"]
 
 #@config URN registration of services setup for the SuperNEMO demonstrator detector setup (version 1.0)
 
 description : string = "Services setup for the SuperNEMO demonstrator detector setup (version 1.0)"
 
-topics : string[1] = "geometry"
+topics : string[1] = "dependency"
 
-topic.geometry.component   : string = "urn:snemo:demonstrator:geometry:4.0"
+topic.dependency.components : string[1] = "urn:snemo:demonstrator:geometry:4.0"
 
 
-####################################################################
-[urn="urn:snemo:demonstrator:setup:1.0:variants" category="variant"]
+#####################################################################
+[urn="urn:snemo:demonstrator:setup:1.0:variants" category="variants"]
 
 #@config URN registration of variants setup for the SuperNEMO demonstrator detector setup (version 1.0)
 
 description : string = "Variants setup for the SuperNEMO demonstrator detector setup (version 1.0)"
+
+topics : string[1] = "dependency"
+topic.dependency.components: string[1] = "urn:snemo:demonstrator:geometry:4.0:variants:registry"
 
 
 ############################################################################################
@@ -52,8 +55,8 @@ description : string = "Variants setup for the SuperNEMO demonstrator detector s
 
 description : string = "Basic variant setup 1.0.0 for the SuperNEMO demonstrator detector setup (version 1.0)"
 
-topics : string[1] = "variant"
-topic.variant.component : string = "urn:snemo:demonstrator:setup:1.0:variants"
+topics : string[1] = "dependency"
+topic.dependency.components : string[1] = "urn:snemo:demonstrator:setup:1.0:variants"
 
 
 #########################################################################################
@@ -63,8 +66,8 @@ topic.variant.component : string = "urn:snemo:demonstrator:setup:1.0:variants"
 
 description : string = "HC variant setup 1.0.0 for the SuperNEMO demonstrator detector setup (version 1.0)"
 
-topics : string[1] = "variant"
-topic.variant.component : string = "urn:snemo:demonstrator:setup:1.0:variants"
+topics : string[1] = "dependency"
+topic.dependency.component : string[1] = "urn:snemo:demonstrator:setup:1.0:variants"
 
 
 ########################################################################################
@@ -89,9 +92,9 @@ topic.alias.component: string = "urn:snemo:demonstrator:setup:1.0:variants:profi
 
 description : string = "BiPo3 detector setup (version 1.0)"
 
-topics : string[1] = "experiment"
+topics : string[1] = "context"
 
-topic.experiment.component : string = "urn:bipo3:detector"
+topic.context.component : string = "urn:bipo3:detector"
 
 
 # end

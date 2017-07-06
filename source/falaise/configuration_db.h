@@ -41,6 +41,8 @@
 // Standard library:
 #include <memory>
 #include <set>
+#include <map>
+#include <vector>
 
 // Third Party:
 // - Bayeux:
@@ -53,6 +55,50 @@ namespace falaise {
   {
   public:
 
+    /// \brief Labels associated to supported categories of tagged items
+    struct category {
+      /// Label of an experiment
+      static const std::string & experiment_label();
+      /// Label for a geometry setup
+      static const std::string & geometry_setup_label();
+      /// Label for a devices manager setup
+      static const std::string & devices_setup_label();
+      /// Label for an experimental setup
+      static const std::string & experimental_setup_label();
+      /// Label for a processing setup
+      static const std::string & processing_setup_label();
+      /// Label for a processing pipeline
+      static const std::string & processing_pipeline_label();
+      /// Label for a processing module
+      static const std::string & processing_module_label();
+      /// Label for a simulation setup
+      static const std::string & simulation_setup_label();
+      /// Label for a reconstruction setup
+      static const std::string & reconstruction_setup_label();
+      /// Label for a variants service setup
+      static const std::string & variants_service_label();
+      /// Label for a variants registry setup
+      static const std::string & variants_registry_label();
+      /// Label for a variants profile
+      static const std::string & variants_profile_label();
+      /// Label for a services setup
+      static const std::string & services_manager_label();
+      /// Label for a generic configuration
+      static const std::string & configuration_label();
+      /// Label for a generic dataset
+      static const std::string & data_label();
+      /// Label suffix for default tags (format: urn:xxx[:yyy[:zzz]]]:default)
+      static const std::string & default_urn_suffix();
+    };
+
+    /// \brief Simple record representing a registered URN
+    struct urn_entry {
+      std::string urn;         ///< URN identifier of the resource
+      std::string description; ///!< Description of the resource
+      std::string category;    ///!< Category of the resource
+      std::map<std::string, std::string> meta; ///< Dictionary of metadata as key/value pairs
+    };
+
     /// Constructor
     configuration_db();
 
@@ -64,6 +110,18 @@ namespace falaise {
 
     /// Check if an URN is registered with a given category
     bool check_with_category(const std::string & urn_, const std::string & category_) const;
+
+    /// Find the list of URN entries which optionally match some DB pattern, some URN pattern, some category pattern
+    bool find(std::vector<urn_entry> & entries_,
+              const std::string & urn_regex_ = "",
+              const std::string & category_regex_ = "",
+              const std::string & db_regex_ = "") const;
+
+    /// Find an unique URN entry which optionally matches some DB pattern, some URN pattern, some category pattern
+    bool find_unique(urn_entry & entry_,
+                     const std::string & urn_regex_ = "",
+                     const std::string & category_regex_ = "",
+                     const std::string & db_regex_ = "") const;
 
     /// Check if an URN can be resolved as a path
     bool path_can_be_resolved_from(const std::string & urn_) const;
@@ -84,9 +142,9 @@ namespace falaise {
     ///           |                        |                            |
     /// [dependee-0 as "category"] [dependee-1 as "category"] ... [dependee-N as "category"]
     /// \end code
-    bool find_direct_dependees_with_category_from(const std::string & from_urn_,
-                                                  const std::string & category_,
-                                                  std::set<std::string> & dependees_);
+    bool find_direct_dependees_with_category_from(std::set<std::string> & dependees_,
+                                                  const std::string & from_urn_,
+                                                  const std::string & category_);
 
     /// Find an unique direct dependee URN of given category from a given URN
     /// \code
@@ -96,9 +154,9 @@ namespace falaise {
     ///        v
     ///    [dependee as "category"]
     /// \end code
-    bool find_direct_unique_dependee_with_category_from(const std::string & from_urn_,
-                                                        const std::string & category_,
-                                                        std::string & dependers_);
+    bool find_direct_unique_dependee_with_category_from(std::string & dependee_,
+                                                        const std::string & from_urn_,
+                                                        const std::string & category_);
 
     /// Find direct depender URNs of given category from a given URN
     /// \code
@@ -109,9 +167,9 @@ namespace falaise {
     ///                                    v
     ///                                [from-urn]
     /// \end code
-    bool find_direct_dependers_with_category_from(const std::string & from_urn_,
-                                                  const std::string & category_,
-                                                  std::set<std::string> & dependers_);
+    bool find_direct_dependers_with_category_from(std::set<std::string> & dependers_,
+                                                  const std::string & from_urn_,
+                                                  const std::string & category_);
 
     /// Find an unique depender URNs of given category from a given URN
     /// \code
@@ -121,9 +179,9 @@ namespace falaise {
     ///        v
     ///    [from-urn]
     /// \end code
-    bool find_direct_unique_depender_with_category_from(const std::string & from_urn_,
-                                                        const std::string & category_,
-                                                        std::string & depender_);
+    bool find_direct_unique_depender_with_category_from(std::string & depender_,
+                                                        const std::string & from_urn_,
+                                                        const std::string & category_);
 
     /// Check if a given URN directly depends on another URN
     /// \code

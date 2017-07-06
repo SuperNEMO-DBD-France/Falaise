@@ -34,6 +34,118 @@
 
 namespace falaise {
 
+  // static
+  const std::string & configuration_db::category::experiment_label()
+  {
+    static const std::string _label("experiment");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::geometry_setup_label()
+  {
+    static const std::string _label("geometry");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::devices_setup_label()
+  {
+    static const std::string _label("devices");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::experimental_setup_label()
+  {
+    static const std::string _label("expsetup");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::processing_setup_label()
+  {
+    static const std::string _label("processing");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::processing_pipeline_label()
+  {
+    static const std::string _label("pipeline");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::processing_module_label()
+  {
+    static const std::string _label("procmodule");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::simulation_setup_label()
+  {
+    static const std::string _label("simsetup");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::reconstruction_setup_label()
+  {
+    static const std::string _label("recsetup");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::variants_service_label()
+  {
+    static const std::string _label("variants");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::variants_registry_label()
+  {
+    static const std::string _label("varregistry");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::variants_profile_label()
+  {
+    static const std::string _label("varprofile");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::services_manager_label()
+  {
+    static const std::string _label("services");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::configuration_label()
+  {
+    static const std::string _label("configuration");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::data_label()
+  {
+    static const std::string _label("data");
+    return _label;
+  }
+
+  // static
+  const std::string & configuration_db::category::default_urn_suffix()
+  {
+    static const std::string _label(":default");
+    return _label;
+  }
+
   struct configuration_db::pimpl_type
   {
     pimpl_type()
@@ -67,6 +179,42 @@ namespace falaise {
     return _pimpl_->kuqs.check_urn_info(urn_, category_);
   }
 
+  bool configuration_db::find(std::vector<urn_entry> & entries_,
+                              const std::string & urn_regex_,
+                              const std::string & category_regex_,
+                              const std::string & db_regex_) const
+  {
+    std::vector<std::string> urn_infos;
+    if (_pimpl_->kuqs.find_urn_info(urn_infos,
+                                    db_regex_,
+                                    urn_regex_,
+                                    category_regex_)) {
+      for (std::size_t i = 0; i < urn_infos.size(); i++) {
+        urn_entry ue;
+        ue.urn = urn_infos[i];
+        const datatools::urn_info & uinfo = _pimpl_->kuqs.get_urn_info(ue.urn);
+        ue.description = uinfo.get_description();
+        ue.category = uinfo.get_category();
+        entries_.push_back(ue);
+      }
+    }
+    return entries_.size() > 0;
+  }
+
+  bool configuration_db::find_unique(urn_entry & entry_,
+                                     const std::string & urn_regex_,
+                                     const std::string & category_regex_,
+                                     const std::string & db_regex_) const
+  {
+    std::vector<urn_entry> entries;
+    if (find(entries, urn_regex_, category_regex_, db_regex_)) {
+      if (entries.size() != 1) return false;
+      entry_ = entries.front();
+      return true;
+    }
+    return false;
+  }
+
   bool configuration_db::path_can_be_resolved_from(const std::string & urn_) const
   {
     return _pimpl_->kuqs.check_urn_to_path(urn_);
@@ -83,9 +231,9 @@ namespace falaise {
     return _pimpl_->kuqs.resolve_urn_to_path(urn_, category_, mime_, path_);
   }
 
-  bool configuration_db::find_direct_dependers_with_category_from(const std::string & from_urn_,
-                                                                  const std::string & category_,
-                                                                  std::set<std::string> & dependers_)
+  bool configuration_db::find_direct_dependers_with_category_from(std::set<std::string> & dependers_,
+                                                                  const std::string & from_urn_,
+                                                                  const std::string & category_)
   {
     DT_THROW_IF(!check(from_urn_), std::logic_error, "No URN '" << from_urn_ << "'!");
     dependers_.clear();
@@ -102,13 +250,13 @@ namespace falaise {
     return dependers_.size() > 0;
   }
 
-  bool configuration_db::find_direct_unique_depender_with_category_from(const std::string & from_urn_,
-                                                                        const std::string & category_,
-                                                                        std::string & depender_)
+  bool configuration_db::find_direct_unique_depender_with_category_from(std::string & depender_,
+                                                                        const std::string & from_urn_,
+                                                                        const std::string & category_)
   {
     depender_.clear();
     std::set<std::string> dependers;
-    if (!find_direct_dependers_with_category_from(from_urn_, category_, dependers)) {
+    if (!find_direct_dependers_with_category_from(dependers, from_urn_, category_)) {
       return false;
     }
     if (dependers.size() == 1) {
@@ -156,9 +304,9 @@ namespace falaise {
     return false;
   }
 
-  bool configuration_db::find_direct_dependees_with_category_from(const std::string & from_urn_,
-                                                                  const std::string & category_,
-                                                                  std::set<std::string> & dependees_)
+  bool configuration_db::find_direct_dependees_with_category_from(std::set<std::string> & dependees_,
+                                                                  const std::string & from_urn_,
+                                                                  const std::string & category_)
   {
     DT_THROW_IF(!check(from_urn_), std::logic_error, "No URN '" << from_urn_ << "'!");
     const datatools::urn_info & uinfo = _pimpl_->kuqs.get_urn_info(from_urn_);
@@ -180,13 +328,13 @@ namespace falaise {
     return dependees_.size() > 0;
   }
 
-  bool configuration_db::find_direct_unique_dependee_with_category_from(const std::string & from_urn_,
-                                                                        const std::string & category_,
-                                                                        std::string & dependee_)
+  bool configuration_db::find_direct_unique_dependee_with_category_from(std::string & dependee_,
+                                                                        const std::string & from_urn_,
+                                                                        const std::string & category_)
   {
     dependee_.clear();
     std::set<std::string> dependees;
-    if (!find_direct_dependees_with_category_from(from_urn_, category_, dependees)) {
+    if (!find_direct_dependees_with_category_from(dependees, from_urn_, category_)) {
       return false;
     }
     if (dependees.size() == 1) {

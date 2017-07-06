@@ -42,7 +42,6 @@
 // Third Party
 // - Boost
 #include "boost/filesystem.hpp"
-// #include "boost/date_time/posix_time/posix_time.hpp"
 
 // - Bayeux
 #include "bayeux/bayeux.h"
@@ -50,12 +49,8 @@
 #include "bayeux/datatools/multi_properties.h"
 #include "bayeux/datatools/things.h"
 #include "bayeux/datatools/urn.h"
-#include "bayeux/datatools/kernel.h"
 #include "bayeux/datatools/configuration/variant_service.h"
 #include "bayeux/datatools/service_manager.h"
-#include "bayeux/datatools/urn_to_path_resolver_service.h"
-#include "bayeux/datatools/urn_db_service.h"
-#include "bayeux/datatools/urn_query_service.h"
 #include "bayeux/dpp/output_module.h"
 #include "bayeux/geomtools/manager.h"
 #include "bayeux/mctools/g4/simulation_module.h"
@@ -151,12 +146,6 @@ namespace FLSimulate {
     system_props.store_boolean("embeddedMetadata",
                                flSimParameters.embeddedMetadata,
                                "Metadata embedding flag");
-
-    // Remove timestamp from metadata:
-    // boost::posix_time::ptime start_run_timestamp = boost::posix_time::second_clock::universal_time();
-    // system_props.store_string("timestamp",
-    //                           boost::posix_time::to_iso_string(start_run_timestamp),
-    //                           "Run start timestamp");
 
     if (flSimParameters.doSimulation) {
       // Simulation section:
