@@ -41,8 +41,8 @@ description : string = "SuperNEMO demonstrator vertex generation variants regist
 description : string = "SuperNEMO demonstrator primary event generation variants registry (version 1.2)"
 
 
-#############################################################################################
-[urn="urn:snemo:demonstrator:simulation:geant4:2.1:variants:registry" category="varregistry"]
+######################################################################################
+[urn="urn:snemo:demonstrator:simulation:2.1:variants:registry" category="varregistry"]
 
 #@config URN registration of SuperNEMO demonstrator Geant4 session event generation variants registry (version 2.1)
 
@@ -60,7 +60,7 @@ topic.dependency.components : string[4] = \
   "urn:snemo:demonstrator:geometry:4.0:variants:registry" \
   "urn:snemo:demonstrator:simulation:vertexes:4.1:variants:registry" \
   "urn:snemo:demonstrator:simulation:decays:1.2:variants:registry" \
-  "urn:snemo:demonstrator:simulation:geant4:2.1:variants:registry"
+  "urn:snemo:demonstrator:simulation:2.1:variants:registry"
 
 
 #############################################################################################
