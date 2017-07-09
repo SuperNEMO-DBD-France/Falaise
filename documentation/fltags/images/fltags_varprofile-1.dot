@@ -1,0 +1,21 @@
+digraph FLTagsVarProfile1 {
+	node [shape=box]
+	tag1 [label="urn:snemo:demonstrator:simulation:2.1:variants"];
+	tag0 [label="other components..."];
+	tag2 [label="urn:snemo:demonstrator:simulation:2.1"];
+	subgraph cluster_variant_profiles {
+		color="black";
+		label="Blessed profiles";
+		tag21 [label="urn:snemo:demonstrator:simulation:2.1:variants:profiles:1"];
+		tag22 [label="urn:snemo:demonstrator:simulation:2.1:variants:profiles:2"];
+		tag23 [label="other profiles..."];
+		tag210 [label="urn:snemo:demonstrator:simulation:2.1:variants:profiles:default"];
+		{ rank=max ; tag21, tag22, tag23 }
+	}
+	tag2 -> tag1 [label=" dependency ", fontsize=8];
+	tag2 -> tag0 [label=" dependency ", fontsize=8];
+	tag21 -> tag1 [label=" dependency ", fontsize=8];
+	tag22 -> tag1 [label=" dependency ", fontsize=8];
+	tag23 -> tag1 [label=" dependency ", fontsize=8];
+	tag210 -> tag21 [label=" alias ", fontsize=8];
+}

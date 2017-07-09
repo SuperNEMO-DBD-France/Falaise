@@ -1,0 +1,11 @@
+digraph FLTagsGeometry1 {
+	node [shape=box]
+	tag0 [label="urn:snemo:demonstrator"];
+	tag1 [label="urn:bipo3"];
+	tag2 [label="urn:snemo:demonstrator:geometry:4.0"];
+	tag3 [label="urn:snemo:demonstrator:geometry:5.0"];
+	tag4 [label="urn:bipo3:geometry:1.0"];
+	tag3 -> tag0 [label=" dependency ", fontsize=8];
+	tag2 -> tag0 [label=" dependency ", fontsize=8];
+	tag4 -> tag1 [label=" dependency ", fontsize=8];
+}

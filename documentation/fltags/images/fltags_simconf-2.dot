@@ -1,0 +1,17 @@
+digraph FLTagsSimConf1 {
+	node [shape=box]
+	tag1 [label="urn:snemo:demonstrator:simulation:2.1:variants"];
+
+	subgraph cluster_sim_config {
+		label="Simulation configuration"
+		tag2 [label="urn:snemo:demonstrator:simulation:2.1"];
+		tag4 [label="urn:snemo:demonstrator:simulation:2.1:variants:profiles:default"];
+	}
+	tag3 [label="urn:snemo:demonstrator:simulation:2.1:variants:profiles:2\n(blessed profile)"];
+	tag30 [shape="note", label="Blessed variant profile file"];
+
+	tag2 -> tag1 [label=" dependency ", fontsize=8];
+	tag4 -> tag3 [label=" alias ", fontsize=8];
+	tag3 -> tag1 [label=" dependency ", fontsize=8];
+	tag3 -> tag30 [label=" resolved as ", fontsize=8];
+}

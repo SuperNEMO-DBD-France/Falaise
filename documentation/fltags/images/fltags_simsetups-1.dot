@@ -1,0 +1,18 @@
+digraph FLTagsSimSetups1 {
+	node [shape=box]
+	tag0 [label="urn:snemo:demonstrator"];
+	tag1 [label="urn:snemo:demonstrator:geometry:4.0"];
+	tag10 [label="urn:snemo:demonstrator:devices:1.0"];
+	tag2 [label="urn:snemo:demonstrator:setup:1.0"];
+	tag3 [label="urn:snemo:demonstrator:simulation:vertexes:4.1"];
+	tag4 [label="urn:snemo:demonstrator:simulation:decays:1.2"];
+	tag5 [label="urn:snemo:demonstrator:simulation:2.1"];
+	tag1 -> tag0 [label=" dependency ", fontsize=8];
+	tag10 -> tag0 [label=" dependency ", fontsize=8];
+	tag2 -> tag1 [label=" dependency ", fontsize=8];
+	tag2 -> tag10 [label=" dependency ", fontsize=8];
+	tag3 -> tag1 [label=" dependency ", fontsize=8];
+	tag5 -> tag2 [label=" dependency ", fontsize=8];
+	tag5 -> tag3 [label=" dependency ", fontsize=8];
+	tag5 -> tag4 [label=" dependency ", fontsize=8];
+}

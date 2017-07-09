@@ -1,0 +1,7 @@
+digraph FLTagsExperiments1 {
+	node [shape=box]
+	tag0 [label="urn:snemo:demonstrator"];
+	tag1 [label="urn:bipo3:detector"];
+	tag2 [label="urn:atlas"];
+	tag3 [label="urn:lhcb"];
+}

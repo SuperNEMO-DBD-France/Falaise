@@ -1,0 +1,15 @@
+digraph FLTagsRecSetups1 {
+	node [shape=box]
+	tag0 [label="urn:snemo:demonstrator"];
+	tag1 [label="urn:snemo:demonstrator:geometry:4.0"];
+	tag2 [label="urn:snemo:demonstrator:devices:1.0"];
+	tag3 [label="urn:snemo:demonstrator:setup:1.0"];
+	tag4 [label="urn:snemo:demonstrator:reconstruction:1.0.0:pipeline"];
+	tag5 [label="urn:snemo:demonstrator:reconstruction:1.0.0"];
+	tag1 -> tag0 [label=" dependency ", fontsize=8];
+	tag2 -> tag0 [label=" dependency ", fontsize=8];
+	tag3 -> tag1 [label=" dependency ", fontsize=8];
+	tag3 -> tag2 [label=" dependency ", fontsize=8];
+	tag5 -> tag3 [label=" dependency ", fontsize=8];
+	tag5 -> tag4 [label=" dependency ", fontsize=8];
+}

@@ -1,0 +1,22 @@
+digraph FLTagsVariants1 {
+	node [shape=box]
+	tag00 [label="urn:snemo:demonstrator:geometry:4.0"];
+	tag0 [label="urn:snemo:demonstrator:geometry:4.0:variants:registry"];
+	tag1 [label="urn:snemo:demonstrator:simulation:vertexes:4.1:variants:registry"];
+	tag2 [label="urn:snemo:demonstrator:simulation:decays:1.2:variants:registry"];
+	tag3 [label="urn:snemo:demonstrator:simulation:2.1:variants:registry"];
+	tag4 [label="urn:snemo:demonstrator:simulation:2.1:variants"];
+	tag5 [label="urn:snemo:demonstrator:simulation:2.1"];
+	tag6 [label="urn:snemo:demonstrator:reconstruction:2.1:variants"];
+	tag7 [label="urn:snemo:demonstrator:reconstruction:2.1"];
+	tag00 -> tag0 [label=" dependency ", fontsize=8];
+	tag4 -> tag0 [label=" dependency ", fontsize=8];
+	tag4 -> tag1 [label=" dependency ", fontsize=8];
+	tag4 -> tag2 [label=" dependency ", fontsize=8];
+	tag4 -> tag3 [label=" dependency ", fontsize=8];
+	tag5 -> tag4 [label=" dependency ", fontsize=8];
+	tag6 -> tag0 [label=" dependency ", fontsize=8];
+	tag7 -> tag6 [label=" dependency ", fontsize=8];
+	tag5 -> tag00 [label=" dependency ", fontsize=8];
+	tag7 -> tag00 [label=" dependency ", fontsize=8];
+}

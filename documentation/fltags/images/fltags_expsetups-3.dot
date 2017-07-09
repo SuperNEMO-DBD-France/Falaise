@@ -1,0 +1,11 @@
+digraph FLTagsExpSetups3 {
+	node [shape=box]
+	tag0 [label="urn:snemo:demonstrator"];
+	tag1 [label="urn:snemo:demonstrator:geometry:5.0"];
+	tag2 [label="urn:snemo:demonstrator:device:2.0"];
+	tag3 [label="urn:snemo:demonstrator:setup:4.0"];
+	tag3 -> tag1 [label=" dependency ", fontsize=8];
+	tag3 -> tag2 [label=" dependency ", fontsize=8];
+	tag1 -> tag0 [label=" dependency ", fontsize=8];
+	tag2 -> tag0 [label=" dependency ", fontsize=8];
+}

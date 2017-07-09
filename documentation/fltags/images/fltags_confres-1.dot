@@ -1,0 +1,48 @@
+digraph FLTagsConfRes1 {
+	node [shape=box]
+	subgraph cluster_expsetup {
+		color="blue";
+
+		tag00 [label="experiment"];
+		tag0 [label="geometry"];
+		tag1 [label="devices"];
+		tag2 [label="experimental setup",
+		      style="filled",
+		      fillcolor="lightblue"];
+	}
+
+	tag3 [label="vertex generation"];
+	tag4 [label="decay generation"];
+
+	#{ rank=same, tag2, tag3, tag4 }
+	tag5 [label="simulation setup"];
+	tag50 [label="reconstruction setup"];
+	#{ rank=same, tag5, tag50 }
+	tag100 [shape="note", label="Monte Carlo data"];
+	tag101 [shape="note", label="Reconstructed data"];
+	#{ rank=same, tag6, tag16 }
+	subgraph cluster_pipeline {
+		label="Pipeline";
+		tag6 [label="FLSimulate"];
+		tag16 [label="FLReconstruct"];
+        }
+	#{ rank=same, tag100, tag101 }
+
+	tag0 -> tag00 [label=" dependency ", fontsize=8];
+	tag1 -> tag00 [label=" dependency ", fontsize=8];
+	tag2 -> tag0 [label=" dependency ", fontsize=8];
+	tag2 -> tag1 [label=" dependency ", fontsize=8];
+	tag5 -> tag2 [label=" dependency ", fontsize=8, color="blue"];
+	tag5 -> tag3 [label=" dependency ", fontsize=8];
+	tag5 -> tag4 [label=" dependency ", fontsize=8];
+	tag6 -> tag5 [label=" use ", fontsize=8];
+	tag16 -> tag50 [label=" use ", fontsize=8];
+	tag50 -> tag2 [label=" dependency ", fontsize=8, color="blue"];
+
+	tag6 -> tag100 [label=" output ", fontsize=8];
+	tag100 -> tag5 [label=" context ", fontsize=8, color="blue"];
+
+	tag16 -> tag100 [label=" input ", fontsize=8];
+	tag16 -> tag101 [label=" output ", fontsize=8];
+	tag101 -> tag50 [label=" context ", fontsize=8, color="blue"];
+}

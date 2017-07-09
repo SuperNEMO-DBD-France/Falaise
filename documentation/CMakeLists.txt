@@ -118,6 +118,14 @@ configure_file(InstallationGuide.md.in InstallationGuide.md @ONLY)
 # message(STATUS "****** _errcode = [${_errcode}]")
 # ${CMAKE_CURRENT_BINARY_DIR}/FLSimulateVariantsDoc.rst
 
+execute_process(COMMAND ${PROJECT_SOURCE_DIR}/documentation/fltags/images/prepare_images.sh
+  --output-dir ${PROJECT_BINARY_DIR}/documentation/fltags/images
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/documentation/fltags/images
+  RESULT_VARIABLE _fltags_code
+  )
+
+message(STATUS "Code =${_fltags_code}")
+
 set(FALAISE_MARKDOWN_DOCS
   Mainpage.md
   ${PROJECT_SOURCE_DIR}/source/Falaise.1.md
@@ -150,7 +158,7 @@ endforeach()
 
 # - Image paths
 set(FALAISE_DOXYGEN_IMAGE_DIRS
-  "${CMAKE_CURRENT_SOURCE_DIR}/flsimulate/images ${CMAKE_CURRENT_SOURCE_DIR}/flreconstruct/images ${CMAKE_CURRENT_SOURCE_DIR}/flvisualize/images ${CMAKE_CURRENT_SOURCE_DIR}/fltags/images"
+  "${CMAKE_CURRENT_SOURCE_DIR}/flsimulate/images ${CMAKE_CURRENT_SOURCE_DIR}/flreconstruct/images ${CMAKE_CURRENT_SOURCE_DIR}/flvisualize/images ${CMAKE_CURRENT_BINARY_DIR}/fltags/images"
   )
 
 #-----------------------------------------------------------------------

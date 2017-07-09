@@ -1,4 +1,4 @@
-digraph TagDependencies1 {
+digraph FLTagsDependencies1 {
 	node [shape=box]
 	tag0 [label="urn:0"];
 	tag1 [label="urn:1"];
