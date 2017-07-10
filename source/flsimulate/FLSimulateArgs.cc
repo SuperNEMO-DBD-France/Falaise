@@ -428,7 +428,8 @@ namespace FLSimulate {
     if (!flSimParameters.simulationSetupUrn.empty()) {
       // Check URN registration from the configuration DB:
       {
-        DT_THROW_IF(!cfgdb.check_with_category(flSimParameters.simulationSetupUrn, "simsetup"),
+        DT_THROW_IF(!cfgdb.check_with_category(flSimParameters.simulationSetupUrn,
+                                               falaise::configuration_db::category::simulation_setup_label()),
                     std::logic_error,
                     "Cannot find simulation setup URN='" << flSimParameters.simulationSetupUrn << "'!");
       }
