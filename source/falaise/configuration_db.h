@@ -1,21 +1,11 @@
 //! \file    falaise/configuration_db.h
 //! \brief   Utilities for accessing falaise resource configuration files
-//! \details The falaise library makes use of several resource files
-//!          containing isotopic and radioactive decays data.
-//!          Falaise also implements a plugin architecture, with
-//!          several supplied as core functionality.
-//!
-//!          As these files are not compiled into the falaise library,
-//!          a simple API is provided to return the root paths to core
-//!          resource and plugin directories.
-//!
-//!          These paths are calculated based on the location of the
-//!          Falaise library, allowing relocation of the Falaise
-//!          package after installation.
-//!
-//!          If your application uses resources from Falaise,
-//!          you must call the falaise::init_resources function
-//!          before trying to access resources.
+//! \details The falaise library makes use of a tag system which allows
+//!          to identify and locate configuration items, typically files and/or
+//!          assemblies of files. The configuration DB class implements some
+//!          high-level query operations to search configuration items through their
+//!          tags, locate then as files published by the Falaise library, find associated
+//!          dependencies.
 //
 // Copyright (c) 2017 by François Mauger <mauger@lpccaen.in2p3.fr>
 // Copyright (c) 2017 by Université de Caen Normandie
@@ -50,7 +40,7 @@
 
 namespace falaise {
 
-  /// \brief Utility to access tagged configuration resources through the system URN query service
+  /// \brief Utility to access tagged configuration resources through the Bayeux system URN query service
   class configuration_db
   {
   public:
@@ -93,10 +83,10 @@ namespace falaise {
 
     /// \brief Simple record representing a registered URN
     struct urn_entry {
-      std::string urn;         ///< URN identifier of the resource
-      std::string description; ///!< Description of the resource
-      std::string category;    ///!< Category of the resource
-      std::map<std::string, std::string> meta; ///< Dictionary of metadata as key/value pairs
+      std::string urn;         //!< URN identifier/tag of the resource
+      std::string description; //!< Description of the resource
+      std::string category;    //!< Category of the resource
+      std::map<std::string, std::string> meta; //!< Dictionary of metadata as key/value pairs
     };
 
     /// Constructor
@@ -134,12 +124,11 @@ namespace falaise {
 
     /// Find direct dependee URNs of given category from a given URN
     /// \code
-    ///                                    |
-    ///                                    v
     ///                                [from_urn]
     ///                                    |
-    ///           +------------------------+----------------------------+
+    ///           +------------------------+----------------------------+ "*"
     ///           |                        |                            |
+    ///           v                        v                            v
     /// [dependee-0 as "category"] [dependee-1 as "category"] ... [dependee-N as "category"]
     /// \end code
     bool find_direct_dependees_with_category_from(std::set<std::string> & dependees_,
@@ -162,7 +151,7 @@ namespace falaise {
     /// \code
     /// [depender-0 as "category"] [depender-1 as "category"] ... [depender-N as "category"]
     ///           |                        |                            |
-    ///           +------------------------+----------------------------+
+    ///           +------------------------+----------------------------+ "*"
     ///                                    |
     ///                                    v
     ///                                [from-urn]
@@ -187,7 +176,7 @@ namespace falaise {
     /// \code
     ///      [urn]
     ///        |
-    ///        | "alias"
+    ///        | "*"
     ///        v
     ///    [dependee-urn]
     /// \end code
