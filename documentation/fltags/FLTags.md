@@ -19,16 +19,20 @@ library.
 URN
 ---
 
-The   tag   is  implemented   as   a   character  string   using   the
-[URN](https://fr.wikipedia.org/wiki/Uniform_Resource_Name)      format
-(Uniform Resource Name):
+A          tag         is          implemented         as          a
+[URN](https://en.wikipedia.org/wiki/Uniform_Resource_Name)    (Uniform
+Resource Name) character string, using the `urǹ scheme :
 
 Examples:
+- `urn:snemo:demonstrator`
 - `urn:snemo:demonstrator:geometry:4.0`
 - `urn:snemo:demonstrator:simulation:2.1`
+- `urn:snemo:demonstrator:rawdata:run:23`
+- `urn:snemo:demonstrator:dataset:42`
+- `urn:sw:bayeux:3.1.0`
 
 The leading ``urn`` *prefix* is mandatory.  Then comes a mandatory URN
-*namespace*, i.e.   ``snemo:demonstrator``.  The last part  of the URN
+*namespace*, like   ``snemo:demonstrator``.  The last part  of the URN
 tag is arbitrary and can be considered as the *identifier* of the item
 with respect to the  *namespace*. This *identifier* typically consists
 in a sequence  of some alphabetical tokens, separated  by colons (`:`)
@@ -70,14 +74,15 @@ least part of it, by sequenced data processing algorithms.
 
 *Example:*
 
-![Tags with a graph of resources](@ref fltags_confres-1.png)
+![A data processing pipeline and its associated graph of resources](@ref fltags_confres-1.png)
 
 Monte  Carlo  data  are  generated   by  `flsimulate`  using  a  given
 configuration of  the simulation setup.  When  running `flreconstruct`
-to  process Monte  Carlo data,  one  must be  sure to  reuse the  same
-configuration  of the  experimental  setup implied  by the  simulation
-setup,  typically  using the  same  geometry  and devices  models  and
-associated options (*variants* parameters).
+to process *Monte Carlo data* and build *reconstructed data*, one must
+be sure to reuse the same configuration of the experimental setup that
+was used  at the simulation  stage, typically using the  same geometry
+and  devices models  and associated  options (*variants*  parameters),
+besides the specific reconstruction pipeline..
 
 
 Services and tools
