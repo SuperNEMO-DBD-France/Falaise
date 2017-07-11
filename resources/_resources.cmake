@@ -144,6 +144,7 @@ ${PROJECT_SOURCE_DIR}/resources/config/snemo/demonstrator/README.rst
 ${PROJECT_SOURCE_DIR}/resources/config/snemo/demonstrator/reconstruction/legacy/official-1.0.0.conf
 ${PROJECT_SOURCE_DIR}/resources/config/snemo/demonstrator/reconstruction/legacy/1.0/mock_calorimeter_s2c.conf
 ${PROJECT_SOURCE_DIR}/resources/config/snemo/demonstrator/reconstruction/legacy/official_with_visu-1.0.0.conf
+${PROJECT_SOURCE_DIR}/resources/config/snemo/demonstrator/reconstruction/libraries/1.0/plugins.lis
 ${PROJECT_SOURCE_DIR}/resources/config/snemo/demonstrator/reconstruction/pipeline/hc/1.0.0/flreconstruct.conf
 ${PROJECT_SOURCE_DIR}/resources/config/snemo/demonstrator/reconstruction/pipeline/hc/1.0.0/modules.defs
 ${PROJECT_SOURCE_DIR}/resources/config/snemo/demonstrator/reconstruction/pipeline/README.rst

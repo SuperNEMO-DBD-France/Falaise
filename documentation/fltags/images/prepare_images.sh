@@ -15,6 +15,10 @@ while [ -n "$1" ] ; do
     shift 1
 done
 
+if [ "x${output_dir}" = "x" ]; then
+    output_dir="."
+fi
+
 echo >&2 "[info] output_dir='${output_dir}'"
 
 list="dependencies-1 \

@@ -1,0 +1,13 @@
+# -*- mode: conf-unix -*-
+
+#@description List of default reconstruction plugins to be loaded
+plugins : string[7] = \
+  "Falaise_CAT" \
+  "Falaise_ChargedParticleTracking" \
+  "Falaise_MockTrackerClusterizer" \
+  "TrackFit" \
+  "Falaise_TrackFit" \
+  "Falaise_VisuToy" \
+  "Things2Root"
+
+# end
