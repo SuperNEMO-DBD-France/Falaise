@@ -1,5 +1,7 @@
 digraph FLTagsConfRes1 {
 	node [shape=box]
+	## graph [splines=ortho]
+	compound=true;
 	subgraph cluster_confres {
 		label="Configuration resources"
 		fontname="bold";
@@ -9,65 +11,71 @@ digraph FLTagsConfRes1 {
 			labeljust="left";
 			fontname="bold";
 			color="blue";
-			tag00 [label="experiment"];
-			tag0 [label="geometry"];
-			tag1 [label="devices"];
-			tag2 [label="experimental setup";
+			// Vertices:
+			tagExperiment [label="experiment"];
+			tagGeometryService [label="geometry"];
+			tagDevicesServices [label="devices"];
+			tagExpSetupServices [label="services"];
+			tagExpSetup [label="experimental setup";
 			      style="filled";
 			      fillcolor="lightblue"];
 			// Edges:
-			tag0 -> tag00 [label=" dependency ", fontsize=8];
-			tag1 -> tag00 [label=" dependency ", fontsize=8];
-			tag2 -> tag0 [label=" dependency ", fontsize=8];
-			tag2 -> tag1 [label=" dependency ", fontsize=8];
+			tagGeometryService  -> tagExperiment [label=" dependency ", fontsize=8];
+			tagDevicesServices  -> tagExperiment [label=" dependency ", fontsize=8];
+			tagExpSetupServices -> tagGeometryService [label=" dependency ", fontsize=8];
+			tagExpSetupServices -> tagDevicesServices [label=" dependency ", fontsize=8];
+			tagExpSetup         -> tagExpSetupServices [label=" dependency ", fontsize=8];
 		}
-
-		tag3 [label="vertex generation"];
-		tag4 [label="decay generation"];
-		tag7 [label="Geant4 session"];
-		tag5 [label="simulation setup"];
-		tag50 [label="reconstruction setup"];
-		tag60 [label="pipeline"];
+		// Vertices:
+		tagGenDecays [label="decay generation"];
+		tagGenVertex [label="vertex generation"];
+		tagGeant4 [label="Geant4 session"];
+		tagSimSetupServices [label="services"];
+		tagSimSetup [label="simulation setup"];
+		tagRecSetupServices [label="services"];
+		tagRecSetup [label="reconstruction setup"];
+		tagRecPipeline [label="pipeline"];
 		// Edges:
-		tag5 -> tag2 [label=" dependency ", fontsize=8, color="blue"];
-		tag5 -> tag3 [label=" dependency ", fontsize=8];
-		tag5 -> tag4 [label=" dependency ", fontsize=8];
-		tag5 -> tag7 [label=" dependency ", fontsize=8];
-		tag50 -> tag2 [label=" dependency ", fontsize=8, color="blue"];
-		tag50 -> tag60 [label=" dependency ", fontsize=8, color="blue"];
+		tagSimSetup -> tagExpSetup [label=" dependency ", fontsize=8, color="black"];
+		tagSimSetup -> tagGenVertex [label=" dependency ", fontsize=8];
+		tagSimSetup -> tagGenDecays [label=" dependency ", fontsize=8];
+		tagSimSetup -> tagGeant4 [label=" dependency ", fontsize=8];
+		tagSimSetup -> tagSimSetupServices [label=" dependency ", fontsize=8];
+		tagRecSetup -> tagExpSetup [label=" dependency ", fontsize=8, color="black"];
+		tagRecSetup -> tagRecPipeline [label=" dependency ", fontsize=8];
+		tagRecSetup -> tagRecSetupServices [label=" dependency ", fontsize=8];
+		tagSimSetupServices -> tagGeometryService [label=" dependency ", fontsize=8];
+		tagSimSetupServices -> tagDevicesServices [label=" dependency ", fontsize=8];
+		tagRecSetupServices -> tagGeometryService [label=" dependency ", fontsize=8];
+		tagRecSetupServices -> tagDevicesServices [label=" dependency ", fontsize=8];
+		tagGenVertex -> tagSimSetupServices [label=" dependency ", fontsize=8];
+		tagGeant4 -> tagSimSetupServices [label=" dependency ", fontsize=8];
+		tagGeant4 -> tagGenVertex [label=" dependency ", fontsize=8];
+		tagGeant4 -> tagGenDecays [label=" dependency ", fontsize=8];
+		tagRecPipeline -> tagRecSetupServices [label=" dependency ", fontsize=8];
 	}
 
-	subgraph cluster_pipeline {
+	subgraph cluster_dataprocessingflow {
 		rankdir="LR";
-		label="Pipeline";
+		label="Data processing flow";
 		labeljust="left";
 		fontname="bold";
-		tag6 [label="FLSimulate"];
-		// subgraph cluster_simdata {
-		// 	label="Simulation output";
-		// 	labeljust="left";
-		// 	fontname="bold";
-			tag100 [shape="note", label="Monte Carlo data\n+metadata"];
-		// 	tag200 [shape="note", label="Monte Carlo metadata"];
-		// 	tag100 -> tag200 [label=" context ", fontsize=8];
-		// }
-		tag16 [label="FLReconstruct"];
-		// subgraph cluster_simdata {
-		// 	label="Reconstruction output";
-		// 	labeljust="left";
-		// 	fontname="bold";
-			tag101 [shape="note", label="Reconstructed data\n+metadata"];
-		// 	tag201 [shape="note", label="Reconstructed metadata"];
-		// 	tag101 -> tag201 [label=" context ", fontsize=8];
-		// }
-		{rank="same"; tag6, tag100, tag16, tag101 }
+		// Vertices:
+		tagFLSimulate     [label="FLSimulate"];
+		tagMonteCarloData [shape="note", label="Monte Carlo data\n+ metadata"];
+		tagRecData        [shape="note", label="Reconstructed data\n+ metadata"];
+		tagFLReconstruct  [label="FLReconstruct"];
 		// Edges:
-		tag6 -> tag100 [label=" output ", fontsize=8];
-		tag100 -> tag16 [label=" input ", fontsize=8];
-		tag16 -> tag101 [label=" output ", fontsize=8];
+		tagFLSimulate     -> tagMonteCarloData [constraint=none, label=" output ", fontsize=8];
+		tagMonteCarloData -> tagFLReconstruct  [constraint=none, label=" input ", fontsize=8, weight=4];
+		tagFLReconstruct  -> tagRecData        [constraint=none, label=" output ", fontsize=8];
+		{ rank=same;
+			tagFLSimulate tagMonteCarloData tagFLReconstruct tagRecData ;
+			rankdir="LR"}
 	}
-	tag6 -> tag5 [label=" use ", fontsize=8];
-	tag16 -> tag50 [label=" use ", fontsize=8];
-	tag100 -> tag5 [label=" context ", fontsize=8, color="blue"];
-	tag101 -> tag50 [label=" context ", fontsize=8, color="blue"];
+	// Edges:
+	tagFLSimulate     -> tagSimSetup [label=" use ", fontsize=8];
+	tagFLReconstruct  -> tagRecSetup [label=" use ", fontsize=8];
+	tagMonteCarloData -> tagSimSetup [label=" context ", style=dashed, fontsize=8, color="black"];
+	tagRecData        -> tagRecSetup [label=" context ", style=dashed, fontsize=8, color="black"];
 }
