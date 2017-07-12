@@ -91,6 +91,13 @@ namespace falaise {
   }
 
   // static
+  const std::string & configuration_db::category::digitization_setup_label()
+  {
+    static const std::string _label("digisetup");
+    return _label;
+  }
+
+  // static
   const std::string & configuration_db::category::reconstruction_setup_label()
   {
     static const std::string _label("recsetup");

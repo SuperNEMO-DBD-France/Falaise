@@ -63,6 +63,8 @@ namespace falaise {
       static const std::string & processing_module_label();
       /// Label for a simulation setup
       static const std::string & simulation_setup_label();
+      /// Label for a digitization setup
+      static const std::string & digitization_setup_label();
       /// Label for a reconstruction setup
       static const std::string & reconstruction_setup_label();
       /// Label for a variants service setup
