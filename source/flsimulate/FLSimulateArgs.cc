@@ -522,6 +522,7 @@ namespace FLSimulate {
       }
     } // !flSimParameters.simulationSetupUrn.empty()
 
+    // Variants profile:
     if (!flSimParameters.variantSubsystemParams.profile_load.empty()) {
       // Check the variant config path:
       DT_THROW_IF(flSimParameters.variantSubsystemParams.config_filename.empty(),
