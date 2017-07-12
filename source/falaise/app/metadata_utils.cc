@@ -5,9 +5,10 @@
 
 // Third party:
 // - Bayeux:
-#include <bayeux/datatools/kernel.h>
-#include <bayeux/datatools/urn_query_service.h>
 #include <bayeux/dpp/input_module.h>
+
+// This Project
+#include "falaise/configuration_db.h"
 
 namespace falaise {
 
@@ -23,6 +24,7 @@ namespace falaise {
       variantProfilePath = "";
       variantProfileUrn = "";
       variantProfilePath = "";
+      variantSettings.clear();
       servicesConfigPath = "";
       variantProfilePath = "";
       numberOfEvents = 0;
@@ -75,8 +77,7 @@ namespace falaise {
 
     void metadata_input::scan(const datatools::multi_properties & mp_)
     {
-      datatools::kernel & dtk = datatools::kernel::instance();
-      const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
+      falaise::configuration_db cfgdb;
       if (mp_.empty()) {
         return;
       }
@@ -101,31 +102,48 @@ namespace falaise {
           ms.find_string("flsimulate.digitization", "flsimulate::section", "digitizationSetupUrn", this->digiSetupUrn);
         }
 
+        // Variants section:
+        if (this->doSimulation && ms.check_section("flsimulate.variants", "flsimulate::section")) {
+          ms.find_string ("flsimulate.variants", "flsimulate::section", "configUrn",  this->variantConfigUrn);
+          ms.find_path   ("flsimulate.variants", "flsimulate::section", "config",     this->variantConfigPath);
+          ms.find_string ("flsimulate.variants", "flsimulate::section", "profileUrn", this->variantProfileUrn);
+          ms.find_path   ("flsimulate.variants", "flsimulate::section", "profile",    this->variantProfilePath);
+          ms.find_strings("flsimulate.variants", "flsimulate::section", "settings",   this->variantSettings);
+        }
+
+        // Service section:
+        if (this->doSimulation && ms.check_section("flsimulate.services", "flsimulate::section")) {
+          ms.find_string ("flsimulate.services", "flsimulate::section", "configUrn", this->servicesConfigUrn);
+          ms.find_path   ("flsimulate.services", "flsimulate::section", "config",    this->servicesConfigPath);
+        }
+
         // If no experimental setup identifier/URN is set:
         if (this->experimentalSetupUrn.empty() && !this->simuSetupUrn.empty()) {
           // Then try to fetch the simulation setup identifier/URN:
-          std::string conf_category = "simsetup";
-          DT_THROW_IF(!dtkUrnQuery.check_urn_info(this->simuSetupUrn, conf_category),
+          std::string conf_category = falaise::configuration_db::category::simulation_setup_label();
+          DT_THROW_IF(!cfgdb.check_with_category(this->simuSetupUrn, conf_category),
                       std::logic_error,
-                      "Cannot query URN='" << this->simuSetupUrn << "'!");
+                      "Cannot query simulation setup URN='" << this->simuSetupUrn << "'!");
           // and extract the associated 'experimentalSetupUrn':
-          const datatools::urn_info & simuSetupUrnInfo = dtkUrnQuery.get_urn_info(this->simuSetupUrn);
-          if (simuSetupUrnInfo.has_topic("expsetup") &&
-              simuSetupUrnInfo.get_components_by_topic("expsetup").size() == 1) {
-            this->experimentalSetupUrn = simuSetupUrnInfo.get_component("expsetup");
+          std::string expsetup_dependee;
+          if (cfgdb.find_direct_unique_dependee_with_category_from(expsetup_dependee,
+                                                                   this->simuSetupUrn,
+                                                                   falaise::configuration_db::category::experimental_setup_label())) {
+            this->experimentalSetupUrn = expsetup_dependee;
           }
         }
         if (this->experimentalSetupUrn.empty() && !this->digiSetupUrn.empty()) {
           // Then try to fetch the digitization setup identifier/URN:
-          std::string conf_category = "digisetup";
-          DT_THROW_IF(!dtkUrnQuery.check_urn_info(this->digiSetupUrn, conf_category),
+          std::string conf_category = falaise::configuration_db::category::digitization_setup_label();
+          DT_THROW_IF(!cfgdb.check_with_category(this->digiSetupUrn, conf_category),
                       std::logic_error,
                       "Cannot query URN='" << this->digiSetupUrn << "'!");
           // and extract the associated 'experimentalSetupUrn':
-          const datatools::urn_info & digiSetupUrnInfo = dtkUrnQuery.get_urn_info(this->digiSetupUrn);
-          if (digiSetupUrnInfo.has_topic("expsetup") &&
-              digiSetupUrnInfo.get_components_by_topic("expsetup").size() == 1) {
-            this->experimentalSetupUrn = digiSetupUrnInfo.get_component("expsetup");
+          std::string expsetup_dependee;
+          if (cfgdb.find_direct_unique_dependee_with_category_from(expsetup_dependee,
+                                                                   this->digiSetupUrn,
+                                                                   falaise::configuration_db::category::experimental_setup_label())) {
+            this->experimentalSetupUrn = expsetup_dependee;
           }
         }
 
@@ -147,16 +165,32 @@ namespace falaise {
         // If no experimental setup identifier/URN is set:
         if (this->experimentalSetupUrn.empty() && !this->recSetupUrn.empty()) {
           // Then try to fetch the reconstruction setup identifier/URN:
-          std::string conf_category = "recsetup";
-          DT_THROW_IF(!dtkUrnQuery.check_urn_info(this->recSetupUrn, conf_category),
+          std::string conf_category = falaise::configuration_db::category::reconstruction_setup_label();
+          DT_THROW_IF(!cfgdb.check_with_category(this->recSetupUrn, conf_category),
                       std::logic_error,
-                      "Cannot query URN='" << this->recSetupUrn << "'!");
+                      "Cannot check URN='" << this->recSetupUrn << "'!");
           // and extract the associated 'experimentalSetupUrn':
-          const datatools::urn_info & recSetupUrnInfo = dtkUrnQuery.get_urn_info(this->recSetupUrn);
-          if (recSetupUrnInfo.has_topic("expsetup") &&
-              recSetupUrnInfo.get_components_by_topic("expsetup").size() == 1) {
-            this->experimentalSetupUrn = recSetupUrnInfo.get_component("expsetup");
+          std::string expsetup_dependee;
+          if (cfgdb.find_direct_unique_dependee_with_category_from(expsetup_dependee,
+                                                                   this->recSetupUrn,
+                                                                   falaise::configuration_db::category::experimental_setup_label())) {
+            this->experimentalSetupUrn = expsetup_dependee;
           }
+        }
+
+        // Variants section:
+        if (this->doSimulation && ms.check_section("flreconstruct.variants", "flreconstruct::section")) {
+          ms.find_string ("flreconstruct.variants", "flreconstruct::section", "configUrn",  this->variantConfigUrn);
+          ms.find_path   ("flreconstruct.variants", "flreconstruct::section", "config",     this->variantConfigPath);
+          ms.find_string ("flreconstruct.variants", "flreconstruct::section", "profileUrn", this->variantProfileUrn);
+          ms.find_path   ("flreconstruct.variants", "flreconstruct::section", "profile",    this->variantProfilePath);
+          ms.find_strings("flreconstruct.variants", "flreconstruct::section", "settings",   this->variantSettings);
+        }
+
+        // Service section:
+        if (this->doSimulation && ms.check_section("flreconstruct.services", "flreconstruct::section")) {
+          ms.find_string ("flreconstruct.services", "flreconstruct::section", "configUrn", this->servicesConfigUrn);
+          ms.find_path   ("flreconstruct.services", "flreconstruct::section", "config",    this->servicesConfigPath);
         }
 
       } // Input metadata from FLReconstruct
@@ -293,6 +327,25 @@ namespace falaise {
       }
       if (!d.is_string()) return false;
       propValue_ = d.get_string_value();
+      return true;
+    }
+
+    bool metadata_scanner::find_strings(const std::string & section_name_,
+                                        const std::string & section_type_,
+                                        const std::string & propKey_,
+                                        std::vector<std::string> & propValues_) const
+    {
+      datatools::properties::data d;
+      if (!_find_data_in_section_(section_name_, section_type_, propKey_, d)) {
+        return false;
+      }
+      if (!d.is_vector()) return false;
+      if (!d.is_string()) return false;
+      propValues_.clear();
+      propValues_.reserve(d.get_size());
+      for (std::size_t i = 0; i < (std::size_t) d.get_size(); i++) {
+        propValues_.push_back(d.get_string_value(i));
+      }
       return true;
     }
 

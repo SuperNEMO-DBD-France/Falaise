@@ -24,6 +24,7 @@
 
 // Standard library:
 #include <string>
+#include <vector>
 #include <iostream>
 
 // Third party:
@@ -69,25 +70,26 @@ namespace falaise {
     //! \brief Commonly used parameters extracted from input metadata
     struct metadata_input
     {
-      std::string userProfile = "";          //!< the user profile used to produce input data
-      std::string experimentalSetupUrn = ""; //!< the experimental setup tag used to produce input data
-      std::string variantConfigUrn = "";     //!< the variant service tag used to produce input data
-      std::string variantConfigPath = "";    //!< the variant service configuration file path used to produce input data
-      std::string variantProfileUrn = "";    //!< the variant profile tag used to produce input data
-      std::string variantProfilePath = "";   //!< the variant profile file used to produce input data
-      std::string servicesConfigUrn = "";    //!< the services configuration tag used to produce input data
-      std::string servicesConfigPath = "";   //!< the services configuration file path used to produce input data
-      std::size_t numberOfEvents = 0;        //!< the number of event after input data
-      bool        doSimulation = false;      //!< the flag for simulation input
-      std::string simuSetupUrn = "";         //!< the simulation setup tag used to produce input data
-      bool        doDigitization = false;    //!< the flag for digitization input
-      std::string digiSetupUrn = "";         //!< the digitization setup tag used to produce input data
-      bool        doReconstruction = false;  //!< the flag for reconstruction input
-      std::string recSetupUrn = "";          //!< the reconstruction setup tag used to produce input data
+      std::string userProfile = "";             //!< the user profile used to produce input data
+      std::string experimentalSetupUrn = "";    //!< the experimental setup tag used to produce input data
+      std::string variantConfigUrn = "";        //!< the variant service tag used to produce input data
+      std::string variantConfigPath = "";       //!< the variant service configuration file path used to produce input data
+      std::string variantProfileUrn = "";       //!< the variant profile tag used to produce input data
+      std::string variantProfilePath = "";      //!< the variant profile file used to produce input data      }
+
+      std::vector<std::string> variantSettings; //!< the variant settings used to produce input data
+      std::string servicesConfigUrn = "";       //!< the services configuration tag used to produce input data
+      std::string servicesConfigPath = "";      //!< the services configuration file path used to produce input data
+      std::size_t numberOfEvents = 0;           //!< the number of event after input data
+      bool        doSimulation = false;         //!< the flag for simulation input
+      std::string simuSetupUrn = "";            //!< the simulation setup tag used to produce input data
+      bool        doDigitization = false;       //!< the flag for digitization input
+      std::string digiSetupUrn = "";            //!< the digitization setup tag used to produce input data
+      bool        doReconstruction = false;     //!< the flag for reconstruction input
+      std::string recSetupUrn = "";             //!< the reconstruction setup tag used to produce input data
 
       // Reset parameters to default values
       void reset();
-
       // Scan the source metadata container and extract parameters' values
       void scan(const datatools::multi_properties &);
 
@@ -96,6 +98,8 @@ namespace falaise {
     };
 
     //! \brief Metadata scanner
+    //! Extract typed parameters through their hosting section (name and type)
+    //! and identifiers from a metadata container.
     class metadata_scanner {
     public:
 
@@ -105,47 +109,52 @@ namespace falaise {
       metadata_scanner(const datatools::multi_properties &);
 
       bool check_section(const std::string & section_name_,
-			 const std::string & section_type_) const;
+                         const std::string & section_type_) const;
 
       const datatools::properties & get_section(const std::string & section_name_,
-						const std::string & section_type_) const;
+                                                const std::string & section_type_) const;
 
       bool find_boolean(const std::string & section_name_,
-			const std::string & section_type_,
-			const std::string & propKey_,
-			bool & propValue_) const;
+                        const std::string & section_type_,
+                        const std::string & propKey_,
+                        bool & propValue_) const;
 
       bool find_integer(const std::string & section_name_,
-			const std::string & section_type_,
-			const std::string & propKey_,
-			int & propValue_) const;
+                        const std::string & section_type_,
+                        const std::string & propKey_,
+                        int & propValue_) const;
 
       bool find_size(const std::string & section_name_,
-		     const std::string & section_type_,
-		     const std::string & propKey_,
-		     std::size_t & propValue_) const;
+                     const std::string & section_type_,
+                     const std::string & propKey_,
+                     std::size_t & propValue_) const;
 
       bool find_real(const std::string & section_name_,
-		     const std::string & section_type_,
-		     const std::string & propKey_,
-		     double & propValue_) const;
+                     const std::string & section_type_,
+                     const std::string & propKey_,
+                     double & propValue_) const;
 
       bool find_string(const std::string & section_name_,
-		       const std::string & section_type_,
-		       const std::string & propKey_,
-		       std::string & propValue_) const;
+                       const std::string & section_type_,
+                       const std::string & propKey_,
+                       std::string & propValue_) const;
+
+      bool find_strings(const std::string & section_name_,
+                        const std::string & section_type_,
+                        const std::string & propKey_,
+                        std::vector<std::string> & propValues_) const;
 
       bool find_path(const std::string & section_name_,
-		     const std::string & section_type_,
-		     const std::string & propKey_,
-		     std::string & propValue_) const;
+                     const std::string & section_type_,
+                     const std::string & propKey_,
+                     std::string & propValue_) const;
 
     private:
 
       bool _find_data_in_section_(const std::string & section_name_,
-				  const std::string & section_type_,
-				  const std::string & propKey_,
-				  datatools::properties::data & data_) const;
+                                  const std::string & section_type_,
+                                  const std::string & propKey_,
+                                  datatools::properties::data & data_) const;
 
     private:
 
@@ -158,3 +167,9 @@ namespace falaise {
 } // namespace falaise
 
 #endif // FALAISE_APP_METADATA_UTILS_H
+
+// Local Variables: --
+// mode: c++ --
+// c-file-style: "gnu" --
+// tab-width: 2 --
+// End: --
