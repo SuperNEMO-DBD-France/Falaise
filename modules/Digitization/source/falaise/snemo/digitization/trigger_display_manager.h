@@ -86,6 +86,7 @@ namespace snemo {
 
 			/// Fill tracker matrix for 1600ns
 			void fill_tracker_trigger_matrix_1600ns(bool geiger_matrix_[trigger_info::NSIDES][trigger_info::NLAYERS][trigger_info::NROWS]);
+
 			// Fill matrix for coincidences for 1600ns
 			void fill_coincidence_trigger_matrix_1600ns(std::bitset<10> zoning_word_[trigger_info::NSIDES], bool geiger_matrix_[trigger_info::NSIDES][trigger_info::NLAYERS][trigger_info::NROWS]);
 

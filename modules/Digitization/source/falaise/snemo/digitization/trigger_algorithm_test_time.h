@@ -33,7 +33,7 @@ namespace snemo {
  		public :
 
 			/// Trigger display manager is a friend because it can access to members for display
-			friend class trigger_display_manager;
+			// friend class trigger_display_manager;
 
       /// Default constructor
       trigger_algorithm_test_time();
@@ -65,11 +65,17 @@ namespace snemo {
 			/// Set the L2 decision coincidence gate size
 			void set_L2_decision_coincidence_gate_size(unsigned int L2_decision_coincidence_gate_size_);
 
+			/// Set the L2 decision coincidence gate size
+			unsigned int get_L2_decision_coincidence_gate_size();
+
 			/// Check if previous event circular buffer depth is set
 			bool has_previous_event_buffer_depth() const;
 
 			/// Set previous event circular buffer depth
 			void set_previous_event_buffer_depth(unsigned int circular_buffer_depth_);
+
+			/// Get the previous event circular buffer depth
+			unsigned int get_previous_event_buffer_depth();
 
       /// Check if the coincidence config is activated
 			bool is_activated_coincidence() const;
@@ -77,8 +83,8 @@ namespace snemo {
       /// Initializing
       void initialize();
 
-      /// Initializing
-      void initialize(const datatools::properties & config_);
+			/// Initializing with a multi properties
+			void initialize(const datatools::multi_properties & mconfig_);
 
       /// Check if the algorithm is initialized
       bool is_initialized() const;
@@ -138,7 +144,7 @@ namespace snemo {
 			const clock_utils * _clock_manager_; //!< Pointer to a clock manager useful for clockticks
 			unsigned int _coincidence_calorimeter_gate_size_; //!< Size of calorimeter gate for extension of calo records during X CT 1600ns
 			unsigned int _L2_decision_coincidence_gate_size_; //!< Size of the L2 decision coincidence gate (typically 5 x 1600 ns)
-			unsigned int _previous_event_circular_buffer_depth_; //!< Depth for the previous events circular buffer (Pile of PERs)
+			int _previous_event_circular_buffer_depth_; //!< Depth for the previous events circular buffer (Pile of PERs)
 
 			// Trigger configuration (to be implemented with variants in .conf file) :
 			bool _activate_calorimeter_only_;

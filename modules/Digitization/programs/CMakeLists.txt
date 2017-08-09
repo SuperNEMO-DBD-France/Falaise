@@ -1,14 +1,15 @@
 # - List of test programs:
 set(FalaiseDigitizationPlugin_PROGRAMS
-  fldigi_tracker_trigger_mem_maker.cxx
-  fldigi_delayed_alpha_near_source_validation.cxx
-  fldigi_delayed_alpha_near_source_analysis.cxx
-  fldigi_delayed_alpha_geiger_cells_hit.cxx
-  fldigi_delayed_alpha_validation.cxx
-  fldigi_spatial_distribution.cxx
-  fldigi_bismuth_0nu_analysis.cxx
-  sd_physical_cuts.cxx
+  # fldigi_tracker_trigger_mem_maker.cxx
+  # fldigi_delayed_alpha_near_source_validation.cxx
+  # fldigi_delayed_alpha_near_source_analysis.cxx
+  # fldigi_delayed_alpha_geiger_cells_hit.cxx
+  # fldigi_delayed_alpha_validation.cxx
+  # fldigi_spatial_distribution.cxx
+  # fldigi_bismuth_0nu_analysis.cxx
+  # sd_physical_cuts.cxx
   trigger_board_implementation.cxx
+  trigger_program.cxx
   )
 
 # Use C++11

@@ -11,7 +11,7 @@
 #include <string>
 
 namespace snemo {
-  
+
   namespace digitization {
 
 		/// Comparison operator between two bitsets
@@ -35,18 +35,21 @@ namespace snemo {
 
 			/// Default constructor
 			memory();
-		
+
+			/// Default destructor
+			~memory();
+
 			/// Constructor
 			memory(const std::bitset<DataSize> & default_data_);
-			
+
 			/// Add a couple of address bitset & data bitset into the memory map
 			void push(const std::bitset<AddressSize> & address_bitset_,
 								const std::bitset<DataSize> & data_bitset_);
-  
+
 			/// Fetch the data bitset corresponding to an address bitset
 			void fetch(const std::bitset<AddressSize> & address_bitset_,
 								 std::bitset<DataSize> & data_bitset_);
-  
+
 			/// Return the data bitset corresponding to an address bitset
 			const std::bitset<DataSize> & fetch(const std::bitset<AddressSize> & address_bitset_);
 
@@ -61,15 +64,15 @@ namespace snemo {
 
 			/// Load from a file a memory and store it in the memory map with description
 			void load_from_file(const std::string & filename_, std::string & description_);
-			
+
 			/// Reset
 			void reset();
-  
+
 			/// Return the number of addresses
       inline std::size_t get_number_of_addresses() const;
 
 		private :
-			
+
 			typedef std::map<std::bitset<AddressSize>, std::bitset<DataSize>, bitset_compare<AddressSize> > memory_dict_type;
 			memory_dict_type _memory_; //!< Memory map of bitset, key = address bitset, value = data bitset
 			std::bitset<DataSize> _default_data_; //!< Default bitset data
@@ -83,7 +86,7 @@ namespace snemo {
 #include <snemo/digitization/memory-inl.h>
 
 #endif // FALAISE_DIGITIZATION_PLUGIN_SNEMO_DIGITIZATION_MEMORY_H
-/* 
+/*
 ** Local Variables: --
 ** mode: c++ --
 ** c-file-style: "gnu" --

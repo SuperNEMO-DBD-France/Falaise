@@ -2,11 +2,11 @@
 // Author(s): Yves LEMIERE <lemiere@lpccaen.in2p3.fr>
 // Author(s): Guillaume OLIVIERO <goliviero@lpccaen.in2p3.fr>
 
-// Standard library : 
+// Standard library :
 #include <vector>
 #include <fstream>
 
-// Boost : 
+// Boost :
 #include <boost/dynamic_bitset.hpp>
 
 // - Bayeux/datatools :
@@ -19,7 +19,7 @@
 #include <snemo/digitization/mapping.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     tracker_trigger_algorithm_test_time::tracker_trigger_algorithm_test_time()
@@ -30,7 +30,7 @@ namespace snemo {
     }
 
     tracker_trigger_algorithm_test_time::~tracker_trigger_algorithm_test_time()
-    {   
+    {
       if (is_initialized())
 	{
 	  reset();
@@ -48,35 +48,35 @@ namespace snemo {
     void tracker_trigger_algorithm_test_time::fill_mem1_all(const std::string & filename_)
     {
       DT_THROW_IF(is_initialized(), std::logic_error, "Tracker trigger algorithm is already initialized ! ");
-      _sliding_zone_vertical_memory_.load_from_file(filename_); 
+      _sliding_zone_vertical_memory_.load_from_file(filename_);
       return;
     }
 
     void tracker_trigger_algorithm_test_time::fill_mem2_all(const std::string & filename_)
     {
       DT_THROW_IF(is_initialized(), std::logic_error, "Tracker trigger algorithm is already initialized ! ");
-      _sliding_zone_horizontal_memory_.load_from_file(filename_); 
+      _sliding_zone_horizontal_memory_.load_from_file(filename_);
       return;
     }
 
     void tracker_trigger_algorithm_test_time::fill_mem3_all(const std::string & filename_)
     {
       DT_THROW_IF(is_initialized(), std::logic_error, "Tracker trigger algorithm is already initialized ! ");
-      _zone_vertical_memory_.load_from_file(filename_); 
+      _zone_vertical_memory_.load_from_file(filename_);
       return;
     }
 
     void tracker_trigger_algorithm_test_time::fill_mem4_all(const std::string & filename_)
     {
       DT_THROW_IF(is_initialized(), std::logic_error, "Tracker trigger algorithm is already initialized ! ");
-      _zone_horizontal_memory_.load_from_file(filename_); 
+      _zone_horizontal_memory_.load_from_file(filename_);
       return;
     }
 
     void tracker_trigger_algorithm_test_time::fill_mem5_all(const std::string & filename_)
     {
       DT_THROW_IF(is_initialized(), std::logic_error, "Tracker trigger algorithm is already initialized ! ");
-      _zone_vertical_for_horizontal_memory_.load_from_file(filename_); 
+      _zone_vertical_for_horizontal_memory_.load_from_file(filename_);
       return;
     }
 
@@ -153,13 +153,13 @@ namespace snemo {
 	  else
 	    {
 	      temporary_board_bitset.set(i - geiger::tp::BOARD_ID_BIT0, 0);
-	    }	 
+	    }
 	}
       uint32_t temporary_board_id = temporary_board_bitset.to_ulong();
       return temporary_board_id;
     }
 
-    void tracker_trigger_algorithm_test_time::build_hit_cells_gids_from_ctw(const geiger_ctw & my_geiger_ctw_, 
+    void tracker_trigger_algorithm_test_time::build_hit_cells_gids_from_ctw(const geiger_ctw & my_geiger_ctw_,
 									    std::vector<geomtools::geom_id> & hit_cells_gids_) const
     {
       for (unsigned int i = 0; i < mapping::NUMBER_OF_FEBS_BY_CRATE; i++)
@@ -170,7 +170,7 @@ namespace snemo {
 
 	  std::bitset<geiger::tp::TP_SIZE> my_tp_bitset;
 	  my_geiger_ctw_.get_55_bits_in_ctw_word(i, my_tp_bitset);
-	 	  	  
+
 	  for (int32_t j = geiger::tp::TP_BEGIN; j <= geiger::tp::TP_THREE_WIRES_END; j++)
 	    {
 	      if (my_tp_bitset.test(j))
@@ -186,14 +186,14 @@ namespace snemo {
 		  temporary_electronic_id.set(mapping::RACK_INDEX, ctw_rack);
 		  temporary_electronic_id.set(mapping::CRATE_INDEX, ctw_crate);
 		  temporary_electronic_id.set(mapping::BOARD_INDEX, board_id);
-		  temporary_electronic_id.set(mapping::CHANNEL_INDEX, channel_id);  
+		  temporary_electronic_id.set(mapping::CHANNEL_INDEX, channel_id);
 		  {
 		    geomtools::geom_id dummy;
 		    hit_cells_gids_.push_back(dummy);
 		  }
 		  geomtools::geom_id & hit_cell_gid = hit_cells_gids_.back();
 		  _electronic_mapping_->convert_EID_to_GID(mapping::THREE_WIRES_TRACKER_MODE, temporary_electronic_id, hit_cell_gid);
-		}	 
+		}
 	    } // end of TP loop
 
 	} // end of max number of FEB loop
@@ -208,7 +208,7 @@ namespace snemo {
 	  unsigned int layer = hit_cells_gids_[i].get(mapping::LAYER_INDEX);
 	  unsigned int row   = hit_cells_gids_[i].get(mapping::ROW_INDEX);
 	  _a_geiger_matrix_for_a_clocktick_.matrix[side][layer][row] = 1;
-	}   
+	}
       return;
     }
 
@@ -216,16 +216,16 @@ namespace snemo {
     {
       return _a_geiger_matrix_for_a_clocktick_;
     }
-    
+
     void tracker_trigger_algorithm_test_time::reset_zones_informations()
     {
       for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
-	  for (unsigned int iszone = 0; iszone < trigger_info::NSLZONES; iszone++) 
+	  for (unsigned int iszone = 0; iszone < trigger_info::NSLZONES; iszone++)
 	    {
 	      _sliding_zones_[iside][iszone].reset();
 	    }
-	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++) 
+	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
 	    {
 	      _zones_[iside][izone].reset();
 	    }
@@ -239,18 +239,18 @@ namespace snemo {
       _sliding_zones_[side_][szone_id_].szone_id = szone_id_;
 
       unsigned int stop_row = tracker_sliding_zone::stop_row(szone_id_);
-      unsigned int start_row = tracker_sliding_zone::start_row(szone_id_);  
-      for (unsigned int ilayer = 0; ilayer < trigger_info::NLAYERS; ilayer++) 
+      unsigned int start_row = tracker_sliding_zone::start_row(szone_id_);
+      for (unsigned int ilayer = 0; ilayer < trigger_info::NLAYERS; ilayer++)
 	{
-	  for (unsigned int irow = start_row; irow <= stop_row; irow++) 
+	  for (unsigned int irow = start_row; irow <= stop_row; irow++)
 	    {
 	      _sliding_zones_[side_][szone_id_].cells[ilayer][irow - start_row] = _a_geiger_matrix_for_a_clocktick_.matrix[side_][ilayer][irow];
 	    }
 	}
       _sliding_zones_[side_][szone_id_].compute_lr_proj();
-      
+
       return;
-    }	
+    }
 
     void tracker_trigger_algorithm_test_time::build_sliding_zones(tracker_trigger_mem_maker::mem1_type & mem1_,
 								  tracker_trigger_mem_maker::mem2_type & mem2_)
@@ -271,11 +271,11 @@ namespace snemo {
       _zones_[side_][zone_id_].zone_id = zone_id_;
 
       unsigned int stop_row = tracker_zone::stop_row(zone_id_);
-      unsigned int start_row = tracker_zone::start_row(zone_id_);  
-      
-      for (unsigned int ilayer = 0; ilayer < trigger_info::NLAYERS; ilayer++) 
+      unsigned int start_row = tracker_zone::start_row(zone_id_);
+
+      for (unsigned int ilayer = 0; ilayer < trigger_info::NLAYERS; ilayer++)
 	{
-	  for (unsigned int irow = start_row; irow <= stop_row; irow++) 
+	  for (unsigned int irow = start_row; irow <= stop_row; irow++)
 	    {
 	      _zones_[side_][zone_id_].cells[ilayer][irow - start_row] =  _a_geiger_matrix_for_a_clocktick_.matrix[side_][ilayer][irow];
 	    }
@@ -283,12 +283,12 @@ namespace snemo {
 
       return;
     }
-    
+
     void tracker_trigger_algorithm_test_time::build_zones()
     {
-      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++) 
+      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
-	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++) 
+	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
 	    {
 	      build_zone(iside, izone);
 	      build_in_out_pattern(_zones_[iside][izone], _zone_vertical_memory_);
@@ -297,19 +297,19 @@ namespace snemo {
 	    }
 	}
       return;
-    }    
-    
+    }
+
     void tracker_trigger_algorithm_test_time::build_in_out_pattern(tracker_zone & zone_,
 								   tracker_trigger_mem_maker::mem3_type & mem3_)
     {
       unsigned int side = zone_.side;
       unsigned int zone_id = zone_.zone_id;
-      
+
       std::bitset<trigger_info::SLZONE_DATA_IO_PROJ> SZA_IO = _sliding_zones_[side][zone_id * 3].data_IO_proj;
       std::bitset<trigger_info::SLZONE_DATA_IO_PROJ> SZB_IO = _sliding_zones_[side][zone_id * 3 + 1].data_IO_proj;
       std::bitset<trigger_info::SLZONE_DATA_IO_PROJ> SZC_IO = _sliding_zones_[side][zone_id * 3 + 2].data_IO_proj;
       std::bitset<trigger_info::SLZONE_DATA_IO_PROJ> SZD_IO = _sliding_zones_[side][zone_id * 3 + 2].data_IO_proj;
-      
+
       std::bitset<trigger_info::ZONE_ADDR_IO_PATTERN_SIZE> ZONE_ADDR_IO = 0x0;
 
       if (SZD_IO.test(0)) ZONE_ADDR_IO.set(0, true);
@@ -320,24 +320,24 @@ namespace snemo {
       if (SZB_IO.test(1)) ZONE_ADDR_IO.set(5, true);
       if (SZA_IO.test(0)) ZONE_ADDR_IO.set(6, true);
       if (SZA_IO.test(1)) ZONE_ADDR_IO.set(7, true);
-      
+
       mem3_.fetch(ZONE_ADDR_IO, zone_.data_in_out_pattern);
-      
+
       return;
     }
-		
+
     void tracker_trigger_algorithm_test_time::build_left_mid_right_pattern(tracker_zone & zone_,
 									   tracker_trigger_mem_maker::mem4_type & mem4_,
 									   tracker_trigger_mem_maker::mem5_type & mem5_)
     {
       unsigned int side = zone_.side;
       unsigned int zone_id = zone_.zone_id;
-      
+
       std::bitset<trigger_info::SLZONE_DATA_LR_PROJ> SZA_LR = _sliding_zones_[side][zone_id * 3].data_LR_proj;
       std::bitset<trigger_info::SLZONE_DATA_LR_PROJ> SZB_LR = _sliding_zones_[side][zone_id * 3 + 1].data_LR_proj;
       std::bitset<trigger_info::SLZONE_DATA_LR_PROJ> SZC_LR = _sliding_zones_[side][zone_id * 3 + 2].data_LR_proj;
       std::bitset<trigger_info::SLZONE_DATA_LR_PROJ> SZD_LR = _sliding_zones_[side][zone_id * 3 + 3].data_LR_proj;
-      
+
       std::bitset<trigger_info::ZONE_ADDR_LMR_PATTERN_SIZE+2> ZONE_ADDR_LR = 0x0;
 
       ZONE_ADDR_LR[0] = SZD_LR[0];
@@ -356,7 +356,7 @@ namespace snemo {
 	}
 
       if (ZONE_ADDR_LR_REDUCTED != 0)
-	{	  	  
+	{
 	  mem4_.fetch(ZONE_ADDR_LR_REDUCTED, zone_.data_left_mid_right_pattern);
 	}
 
@@ -366,9 +366,9 @@ namespace snemo {
 	  std::bitset<trigger_info::SLZONE_DATA_IO_PROJ> SZB_IO = _sliding_zones_[side][zone_id * 3 + 1].data_IO_proj;
 	  std::bitset<trigger_info::SLZONE_DATA_IO_PROJ> SZC_IO = _sliding_zones_[side][zone_id * 3 + 2].data_IO_proj;
 	  std::bitset<trigger_info::SLZONE_DATA_IO_PROJ> SZD_IO = _sliding_zones_[side][zone_id * 3 + 2].data_IO_proj;
-	  
+
 	  std::bitset<trigger_info::ZONE_ADDR_LMR_WIO_PATTERN_SIZE> ZONE_ADDR_IO = 0x0;
-	  
+
 	  ZONE_ADDR_IO[0] = SZD_IO[0];
 	  ZONE_ADDR_IO[1] = SZD_IO[1];
 	  ZONE_ADDR_IO[2] = SZC_IO[0];
@@ -377,34 +377,34 @@ namespace snemo {
 	  ZONE_ADDR_IO[5] = SZB_IO[1];
 	  ZONE_ADDR_IO[6] = SZA_IO[0];
 	  ZONE_ADDR_IO[7] = SZA_IO[1];
-	  	  
+
 	  mem5_.fetch(ZONE_ADDR_IO, zone_.data_left_mid_right_pattern);
 	}
       return;
     }
 
     void tracker_trigger_algorithm_test_time::build_near_source_pattern(tracker_zone & zone_)
-    {     
+    {
       unsigned int zone_id = zone_.zone_id;
       unsigned int zone_width = tracker_zone::width(zone_id);
       unsigned int zone_middle = zone_width / 2.;
 
       zone_.data_near_source = 0x0;
-      
-      for (unsigned int ilayer = 0; ilayer < trigger_info::NLAYERS; ilayer++) 
+
+      for (unsigned int ilayer = 0; ilayer < trigger_info::NLAYERS; ilayer++)
 	{
 	  for (unsigned int irow = 0; irow < zone_width; irow++)
 	    {
-	      if (zone_.cells[ilayer][irow]) 
+	      if (zone_.cells[ilayer][irow])
 		{
-		  if (ilayer < trigger_info::NUMBER_OF_LAYERS_HIT_FOR_NEAR_SOURCE_BIT) 
+		  if (ilayer < trigger_info::NUMBER_OF_LAYERS_HIT_FOR_NEAR_SOURCE_BIT)
 		    {
 		      if (zone_middle % 2 == 1)
 			{
 			  if (irow <= zone_middle) zone_.data_near_source.set(tracker_zone::DATA_NEAR_SOURCE_BIT_LEFT, true);
 			  if (irow >= zone_middle) zone_.data_near_source.set(tracker_zone::DATA_NEAR_SOURCE_BIT_RIGHT, true);
 			}
-		      else 
+		      else
 			{
 			  if ((zone_id == 0 || zone_id == 5 || zone_id == 9) && irow == zone_middle)
 			    {
@@ -419,15 +419,15 @@ namespace snemo {
 		}
 	    }
 	}
-      
+
       return;
     }
-    
+
     void tracker_trigger_algorithm_test_time::build_tracker_record(trigger_structures::tracker_record & a_tracker_record_)
     {
-      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++) 
+      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
-	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++) 
+	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
 	    {
 	      a_tracker_record_.finale_data_per_zone[iside][izone][trigger_structures::tracker_record::FINALE_DATA_BIT_INNER]   = _zones_[iside][izone].data_in_out_pattern[0];
 	      a_tracker_record_.finale_data_per_zone[iside][izone][trigger_structures::tracker_record::FINALE_DATA_BIT_OUTER]   = _zones_[iside][izone].data_in_out_pattern[1];
@@ -438,43 +438,43 @@ namespace snemo {
 	      a_tracker_record_.finale_data_per_zone[iside][izone][trigger_structures::tracker_record::FINALE_DATA_BIT_NSZ_LEFT]  = _zones_[iside][izone].data_near_source[1];
 	    }
 	}
-      
-      // Build tracker zoning words 
+
+      // Build tracker zoning words
       // - mode LMR "normal" delayed (pattern) -> Tracker / Tracker + calo
       // - mode Near source (1 cell min in the first 4 layers) -> Tracker / tracker
 
-      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++) 
+      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
-	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++) 
+	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
 	    {
 	      std::bitset<3> hpattern_for_a_zone = 0x0;
 	      std::bitset<2> near_source_for_a_zone = 0x0;
-	      	  
+
 	      hpattern_for_a_zone[0]    = a_tracker_record_.finale_data_per_zone[iside][izone][trigger_structures::tracker_record::FINALE_DATA_BIT_RIGHT];     // RIGHT
 	      hpattern_for_a_zone[1]    = a_tracker_record_.finale_data_per_zone[iside][izone][trigger_structures::tracker_record::FINALE_DATA_BIT_MIDDLE];    // MIDDLE
 	      hpattern_for_a_zone[2]    = a_tracker_record_.finale_data_per_zone[iside][izone][trigger_structures::tracker_record::FINALE_DATA_BIT_LEFT];      // LEFT
 	      near_source_for_a_zone[0] = a_tracker_record_.finale_data_per_zone[iside][izone][trigger_structures::tracker_record::FINALE_DATA_BIT_NSZ_RIGHT]; // NSZRIGHT
 	      near_source_for_a_zone[1] = a_tracker_record_.finale_data_per_zone[iside][izone][trigger_structures::tracker_record::FINALE_DATA_BIT_NSZ_LEFT ]; // NSZLEFT
-	      
+
 	      if (hpattern_for_a_zone.any()) a_tracker_record_.zoning_word_pattern[iside].set(izone);
 	      if (near_source_for_a_zone.any()) a_tracker_record_.zoning_word_near_source[iside].set(izone);
 	    }
 	}
-      
+
       std::bitset<5> finale_pattern_per_zone = 0x0;
-      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++) 
+      for (unsigned int iside = 0; iside < trigger_info::NSIDES; iside++)
 	{
-	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++) 
+	  for (unsigned int izone = 0; izone < trigger_info::NZONES; izone++)
 	    {
 	      for (unsigned int i = 0; i < finale_pattern_per_zone.size(); i++)
 		{
 		  finale_pattern_per_zone[i] = a_tracker_record_.finale_data_per_zone[iside][izone][i];
 		}
-	      
+
 	      if (finale_pattern_per_zone.any())
 		{
 		  a_tracker_record_.finale_decision = true;
-		} 
+		}
 	    }
 	}
       return;
@@ -509,7 +509,7 @@ namespace snemo {
 
       return;
     }
-    
+
     void tracker_trigger_algorithm_test_time::_process_for_a_clocktick(const std::vector<datatools::handle<geiger_ctw> > geiger_ctw_list_per_clocktick_,
 								       trigger_structures::tracker_record & a_tracker_record_)
     {
@@ -519,23 +519,23 @@ namespace snemo {
        	{
        	  std::vector<geomtools::geom_id> hit_cells_gids;
        	  build_hit_cells_gids_from_ctw(geiger_ctw_list_per_clocktick_[isize].get(), hit_cells_gids);
-       	  fill_matrix(hit_cells_gids);   
+       	  fill_matrix(hit_cells_gids);
 	} // end of isize
       _a_geiger_matrix_for_a_clocktick_.clocktick_1600ns = geiger_ctw_list_per_clocktick_[0].get().get_clocktick_800ns();
-      
-      build_sliding_zones(_sliding_zone_vertical_memory_, _sliding_zone_horizontal_memory_);  
-      build_zones();      
-      build_tracker_record(a_tracker_record_);     
+
+      build_sliding_zones(_sliding_zone_vertical_memory_, _sliding_zone_horizontal_memory_);
+      build_zones();
+      build_tracker_record(a_tracker_record_);
 
       //_a_geiger_matrix_for_a_clocktick_.display();
       //a_tracker_record_.display();
       //print_zones(std::clog);
       return;
     }
-    
+
     void tracker_trigger_algorithm_test_time::_process(const std::vector<datatools::handle<geiger_ctw> > geiger_ctw_list_per_clocktick_,
 						       trigger_structures::tracker_record & a_tracker_record_)
-    { 
+    {
       _process_for_a_clocktick(geiger_ctw_list_per_clocktick_,
 			       a_tracker_record_);
       return;
@@ -550,12 +550,12 @@ namespace snemo {
 	  _process(geiger_ctw_list_per_clocktick_,
 		   a_tracker_record_);
 	}
-      else 
+      else
 	{
 	  _a_geiger_matrix_for_a_clocktick_.reset();
 	  reset_zones_informations();
 	}
-      
+
       return;
     }
 

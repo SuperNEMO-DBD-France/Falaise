@@ -133,6 +133,11 @@ namespace snemo {
       return;
     }
 
+    unsigned int trigger_algorithm_test_time::get_L2_decision_coincidence_gate_size()
+    {
+      return _L2_decision_coincidence_gate_size_;
+    }
+
     bool trigger_algorithm_test_time::has_previous_event_buffer_depth() const
     {
       return _previous_event_circular_buffer_depth_ != 0;
@@ -145,6 +150,11 @@ namespace snemo {
       return;
     }
 
+    unsigned int trigger_algorithm_test_time::get_previous_event_buffer_depth()
+    {
+      return _previous_event_circular_buffer_depth_;
+    }
+
     bool trigger_algorithm_test_time::is_activated_coincidence() const
     {
       return _activate_any_coincidences_;
@@ -152,68 +162,76 @@ namespace snemo {
 
     void trigger_algorithm_test_time::initialize()
     {
-      datatools::properties dummy_config;
+      datatools::multi_properties dummy_config;
       initialize(dummy_config);
       return;
     }
 
-    void trigger_algorithm_test_time::initialize(const datatools::properties & config_)
+    void trigger_algorithm_test_time::initialize(const datatools::multi_properties & mconfig_)
     {
       DT_THROW_IF(is_initialized(), std::logic_error, "Trigger algorithm is already initialized ! ");
       DT_THROW_IF(_electronic_mapping_ == 0, std::logic_error, "Missing electronic mapping ! " );
       DT_THROW_IF(_clock_manager_ == 0, std::logic_error, "Missing clock manager ! " );
 
-      datatools::properties calo_config;
-      config_.export_and_rename_starting_with(calo_config, "calo.", "");
-      _calo_algo_.initialize(calo_config);
+      std::clog << "Entering initialize with config :" << std::endl;
+      mconfig_.tree_dump(std::clog, "My trigger config in class test_trigger_algo : ");
 
-      datatools::properties tracker_config;
-      config_.export_and_rename_starting_with(tracker_config, "tracker.", "");
-      _tracker_algo_.initialize(tracker_config);
-
-      datatools::properties coinc_config;
-      config_.export_and_rename_starting_with(coinc_config, "coincidence.", "");
-      _coinc_algo_.initialize(coinc_config);
+      datatools::properties general_config;
+      general_config = mconfig_.get_section("general");
+      general_config.tree_dump(std::clog, "General config from multi properties");
 
       if (!has_calorimeter_gate_size()) {
-	if (config_.has_key("coincidence_calorimeter_gate_size")) {
-	  int coincidence_calorimeter_gate_size = config_.fetch_integer("coincidence_calorimeter_gate_size");
+	if (general_config.has_key("coincidence_calorimeter_gate_size")) {
+	  int coincidence_calorimeter_gate_size = general_config.fetch_integer("coincidence_calorimeter_gate_size");
 	  DT_THROW_IF(coincidence_calorimeter_gate_size <= 0, std::domain_error, "Invalid value of coincidence_calorimeter_gate_size !");
 	  set_calorimeter_gate_size((unsigned int) coincidence_calorimeter_gate_size);
 	}
       }
 
       if (!has_L2_decision_coincidence_gate_size()) {
-	if (config_.has_key("L2_decision_coincidence_gate_size")) {
-	  int L2_decision_coincidence_gate_size = config_.fetch_integer("L2_decision_coincidence_gate_size");
+	if (general_config.has_key("L2_decision_coincidence_gate_size")) {
+	  int L2_decision_coincidence_gate_size = general_config.fetch_integer("L2_decision_coincidence_gate_size");
 	  DT_THROW_IF(L2_decision_coincidence_gate_size <= 0, std::domain_error, "Invalid value of L2_decision_coincidence_gate_size !");
 	  set_L2_decision_coincidence_gate_size((unsigned int) L2_decision_coincidence_gate_size);
 	}
       }
 
       if (!has_previous_event_buffer_depth()) {
-	if (config_.has_key("previous_event_buffer_depth")) {
-	  int previous_event_buffer_depth = config_.fetch_integer("previous_event_buffer_depth");
+	if (general_config.has_key("previous_event_buffer_depth")) {
+	  int previous_event_buffer_depth = general_config.fetch_integer("previous_event_buffer_depth");
 	  DT_THROW_IF(previous_event_buffer_depth <= 0, std::domain_error, "Invalid negative previous event buffer depth!");
+	  std::clog << "previous_event_buffer_depth = "  << previous_event_buffer_depth << std::endl;
 	  set_previous_event_buffer_depth((unsigned int) previous_event_buffer_depth);
 	}
       }
 
-      // Check config dependencies (calo only is not compatible with coincidence config for example
-
+      // Check config dependencies (calo only is not compatible with coincidence config for example) -> variant system
       if (!is_activated_coincidence()) {
-	if(config_.has_key("activate_calorimeter_only")) {
-	  bool activate_calorimeter_only_config =  config_.fetch_boolean("activate_calorimeter_only");
+	if(general_config.has_key("activate_calorimeter_only")) {
+	  bool activate_calorimeter_only_config = general_config.fetch_boolean("activate_calorimeter_only");
 	  _activate_calorimeter_only_ = activate_calorimeter_only_config;
 	}
-      }
 
-      if (!is_activated_coincidence()) {
-	if(config_.has_key("activate_any_coincidences")) {
-	  bool activate_any_coincidences_config =  config_.fetch_boolean("activate_any_coincidences");
+	if(general_config.has_key("activate_any_coincidences")) {
+	  bool activate_any_coincidences_config = general_config.fetch_boolean("activate_any_coincidences");
 	  _activate_any_coincidences_ = activate_any_coincidences_config;
 	}
       }
+
+      datatools::properties calo_config;
+      calo_config = mconfig_.get_section("calorimeter");
+      calo_config.tree_dump(std::clog, "Calorimeter config from multi properties");
+      _calo_algo_.initialize(calo_config);
+
+      datatools::properties tracker_config;
+      tracker_config = mconfig_.get_section("tracker");
+      tracker_config.tree_dump(std::clog, "Tracker config from multi properties");
+      _tracker_algo_.initialize(tracker_config);
+
+      datatools::properties coinc_config;
+      coinc_config = mconfig_.get_section("coincidence");
+      coinc_config.tree_dump(std::clog, "Coincidence config from multi properties");
+      _coinc_algo_.initialize(coinc_config);
 
       _initialized_ = true;
       return;
@@ -223,7 +241,6 @@ namespace snemo {
     {
       return _initialized_;
     }
-
 
     const std::vector<trigger_structures::calo_summary_record> trigger_algorithm_test_time::get_calo_records_25ns_vector() const
     {
@@ -782,7 +799,6 @@ namespace snemo {
 		      geiger_ctw_data_1600ns.get_list_of_geiger_ctw_per_clocktick(ict1600, geiger_ctw_list_per_clocktick_1600);
 		      _tracker_algo_.process(geiger_ctw_list_per_clocktick_1600,
 					     a_tracker_record);
-
 		      if (!a_tracker_record.is_empty()) _tracker_records_.push_back(a_tracker_record);
 
 		      trigger_structures::geiger_matrix a_geiger_matrix = _tracker_algo_.get_geiger_matrix_for_a_clocktick();

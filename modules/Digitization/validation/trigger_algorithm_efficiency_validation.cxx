@@ -55,7 +55,7 @@ int main( int  argc_ , char **argv_  )
   std::size_t max_events = 0;
 
   try {
- // Parse options:
+    // Parse options:
     namespace po = boost::program_options;
     po::options_description opts("Allowed options");
     opts.add_options()
@@ -145,7 +145,7 @@ int main( int  argc_ , char **argv_  )
     std::clog << "max_events       = " << max_events << std::endl;
 
     // Event reader :
-        dpp::input_module reader;
+    dpp::input_module reader;
     datatools::properties reader_config;
     reader_config.store("logging.priority", "debug");
     // reader_config.store ("files.mode", "single");

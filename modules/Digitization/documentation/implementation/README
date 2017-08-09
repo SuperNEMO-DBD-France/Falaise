@@ -1,0 +1,26 @@
+Ce dossier contient le minimum à la création d'une présentation BEAMER.
+
+---
+
+Le fichier beamer_example.tex est le fichier principal. Quelques exemples
+d'utilisation des commandes courantes y sont employées.
+
+---
+
+Le chemin '\imgpath' définit le dossier images, lesquelles sont incluses
+sans extensions, par la commande suivante :
+     \includegraphics{\imgpath/<IMG_NAME>}
+     
+---
+     
+Pour compiler votre présentation beamer :
+
+	1. $> cd latex/exemples/presentation_beamer
+	2. $> make
+
+Ceci permet de créer une présentation au format .pdf en utilisant pdflatex.
+
+---
+
+Arnaud Chapon
+20.08.10
