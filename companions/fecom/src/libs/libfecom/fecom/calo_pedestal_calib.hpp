@@ -9,6 +9,10 @@
 #include <string>
 #include <iostream>
 
+// Third party:
+// Bayeux/datatools:
+#include <bayeux/datatools/i_serializable.h>
+
 // This project:
 #include <fecom/calo_constants.hpp>
 
@@ -16,6 +20,7 @@ namespace fecom {
 
   /// \brief Calorimeter pedestal calibration data
   struct calo_pedestal_calib
+		: public datatools::i_serializable
   {
 
   public:
@@ -53,11 +58,12 @@ namespace fecom {
 
   public:
 
-    uint16_t slot_index;  ///< Board index
+    uint16_t board_id;    ///< Board id
     uint8_t  channel;     ///< Channel (0..15)
     uint16_t offset_size; ///< Number of raw samples (64..1024 % 16)
     int32_t  offset[calo_constants::MAX_NUMBER_OF_SAMPLES]; ///< Offset per cell
 
+		DATATOOLS_SERIALIZATION_DECLARATION()
   };
 
 } // namespace fecom

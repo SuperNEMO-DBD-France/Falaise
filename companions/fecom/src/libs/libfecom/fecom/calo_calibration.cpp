@@ -20,6 +20,8 @@
 
 namespace fecom {
 
+  DATATOOLS_SERIALIZATION_SERIAL_TAG_IMPLEMENTATION(calo_calibration, "fecom::calo_calibration")
+
   calo_calibration::calo_calibration()
   {
   }
@@ -84,6 +86,7 @@ namespace fecom {
     uint16_t stop_cell = 1023;
     uint16_t start_channel = 0;
     uint16_t stop_channel = 19;
+    uint16_t board_id = 20;
     bool res = false;
     {
       std::string sw_version;
@@ -99,18 +102,23 @@ namespace fecom {
                               >> qi::uint_
                               >> qi::lit("to")
                               >> qi::uint_
+                              >> qi::lit("board")
+                              >> qi::uint_
                               >> qi::lit(":")
                               ),
                              //  End grammar
                              qi::space,
-                             start_cell, stop_cell, start_channel, stop_channel);
+                             start_cell, stop_cell, start_channel, stop_channel, board_id);
       if (!res || str_iter != end_iter) {
         DT_THROW(std::logic_error, "Cannot parse file header line '" << header_line_ << "'");
       }
+      DT_THROW_IF(board_id > 19, std::logic_error, "Board id value is not correct, check your config file '" << board_id << "'");
       header_.start_cell    = start_cell;
       header_.stop_cell     = stop_cell;
       header_.start_channel = start_channel;
       header_.stop_channel  = stop_channel;
+      header_.board_id      = board_id;
+
     }
     DT_LOG_TRACE_EXITING(logging);
     return;
@@ -154,10 +162,10 @@ namespace fecom {
           }
         }
       }
-      calo_channel_id id(parsing_data_.board_id, channel_id_);
+      calo_channel_id id(parsing_data_.header.board_id, channel_id_);
       calo_pedestal_calib calib;
-      calib.slot_index = (uint16_t) id.board_id;
-      calib.channel = (uint8_t) id.slot_id;
+      calib.board_id = (uint16_t) id.board_id;
+      calib.channel = (uint8_t) id.channel_id;
       calib.offset_size = (uint16_t) offsets.size();
       for (int16_t ioffset = parsing_data_.header.start_cell;
            ioffset <= parsing_data_.header.stop_cell;
@@ -241,7 +249,7 @@ namespace fecom {
     return success;
   }
 
-  void calo_calibration::load_pedestals(const uint16_t board_id_, const std::string & filename_)
+  void calo_calibration::load_pedestals(const std::string & filename_)
   {
     DT_LOG_TRACE_ENTERING(logging);
     std::string fname = filename_;
@@ -250,8 +258,6 @@ namespace fecom {
     DT_LOG_DEBUG(logging, "Input pedestal file: '" << fname << "'");
 
     calo_pedestal_parsing_data parsing_data;
-    parsing_data.board_id = board_id_;
-    DT_LOG_DEBUG(logging, "Board ID = [" << parsing_data.board_id << "]");
     _parse_pedestals_(ipedfile, parsing_data);
 
     ipedfile.close();

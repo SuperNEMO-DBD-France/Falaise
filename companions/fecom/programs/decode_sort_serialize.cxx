@@ -20,6 +20,7 @@
 
 // This project:
 #include <fecom/hit_reader.hpp>
+#include <fecom/calo_calibration.hpp>
 
 /// \brief Working list of raw hits
 struct hit_list
@@ -99,6 +100,7 @@ int main(int argc_, char ** argv_)
 
     bool        is_debug = false;
     std::string input_filename = "";
+    std::string input_calo_pedestal_filename = "";
     std::string output_path = "";
     std::size_t max_hits = 0;
     int         modulo   = 10000;
@@ -112,6 +114,9 @@ int main(int argc_, char ** argv_)
       ("input,i",
        po::value<std::string>(& input_filename),
        "set an input file")
+      ("calo-pedestal,p",
+       po::value<std::string>(& input_calo_pedestal_filename),
+       "set a calo pedestal input file")
       ("output,o",
        po::value<std::string>(& output_path),
        "set the output path")
@@ -186,6 +191,22 @@ int main(int argc_, char ** argv_)
     std::size_t entry_counter = 0;
     std::size_t hit_counter = 0;
     std::size_t bad_hit_counter = 0;
+
+    bool has_calo_pedestal = false;
+    if (!input_calo_pedestal_filename.empty()) {
+      has_calo_pedestal = true;
+      DT_LOG_INFORMATION(logging, "Process do not have calo pedestal filename and no calibration...");
+    }
+
+    // Read, decode and serialize calo_pedestals from input file into calo_calibration object
+    fecom::calo_calibration ccalib;
+    if (has_calo_pedestal) {
+      ccalib.load_pedestals(input_calo_pedestal_filename);
+      ccalib.tree_dump(std::clog, "Calorimeter calibration:");
+      DT_LOG_INFORMATION(logging, "Calo pedestal filename :" << input_calo_pedestal_filename);
+      serializer.store(ccalib);
+    }
+
     while(reader.has_next_hit()) {
       DT_LOG_DEBUG(logging, "Entry counter = " << entry_counter);
       if ((entry_counter % modulo) == 0) {

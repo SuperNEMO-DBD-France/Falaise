@@ -10,7 +10,7 @@ int main(int /*argc_*/, char ** /*argv_*/)
 {
   try {
     fecom::calo_pedestal_calib ped;
-    ped.slot_index = 4;
+    ped.board_id = 4;
     ped.channel = 1;
     ped.offset_size = 16;
     for (std::size_t icell = 0; icell < ped.offset_size; icell++) {

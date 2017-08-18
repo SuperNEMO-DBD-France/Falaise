@@ -12,16 +12,18 @@
 // Third party:
 // #include <bayeux/datatools/i_tree_dump.h>
 #include <bayeux/datatools/logger.h>
+#include <bayeux/datatools/i_serializable.h>
 
 // This project:
 #include <fecom/calo_constants.hpp>
-#include <fecom/calo_utils.hpp>
+#include <fecom/calo_channel_id.hpp>
 #include <fecom/calo_pedestal_calib.hpp>
 
 namespace fecom {
 
   /// \brief Calorimeter calibration manager
   struct calo_calibration
+		: public datatools::i_serializable
   {
 
   public:
@@ -30,7 +32,7 @@ namespace fecom {
     calo_calibration();
 
 		/// Load pedestals from a file
-    void load_pedestals(const uint16_t board_id_, const std::string & filename_);
+    void load_pedestals(const std::string & filename_);
 
 		/// Clear pedestals
     void clear_pedestals();
@@ -42,12 +44,12 @@ namespace fecom {
       int16_t stop_cell     = -1;
       int16_t start_channel = -1;
       int16_t stop_channel  = -1;
+      int16_t board_id = -1;
     };
 
     /// Internal parsing data
     struct calo_pedestal_parsing_data
     {
-      int16_t              board_id = -1;
       calo_pedestal_header header;
     };
 
@@ -78,8 +80,9 @@ namespace fecom {
 		// Management :
     datatools::logger::priority logging = datatools::logger::PRIO_FATAL; ///< Logger
 
-    std::map<calo_channel_id, calo_pedestal_calib> calo_pedestals; /// Map between channel and pedestal calibration
+    std::map<calo_channel_id, calo_pedestal_calib> calo_pedestals; ///< Map between channel and pedestal calibration
 
+		DATATOOLS_SERIALIZATION_DECLARATION()
   };
 
 } // namespace fecom
