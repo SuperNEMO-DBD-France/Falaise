@@ -1,33 +1,35 @@
-// fecom/calo_utils.cpp
+// fecom/calo_channel_id.cpp
 
 // Ourselves:
-#include <fecom/calo_utils.hpp>
+#include <fecom/calo_channel_id.hpp>
 
 // Third party:
 #include <bayeux/datatools/exception.h>
 
 namespace fecom {
 
+  DATATOOLS_SERIALIZATION_SERIAL_TAG_IMPLEMENTATION(calo_channel_id, "fecom::calo_channel_id")
+
   // static
   const int calo_channel_id::INVALID_ID;
 
   calo_channel_id::calo_channel_id()
     : board_id(INVALID_ID)
-    , slot_id(INVALID_ID)
+    , channel_id(INVALID_ID)
   {
   }
 
-  calo_channel_id::calo_channel_id(const int bid_, const int sid_)
+  calo_channel_id::calo_channel_id(const int bid_, const int cid_)
     : board_id(bid_ < 0 ? INVALID_ID : bid_)
-    , slot_id(sid_ < 0 ? INVALID_ID : sid_)
+    , channel_id(cid_ < 0 ? INVALID_ID : cid_)
   {
   }
 
   bool calo_channel_id::is_valid() const
   {
     if (board_id < 0) return false;
-    if (slot_id < 0) return false;
-    if (slot_id > 19) return false;
+    if (channel_id < 0) return false;
+    if (channel_id > 16) return false;
     return true;
   }
 
@@ -41,8 +43,8 @@ namespace fecom {
                 "Invalid calorimeter channel ID!");
     if (id1_.board_id < id2_.board_id) return -1;
     if (id1_.board_id > id2_.board_id) return +1;
-    if (id1_.slot_id < id2_.slot_id) return -1;
-    if (id1_.slot_id > id2_.slot_id) return +1;
+    if (id1_.channel_id < id2_.channel_id) return -1;
+    if (id1_.channel_id > id2_.channel_id) return +1;
     return 0;
   }
 
@@ -59,7 +61,7 @@ namespace fecom {
   // friend
   std::ostream & operator<<(std::ostream & out_, const calo_channel_id & id_)
   {
-    out_ << '[' << id_.board_id << "." <<  id_.slot_id << ']';
+    out_ << '[' << id_.board_id << "." <<  id_.channel_id << ']';
     return out_;
   }
 

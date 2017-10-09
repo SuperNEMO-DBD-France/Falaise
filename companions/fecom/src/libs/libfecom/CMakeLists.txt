@@ -32,7 +32,8 @@ set(FeCom_HEADERS
   fecom/base_hit.ipp
   fecom/calo_constants.hpp
   fecom/tracker_constants.hpp
-  fecom/calo_utils.hpp
+  fecom/calo_channel_id.hpp
+  fecom/calo_channel_id.ipp
   fecom/calo_hit.hpp
   fecom/calo_hit.ipp
   fecom/calo_hit_calibration.hpp
@@ -48,7 +49,9 @@ set(FeCom_HEADERS
   fecom/mock_hc2cd_module.hpp
   fecom/channel_mapping.hpp
   fecom/calo_pedestal_calib.hpp
+  fecom/calo_pedestal_calib.ipp
   fecom/calo_calibration.hpp
+  fecom/calo_calibration.ipp
   fecom/run_header.hpp
   fecom/calo_hit_parser.hpp
   fecom/tracker_channel_hit_parser.hpp
@@ -66,7 +69,7 @@ set(FeCom_SOURCES
   fecom/base_hit.cpp
   fecom/calo_constants.cpp
   fecom/tracker_constants.cpp
-  fecom/calo_utils.cpp
+  fecom/calo_channel_id.cpp
   fecom/calo_hit.cpp
   fecom/calo_hit_calibration.cpp
   fecom/tracker_channel_hit.cpp

@@ -24,6 +24,7 @@
 #include <fecom/hit_reader.hpp>
 #include <fecom/commissioning_event.hpp>
 #include <fecom/channel_mapping.hpp>
+#include <fecom/calo_calibration.hpp>
 
 /// \brief Event builder
 class event_builder
@@ -212,7 +213,7 @@ int main(int argc_, char ** argv_)
     serializer.initialize_standalone(writer_config);
     serializer.tree_dump(std::clog, "HC Event builder writer module");
 
-    DT_THROW_IF(input_calo_mapping_file.empty() || input_tracker_mapping_file.empty(), std::logic_error, "Missing calo or tracker mapping config file ! ");
+    DT_THROW_IF(input_calo_mapping_file.empty() || input_tracker_mapping_file.empty(), std::logic_error, "Missing calo or/and tracker mapping config file ! ");
 
     DT_LOG_INFORMATION(logging, "Mapping calo file    :" + input_calo_mapping_file);
     DT_LOG_INFORMATION(logging, "Mapping tracker file :" + input_tracker_mapping_file);
@@ -236,6 +237,16 @@ int main(int argc_, char ** argv_)
     std::size_t event_serialized = 0;
     uint64_t event_number = first_event_number;
     int modulo = 10000;
+
+    // Deserialize the calorimeter calibration object if the file countain one :
+    fecom::calo_calibration ccalib;
+    bool has_calo_pedestal = false;
+    if (deserializer.record_tag_is(fecom::calo_calibration::SERIAL_TAG)) {
+      deserializer.load(ccalib);
+      has_calo_pedestal = true;
+    }
+    ccalib.tree_dump(std::clog, "Calorimeter calibration:");
+    if (has_calo_pedestal) DT_LOG_INFORMATION(logging, "File has calo pedestals, calo calibration can happen !");
 
     while (deserializer.has_record_tag()) {
       DT_LOG_DEBUG(logging, "Entering has record tag...");

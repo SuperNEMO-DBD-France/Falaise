@@ -96,7 +96,7 @@ namespace fecom {
     // Management :
     bool initialized;
 
-    // Datas :
+    // Data :
     // General :
     std::size_t number_of_events;
 

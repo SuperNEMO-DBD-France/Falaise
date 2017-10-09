@@ -11,6 +11,8 @@
 
 namespace fecom {
 
+  DATATOOLS_SERIALIZATION_SERIAL_TAG_IMPLEMENTATION(calo_pedestal_calib, "fecom::calo_pedestal_calib")
+
   calo_pedestal_calib::calo_pedestal_calib()
   {
     _reset_();
@@ -19,7 +21,7 @@ namespace fecom {
 
   bool calo_pedestal_calib::is_valid() const
   {
-    if (slot_index >= 16) return false;
+    if (board_id >= 20) return false;
     if (channel >= calo_constants::INVALID_BOARD_CHANNEL) return false;
     return (offset_size > 0);
   }
@@ -32,7 +34,7 @@ namespace fecom {
 
   void calo_pedestal_calib::_reset_()
   {
-    slot_index = 0xFFFF;
+    board_id = 20;
     channel = calo_constants::INVALID_BOARD_CHANNEL;
     offset_size = 0;
     for (size_t i = 0; i < calo_constants::MAX_NUMBER_OF_SAMPLES; i++) {
@@ -80,7 +82,7 @@ namespace fecom {
     }
 
     out_ << indent_ << io::tag()
-         << "Slot index  : " << slot_index << std::endl;
+         << "Board id  : " << board_id << std::endl;
 
     out_ << indent_ << io::tag()
          << "Channel     : " << (int) channel << std::endl;

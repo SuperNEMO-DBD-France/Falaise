@@ -306,8 +306,8 @@ int main(int argc_, char ** argv_)
 	  event_number = CE.get_event_id().get_event_number();
 	  event_time_start_ns = CE.get_time_start_ns();
 
-	   number_of_calo = CE.get_number_of_calo();
-	   number_of_geiger_cells = CE.get_number_of_tracker();
+	  number_of_calo = CE.get_number_of_calo();
+	  number_of_geiger_cells = CE.get_number_of_tracker();
 
 	  if ((event_number % modulo) == 1 ){
 	    DT_LOG_DEBUG(logging, "Event number = " << event_number);

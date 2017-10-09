@@ -15,15 +15,26 @@ int main(int /*argc_*/, char ** /*argv_*/)
 
     std::string cpedfile
       = "${FECOM_RESOURCES_DIR}/data/samples/run_0/Calo_Pedestal_Files/calo_pedestals_slot_0.txt";
-    uint16_t board_id = 0;
-    ccalib.load_pedestals(board_id, cpedfile);
-    // board_id = 1;
-    // ccalib.load_pedestals(board_id, cpedfile);
+    ccalib.load_pedestals(cpedfile);
     ccalib.tree_dump(std::clog, "Calorimeter calibration:");
+
+    for (auto it_map = ccalib.calo_pedestals.begin();
+	 it_map != ccalib.calo_pedestals.end();
+	 it_map++)
+      {
+	std::clog << "Calo_channel_id board " << it_map->first.board_id << " channel " << it_map->first.channel_id << " <=> ";
+	it_map->second.tree_dump(std::clog, "A calo pedestal");
+	// it_map->second.print_offsets(std::clog);
+
+
+	std::clog << std::endl;
+      }
+
 
   } catch (std::exception & error) {
     std::cerr << "error: " << error.what() << std::endl;
     return EXIT_FAILURE;
   }
+
   return EXIT_SUCCESS;
 }
