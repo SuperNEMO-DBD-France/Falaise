@@ -46,7 +46,7 @@ manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.c
     datatools::properties::read_config (manager_config_file,
 					manager_config);
     geomtools::manager my_manager;
-   
+
     manager_config.update ("build_mapping", true);
     if (manager_config.has_key ("mapping.excluded_categories"))
       {
@@ -56,7 +56,7 @@ manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.c
 
     std::string pipeline_simulated_data_filename;
     std::string SD_bank_label = "SD";
-    
+
     if(is_input_file){
       pipeline_simulated_data_filename = input_filename;
     }else{
@@ -66,14 +66,14 @@ manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.c
     dpp::input_module reader;
     datatools::properties reader_config;
     reader_config.store ("logging.priority", "debug");
-    reader_config.store ("max_record_total", 1);
+    reader_config.store ("max_record_total", 5);
     reader_config.store ("files.mode", "single");
     reader_config.store ("files.single.filename", pipeline_simulated_data_filename);
     reader.initialize_standalone (reader_config);
     reader.tree_dump (std::clog, "Simulated data reader module");
 
     datatools::things ER;
-    
+
     snemo::digitization::sd_to_geiger_signal_algo sd_2_geiger_signal(my_manager);
     sd_2_geiger_signal.initialize();
 
@@ -82,18 +82,18 @@ manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.c
       {
 	reader.process(ER);
 	// A plain `mctools::simulated_data' object is stored here :
-	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label)) 
+	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label))
 	  {
 	    // Access to the "SD" bank with a stored `mctools::simulated_data' :
 	    const mctools::simulated_data & SD = ER.get<mctools::simulated_data>(SD_bank_label);
 
 	    snemo::digitization::signal_data signal_data;
 	    if( SD.has_step_hits("gg"))
-	      {		  
+	      {
 		sd_2_geiger_signal.process(SD, signal_data);
 		signal_data.tree_dump(std::clog, "Signal data : ", "INFO : ");
 	      }
-	  }     
+	  }
 	ER.clear();
 
 	psd_count++;

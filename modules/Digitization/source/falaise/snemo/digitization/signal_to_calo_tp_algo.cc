@@ -9,7 +9,7 @@
 #include <snemo/digitization/signal_to_calo_tp_algo.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     signal_to_calo_tp_algo::signal_to_calo_tp_algo()
@@ -22,7 +22,7 @@ namespace snemo {
     }
 
     signal_to_calo_tp_algo::~signal_to_calo_tp_algo()
-    {   
+    {
       if (is_initialized())
 	{
 	  reset();
@@ -33,11 +33,11 @@ namespace snemo {
     void signal_to_calo_tp_algo::initialize(electronic_mapping & my_electronic_mapping_)
     {
       DT_THROW_IF(is_initialized(), std::logic_error, "SD to calo tp algorithm is already initialized ! ");
-      _electronic_mapping_ = & my_electronic_mapping_;  
+      _electronic_mapping_ = & my_electronic_mapping_;
       _initialized_ = true;
       return;
     }
-    
+
     bool signal_to_calo_tp_algo::is_initialized() const
     {
       return _initialized_;
@@ -54,11 +54,11 @@ namespace snemo {
     }
 
     void signal_to_calo_tp_algo::set_clocktick_reference(uint32_t clocktick_ref_)
-    { 
-      _clocktick_ref_ = clocktick_ref_;     
+    {
+      _clocktick_ref_ = clocktick_ref_;
       return;
     }
-			
+
     void signal_to_calo_tp_algo::set_clocktick_shift(double clocktick_shift_)
     {
       _clocktick_shift_ = clocktick_shift_;
@@ -79,25 +79,27 @@ namespace snemo {
       DT_THROW_IF(!is_initialized(), std::logic_error, "SD to calo TP algorithm is not initialized ! ");
 
       std::size_t number_of_hits = signal_data_.get_calo_signals().size();
-      double time_reference = signal_data_.get_calo_signals()[0].get().get_signal_time();
+      double time_min_event = signal_data_.get_calo_signals()[0].get().get_signal_time();
       for (std::size_t i = 0; i < number_of_hits; i++)
 	{
-	  if (signal_data_.get_calo_signals()[i].get().get_signal_time() < time_reference)
+	  if (signal_data_.get_calo_signals()[i].get().get_signal_time() < time_min_event)
 	    {
-	      time_reference = signal_data_.get_calo_signals()[0].get().get_signal_time();
+	      time_min_event = signal_data_.get_calo_signals()[0].get().get_signal_time();
 	    }
 	}
 
+      std::clog << "Minimum time event : " << time_min_event << std::endl;
+
       for (std::size_t i = 0; i < number_of_hits; i++)
-	{	 	    
+	{
 	  const calo_signal & a_calo_signal  = signal_data_.get_calo_signals()[i].get();
 	  const geomtools::geom_id & geom_id = a_calo_signal.get_geom_id();
 	  const double calo_hit_amplitude    = a_calo_signal.get_amplitude();
- 
+
 	  if (calo_hit_amplitude >= calo_tp::LOW_THRESHOLD)
 	    {
 	      geomtools::geom_id temporary_electronic_id;
-	      _electronic_mapping_->convert_GID_to_EID(mapping::THREE_WIRES_TRACKER_MODE, 
+	      _electronic_mapping_->convert_GID_to_EID(mapping::THREE_WIRES_TRACKER_MODE,
 						       geom_id,
 						       temporary_electronic_id);
 	      uint32_t electronic_type = temporary_electronic_id.get_type();
@@ -105,19 +107,23 @@ namespace snemo {
 	      electronic_id.set_depth(mapping::BOARD_DEPTH);
 	      electronic_id.set_type(electronic_type);
 	      temporary_electronic_id.extract_to(electronic_id);
-	      
+
 	      bool calo_xt_bit    = 0; // These bits have to be checked
 	      bool calo_spare_bit = 0;
-	      
+
 	      bool existing = false;
 	      unsigned int existing_index = 0;
-	  
-	      double relative_time            = a_calo_signal.get_signal_time() - time_reference ;
+
+	      // double relative_time             = a_calo_signal.get_signal_time() - time_min_event; // before, to check if this deletion has no influence on trigger programs
 	      uint32_t a_calo_signal_clocktick = _clocktick_ref_ + clock_utils::CALO_FEB_SHIFT_CLOCKTICK_NUMBER;
 
-	      if (relative_time > 3)
+	      std::clog << "Calo signal absolute time = " << a_calo_signal.get_signal_time() << std::endl;
+	      std::clog << "A CT 25                   = " << a_calo_signal_clocktick << std::endl;
+
+	      // Calo signal in another CT25
+	      if (a_calo_signal.get_signal_time() > 25) // 25 in nanosecond, other CT 25, increment
 		{
-		  a_calo_signal_clocktick += static_cast<uint32_t>(relative_time) / 3;
+		  a_calo_signal_clocktick += static_cast<uint32_t>(a_calo_signal.get_signal_time()) / 25;
 		}
 
 	      for (unsigned int j = 0; j < my_calo_tp_data_.get_calo_tps().size(); j++)
@@ -129,6 +135,7 @@ namespace snemo {
 		      existing_index = j;
 		    }
 		}
+	      std::clog << "A CT 25 no existing = " << a_calo_signal_clocktick << std::endl << std::endl;
 
 	      if (existing == false)
 		{
@@ -138,11 +145,11 @@ namespace snemo {
 				     a_calo_signal_clocktick);
 		  calo_tp.set_data(calo_hit_amplitude,
 				   calo_xt_bit,
-				   calo_spare_bit);   
+				   calo_spare_bit);
 		  // calo_tp.tree_dump(std::clog, "Calo TP first creation : ", "INFO : ");
 		}
-	
-	      else 
+
+	      else
 		{
 		  snemo::digitization::calo_tp & existing_calo_tp = my_calo_tp_data_.grab_calo_tps()[existing_index].grab();
 		  existing_calo_tp.update_data(calo_hit_amplitude,

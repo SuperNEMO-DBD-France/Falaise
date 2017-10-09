@@ -12,19 +12,30 @@
 // - Bayeux/geomtools :
 #include <bayeux/geomtools/base_hit.h>
 // - Bayeux/datatools :
-#include <datatools/clhep_units.h>
+#include <bayeux/datatools/clhep_units.h>
+#include <bayeux/datatools/handle.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     /// \brief The calo tracker signal
     class calo_signal : public geomtools::base_hit
     {
-    public : 
+    public :
 
 			/// Shift to take account the "drift" PM time + wires travel time
       static constexpr double DELAYED_PM_TIME = 130.6; // It has to be recalculated, approximative time for the moment
+
+			struct compare_handle_by_timestamp {
+
+				bool operator()(const datatools::handle<calo_signal> & ha,
+												const datatools::handle<calo_signal> & hb)
+				{
+					return (ha.get().get_signal_time() < hb.get().get_signal_time());
+				}
+
+			};
 
       /// Default constructor
       calo_signal();
@@ -39,16 +50,16 @@ namespace snemo {
 			/// Set the data with values
 			void set_data(const double & signal_time_,
 										const double & amplitude_);
-      
+
       /// Return the const time with the photomultiplier delay
       double get_signal_time() const;
-     
+
       // Set the time with the photomultiplier delay
       void set_signal_time(const double & signal_time_);
 
       /// Return the const energy
       double get_amplitude() const;
-     
+
       // Set the energy
       void set_amplitude(const double & amplitude_);
 
@@ -64,12 +75,12 @@ namespace snemo {
 														 const std::string & a_indent = "",
 														 bool a_inherit               = false) const;
     private :
-			
+
 			double _signal_time_; //!< Calorimeter signal time
-      double _amplitude_;   //!< Amplitude 
-      
+      double _amplitude_;   //!< Amplitude
+
       // DATATOOLS_SERIALIZATION_DECLARATION();
-      
+
     };
 
   } // end of namespace digitization
@@ -78,7 +89,7 @@ namespace snemo {
 
 #endif /* FALAISE_DIGITIZATION_PLUGIN_SNEMO_DIGITIZATION_CALO_SIGNAL_H */
 
-/* 
+/*
 ** Local Variables: --
 ** mode: c++ --
 ** c-file-style: "gnu" --

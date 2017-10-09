@@ -20,13 +20,13 @@
 #include <boost/cstdint.hpp>
 
 namespace snemo {
-	
+
 	namespace digitization {
-		
-		class clock_utils 
+
+		class clock_utils
 		{
 		public :
-			
+
 			static const uint32_t NUMBER_OF_25_CLOCK_IN_800 = 32;     //!< Number of 25 time clock in 800
 			static const uint32_t MAIN_CLOCKTICK = 25;                //!< Main clocktick, 40 MHz => 25ns.
 			static const uint32_t TRACKER_CLOCKTICK = 800;            //!< Clocktick for tracker, 800ns.
@@ -37,7 +37,7 @@ namespace snemo {
 			static const uint32_t CALO_FEB_SHIFT_CLOCKTICK_NUMBER = 6; //!< Number of clocktick which shift the internal clocktick in a caloFEB
 			static const uint32_t CALO_CB_SHIFT_CLOCKTICK_NUMBER = 7;  //!< Number of clocktick which shift the internal clocktick in a caloCB
 
-			// To define with Thierry ? : 
+			// To define with Thierry ? :
 			static const uint32_t TRACKER_FEB_SHIFT_CLOCKTICK_NUMBER = 1; //!< Number of clocktick 800 ns which shift the internal clocktick in a trackerFEB
 			static const uint32_t TRACKER_CB_SHIFT_CLOCKTICK_NUMBER = 0;  //!< Number of clocktick 800 ns which shift the internal clocktick in a trackerCB
 
@@ -47,7 +47,7 @@ namespace snemo {
 			static const uint32_t TRIGGER_COMPUTING_SHIFT_CLOCKTICK_1600NS = 1; //!< Shift to take into account the time of computing and when it is published (CT+1)
 
 			static const uint32_t PREVIOUS_EVENT_RECORD_LIVING_NUMBER_OF_CLOCKTICK = 625; //!< Number of CT 1600 a previous event record "live" 625 * 1600 = 1 ms
-			
+
 			/// Default constructor
 			clock_utils();
 
@@ -57,10 +57,10 @@ namespace snemo {
 			/// Initializing
       void initialize();
 
-			/// Check if the object is initialized 
+			/// Check if the object is initialized
 			bool is_initialized() const;
 
-			/// Reset the object : 
+			/// Reset the object :
 			void reset();
 
 			/// Get the clocktick reference
@@ -93,32 +93,32 @@ namespace snemo {
 											const std::string & title_  = "",
 											const std::string & indent_ = "",
 											bool inherit_               = false) const;
-			
+
 			/// Compute clockticks reference
 			void compute_clockticks_ref(mygsl::rng & prng_);
-			
+
 		protected :
 			/// Clocktick shift uniform randomize for 25 and 800ns clockticks
 			void _randomize_shift(mygsl::rng & prng_);
-			
+
 		private :
-			
-			bool    _initialized_;       //!< Initialization flag
+
+			bool    _initialized_;        //!< Initialization flag
 			uint32_t _clocktick_ref_;     //!< Clocktick reference (0) for everyone
-			double  _shift_1600_;        //!< Shift between 0 and 1600 corresponding at the physical decay time			
+			double  _shift_1600_;         //!< Shift between 0 and 1600 ns corresponding at the physical decay time
 			uint32_t _clocktick_25_ref_;  //!< Clocktick 25 ns reference
 			uint32_t _clocktick_800_ref_; //!< Clocktick 800 ns reference
-			double  _shift_25_;          //!< 25 ns shift
-			double  _shift_800_;         //!< 800 ns shift
+			double  _shift_25_;           //!< Shift 25 ns
+			double  _shift_800_;          //!< Shift 800 ns
 		};
-	       
+
   } // end of namespace digitization
 
 } // end of namespace snemo
 
 #endif /* FALAISE_DIGITIZATION_PLUGIN_SNEMO_DIGITIZATION_MAPPING_TP_H */
 
-/* 
+/*
 ** Local Variables: --
 ** mode: c++ --
 ** c-file-style: "gnu" --

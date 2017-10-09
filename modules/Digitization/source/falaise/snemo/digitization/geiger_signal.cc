@@ -12,12 +12,12 @@
 #include <datatools/utils.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     // Serial tag for datatools::serialization::i_serializable interface :
     // DATATOOLS_SERIALIZATION_SERIAL_TAG_IMPLEMENTATION(geiger_signal, "snemo::digitalization::geiger_signal")
-    
+
     geiger_signal::geiger_signal()
     {
       datatools::invalidate(_anode_avalanche_time_);
@@ -39,24 +39,24 @@ namespace snemo {
       set_geom_id(electronic_id_);
       return;
     }
-			
+
     void geiger_signal::set_data(const double & anode_avalanche_time_)
     {
       set_anode_avalanche_time(anode_avalanche_time_);
       return;
     }
-       
+
     double geiger_signal::get_anode_avalanche_time() const
     {
       return _anode_avalanche_time_;
     }
-      
+
     void geiger_signal::set_anode_avalanche_time(const double & anode_avalanche_time_)
     {
       _anode_avalanche_time_ = anode_avalanche_time_;
       return;
     }
-   
+
     double geiger_signal::get_plasma_top_time_() const
     {
       return _plasma_top_time_;
@@ -67,12 +67,12 @@ namespace snemo {
       _plasma_top_time_ = plasma_top_time_;
       return;
     }
-   
+
     double geiger_signal::get_plasma_bottom_time_() const
     {
       return _plasma_bottom_time_;
     }
-    
+
     void geiger_signal::set_plasma_bottom_time_(const double & plasma_bottom_time_)
     {
       _plasma_bottom_time_ = plasma_bottom_time_;
@@ -102,7 +102,7 @@ namespace snemo {
 
       return;
     }
-    
+
   } // end of namespace digitization
 
 } // end of namespace snemo

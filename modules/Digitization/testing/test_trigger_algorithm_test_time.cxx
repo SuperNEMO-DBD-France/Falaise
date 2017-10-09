@@ -94,7 +94,7 @@ int main( int  argc_ , char **argv_  )
     }
 
     // Use command line arguments :
-    else if (vm.count("display")) {
+    if (vm.count("display")) {
       is_display = true;
     }
 

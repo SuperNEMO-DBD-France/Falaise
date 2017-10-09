@@ -11,7 +11,7 @@
 #include <datatools/utils.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     // Serial tag for datatools::serialization::i_serializable interface :
@@ -30,7 +30,7 @@ namespace snemo {
       reset();
       return;
     }
-    
+
     void calo_signal::set_header(int32_t calo_signal_hit_id_,
 				 const geomtools::geom_id & electronic_id_)
     {
@@ -51,18 +51,18 @@ namespace snemo {
     {
       return _signal_time_;
     }
-    
+
     void calo_signal::set_signal_time(const double & signal_time_)
     {
       _signal_time_ = signal_time_ + DELAYED_PM_TIME;
       return;
     }
-   
+
     double calo_signal::get_amplitude() const
     {
       return _amplitude_;
     }
-    
+
     void calo_signal::set_amplitude(const double & amplitude_)
     {
       _amplitude_ = amplitude_;
@@ -86,16 +86,16 @@ namespace snemo {
 				 bool /*inherit_*/) const
     {
       base_hit::tree_dump (out_, title_, indent_, true);
-      
+
       out_ << indent_ << datatools::i_tree_dumpable::tag
-           << "Signal time =  : " << _signal_time_  << " ns " << std::endl;
-      
+           << "Signal time =  : " << _signal_time_ / CLHEP::nanosecond << " ns " << std::endl;
+
       out_ << indent_ << datatools::i_tree_dumpable::tag
            << "Amplitude =  : " << _amplitude_  << " mV " << std::endl;
-      
+
       return;
     }
-    
+
   } // end of namespace digitization
 
 } // end of namespace snemo

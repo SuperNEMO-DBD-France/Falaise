@@ -18,11 +18,6 @@
 // Third part :
 // GSL:
 #include <bayeux/mygsl/rng.h>
-// Root :
-#include "TFile.h"
-#include "TTree.h"
-#include "TH1F.h"
-#include "TH2F.h"
 
 // Boost :
 #include <boost/lexical_cast.hpp>
@@ -340,7 +335,7 @@ int main( int  argc_ , char **argv_  )
       /*************************/
       trigger_config.add("coincidence", "trigger_component");
       // datatools::multi_properties::entry & coinc_entry = trigger_config.grab("coincidence");
-    }
+    } // end of manual configuration
 
     // trigger_config.tree_dump(std::clog, "My trigger configuration");
 
@@ -351,41 +346,6 @@ int main( int  argc_ , char **argv_  )
     my_trigger_algo.initialize(trigger_config);
 
     // trigger_config.tree_dump(std::clog, "My trigger config : ");
-
-    // Root file output :
-    // std::string root_output_filename = output_path + "test_trigger_algorithm_time_output.root";
-    // datatools::fetch_path_with_env(root_output_filename);
-    // TFile* root_output_file = new TFile(root_output_filename.c_str(), "RECREATE");
-
-    // std::string string_buffer = "number_of_L2_decision_TH1F";
-    // TH1F * number_of_L2_decision_TH1F = new TH1F(string_buffer.c_str(),
-    // 					    Form("Number of L2 decision"),
-    // 					    10, 0, 10);
-
-    // string_buffer = "CARACO_decision_TH1F";
-    // TH1F * CARACO_decision_TH1F = new TH1F(string_buffer.c_str(),
-    // 					   Form("CARACO decision"),
-    // 					   2, 0, 2);
-
-    // string_buffer = "CARACO_CT_decision_1600ns_TH1F";
-    // TH1F * CARACO_CT_decision_1600ns_TH1F = new TH1F(string_buffer.c_str(),
-    // 						     Form("CARACO CT decision 1600"),
-    // 						     10, 0, 10);
-
-    // string_buffer = "delayed_decision_TH1F";
-    // TH1F * delayed_decision_TH1F = new TH1F(string_buffer.c_str(),
-    // 					    Form("delayed decision"),
-    // 					    2, 0, 2);
-
-    // string_buffer = "delayed_CT_decision_1600ns_TH1F";
-    // TH1F * delayed_CT_decision_1600ns_TH1F = new TH1F(string_buffer.c_str(),
-    // 						      Form("delayed CT decision 1600"),
-    // 						      650, 0, 650);
-
-    // string_buffer = "delayed_L2_trigger_mode_TH1F";
-    // TH1F * delayed_L2_trigger_mode_TH1F = new TH1F(string_buffer.c_str(),
-    // 						      Form("delayed delayed_L2_trigger_mode_TH1F"),
-    // 						      10, 0, 10);
 
     int psd_count = 0; // Event counter
 
@@ -527,14 +487,6 @@ int main( int  argc_ , char **argv_  )
 	      coincidence_collection_records[i].display();
 	    }
 
-    	    // // if (number_of_L2_decision == 4) std::cin.get();
-    	    // number_of_L2_decision_TH1F->Fill(number_of_L2_decision);
-    	    // CARACO_decision_TH1F->Fill(caraco_decision);
-    	    // if (caraco_clocktick_1600ns != snemo::digitization::clock_utils::INVALID_CLOCKTICK) CARACO_CT_decision_1600ns_TH1F->Fill(caraco_clocktick_1600ns);
-    	    // delayed_decision_TH1F->Fill(delayed_decision);
-    	    // if (delayed_decision && delayed_clocktick_1600ns != snemo::digitization::clock_utils::INVALID_CLOCKTICK) delayed_CT_decision_1600ns_TH1F->Fill(delayed_clocktick_1600ns);
-    	    // if (delayed_decision && delayed_trigger_mode != snemo::digitization::trigger_structures::L2_trigger_mode::INVALID) delayed_L2_trigger_mode_TH1F->Fill(delayed_trigger_mode);
-
     	    DT_LOG_INFORMATION(logging, "Number of L2 decision : " << number_of_L2_decision);
     	    DT_LOG_INFORMATION(logging, "CARACO decision :       " << caraco_decision);
     	    DT_LOG_INFORMATION(logging, "CARACO CT1600ns :       " << caraco_clocktick_1600ns);
@@ -551,9 +503,6 @@ int main( int  argc_ , char **argv_  )
     	if (debug) std::clog << "DEBUG : psd count " << psd_count << std::endl;
     	DT_LOG_NOTICE(logging, "Simulated data #" << psd_count);
       } // end of reader is terminated
-
-    // root_output_file->Write();
-    // root_output_file->Close();
 
     std::clog << "The end." << std::endl;
   }

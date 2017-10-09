@@ -13,7 +13,7 @@
 #include <snemo/digitization/mapping.h>
 
 namespace snemo {
-  
+
   namespace digitization {
 
     // Serial tag for datatools::serialization::i_serializable interface :
@@ -25,10 +25,10 @@ namespace snemo {
     }
 
     signal_data::~signal_data()
-    {   
+    {
       reset();
       return;
-    } 		       
+    }
 
     void signal_data::reset_geiger_signals()
     {
@@ -42,7 +42,6 @@ namespace snemo {
       return ;
     }
 
-		
 		geiger_signal & signal_data::add_geiger_signal()
     {
       {
@@ -74,12 +73,12 @@ namespace snemo {
     {
       return _geiger_signals_;
     }
-		
+
 		std::size_t signal_data::get_number_of_geiger_signals() const
 		{
 			return _geiger_signals_.size();
 		}
-		
+
 		std::size_t signal_data::get_number_of_prompt_geiger_signals(double time_limit_) const
 		{
 			std::size_t number_of_prompt_gg_signal = 0;
@@ -88,16 +87,16 @@ namespace snemo {
 				{
 					geiger_signal_handle_type a_gg_signal_handle = *it_signal;
 					geiger_signal a_gg_signal = a_gg_signal_handle.get();
-					
+
 					if (a_gg_signal.get_anode_avalanche_time() < time_limit_)
 						{
 							number_of_prompt_gg_signal++;
 						}
 				}
-			
+
 			return number_of_prompt_gg_signal;
 		}
-		
+
 		std::size_t signal_data::get_number_of_delayed_geiger_signals(double time_limit_) const
 		{
 			std::size_t number_of_delayed_gg_signal = 0;
@@ -106,7 +105,7 @@ namespace snemo {
 				{
 					geiger_signal_handle_type a_gg_signal_handle = *it_signal;
 					geiger_signal a_gg_signal = a_gg_signal_handle.get();
-					
+
 					if (a_gg_signal.get_anode_avalanche_time() > time_limit_)
 						{
 							number_of_delayed_gg_signal++;
@@ -129,7 +128,7 @@ namespace snemo {
 		{
 			return _calo_signals_.size();
 		}
-		
+
 		std::size_t signal_data::get_number_of_main_calo_signals() const
 		{
 			std::size_t number_of_main_calo_signal = 0;
@@ -138,14 +137,14 @@ namespace snemo {
 				{
 					calo_signal_handle_type a_calo_signal_handle = *it_signal;
 					calo_signal a_calo_signal = a_calo_signal_handle.get();
-					
+
 					const geomtools::geom_id a_calo_gid = a_calo_signal.get_geom_id();
 					if(a_calo_gid.get_type() == mapping::CALO_MAIN_WALL_CATEGORY_TYPE)
 						{
 							number_of_main_calo_signal++;
 						}
 				}
-			
+
 			return number_of_main_calo_signal;
 		}
 
@@ -157,14 +156,14 @@ namespace snemo {
 				{
 					calo_signal_handle_type a_calo_signal_handle = *it_signal;
 					calo_signal a_calo_signal = a_calo_signal_handle.get();
-					
+
 					const geomtools::geom_id a_calo_gid = a_calo_signal.get_geom_id();
 					if(a_calo_gid.get_type() == mapping::CALORIMETER_X_WALL_CATEGORY_TYPE)
 						{
 							number_of_xcalo_signal++;
 						}
 				}
-			
+
 			return number_of_xcalo_signal;
 		}
 
@@ -177,17 +176,17 @@ namespace snemo {
 				{
 					calo_signal_handle_type a_calo_signal_handle = *it_signal;
 					calo_signal a_calo_signal = a_calo_signal_handle.get();
-					
+
 					const geomtools::geom_id a_calo_gid = a_calo_signal.get_geom_id();
 					if(a_calo_gid.get_type() == mapping::CALORIMETER_GVETO_CATEGORY_TYPE)
 						{
 							number_of_gveto_signal++;
 						}
 				}
-			
+
 			return number_of_gveto_signal;
 		}
-		
+
 		bool signal_data::has_geiger_signals()
 		{
 			if (_geiger_signals_.size() != 0)
@@ -196,7 +195,7 @@ namespace snemo {
 				}
 			return 0;
 		}
-		
+
 		bool signal_data::has_calo_signals()
 		{
 			if (_calo_signals_.size() != 0)
@@ -225,7 +224,7 @@ namespace snemo {
 			out_ << indent_ << datatools::i_tree_dumpable::inherit_tag (inherit_)
 					 << "Calo signals : " << _calo_signals_.size() << std::endl;
 
-      
+
       return;
     }
 
@@ -266,7 +265,7 @@ namespace snemo {
 
 } // end of namespace snemo
 
-/* 
+/*
 ** Local Variables: --
 ** mode: c++ --
 ** c-file-style: "gnu" --

@@ -19,14 +19,23 @@
 #include <snemo/digitization/calo_signal.h>
 
 namespace snemo {
-  
-  namespace digitization {		
+
+  namespace digitization {
 
     /// \brief Collection of signal data. Both calorimeter signals and geiger signals.
     class signal_data //: public datatools::i_serializable // or DATATOOLS_SERIALIZABLE_CLASS
     {
-    public : 
- 
+    public :
+
+			struct compare_calo_handle_timestamp {
+
+				bool compare_upper_bound(const datatools::handle<calo_signal> & ha, double time_)
+				{
+					return ha.get().get_signal_time() < time_;
+				}
+
+			};
+
       /// Default constructor
       signal_data();
 
@@ -43,8 +52,8 @@ namespace snemo {
       typedef datatools::handle<calo_signal> calo_signal_handle_type;
 
       /// Collection of handles of calo trigger primitive
-      typedef std::vector<calo_signal_handle_type> calo_signal_collection_type;	
-			
+      typedef std::vector<calo_signal_handle_type> calo_signal_collection_type;
+
       /// Reset the list of geiger signals
       void reset_geiger_signals();
 
@@ -60,22 +69,22 @@ namespace snemo {
       /// Return the const collection of geigers trigger primitive
       const geiger_signal_collection_type & get_geiger_signals() const;
 
-      /// Return the mutable collection of geigers trigger primitive			
+      /// Return the mutable collection of geigers trigger primitive
       geiger_signal_collection_type & grab_geiger_signals();
-			
+
 			/// Return the total number of geiger signals
 			std::size_t get_number_of_geiger_signals() const;
-			
-			/// Return the number of prompt (< time_limit_) geiger signals 
+
+			/// Return the number of prompt (< time_limit_) geiger signals
 			std::size_t get_number_of_prompt_geiger_signals(double time_limit_) const;
 
-			/// Return the number of delayed (> time_limit_) geiger signals 
+			/// Return the number of delayed (> time_limit_) geiger signals
 			std::size_t get_number_of_delayed_geiger_signals(double time_limit_) const;
 
       /// Return the const collection of geigers trigger primitive
       const calo_signal_collection_type & get_calo_signals() const;
 
-      /// Return the mutable collection of geigers trigger primitive			
+      /// Return the mutable collection of geigers trigger primitive
       calo_signal_collection_type & grab_calo_signals();
 
 			/// Return the total number of calo signals
@@ -89,10 +98,10 @@ namespace snemo {
 
 			/// Return the total number of gveto signals
 			std::size_t get_number_of_gveto_signals() const;
-			
+
 			/// Check if signal data has geiger signals
 			bool has_geiger_signals();
-			
+
 			/// Check if signal data has calo signals
 			bool has_calo_signals();
 
@@ -105,14 +114,14 @@ namespace snemo {
 														 const std::string & a_indent = "",
 														 bool a_inherit               = false) const;
 
-    protected : 
+    protected :
       /// Check if two geiger or two calo signals do not have the same geom ID
       void _check();
-			
-    private : 
+
+    private :
 
       geiger_signal_collection_type _geiger_signals_; //!< Collection of geigers tracker primitive
-      calo_signal_collection_type _calo_signals_; //!< Collection of calos tracker primitive
+      calo_signal_collection_type _calo_signals_;     //!< Collection of calos tracker primitive
 
       //DATATOOLS_SERIALIZATION_DECLARATION()
 
@@ -129,7 +138,7 @@ BOOST_CLASS_EXPORT_KEY2(snemo::digitization::signal_data,
 
 #endif /* FALAISE_DIGITIZATION_PLUGIN_SNEMO_DIGITIZATION_SIGNAL_DATA_H */
 
-/* 
+/*
 ** Local Variables: --
 ** mode: c++ --
 ** c-file-style: "gnu" --

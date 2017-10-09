@@ -173,12 +173,9 @@ namespace snemo {
       DT_THROW_IF(_electronic_mapping_ == 0, std::logic_error, "Missing electronic mapping ! " );
       DT_THROW_IF(_clock_manager_ == 0, std::logic_error, "Missing clock manager ! " );
 
-      std::clog << "Entering initialize with config :" << std::endl;
-      mconfig_.tree_dump(std::clog, "My trigger config in class test_trigger_algo : ");
-
       datatools::properties general_config;
       general_config = mconfig_.get_section("general");
-      general_config.tree_dump(std::clog, "General config from multi properties");
+      // general_config.tree_dump(std::clog, "General config from multi properties");
 
       if (!has_calorimeter_gate_size()) {
 	if (general_config.has_key("coincidence_calorimeter_gate_size")) {
@@ -200,7 +197,6 @@ namespace snemo {
 	if (general_config.has_key("previous_event_buffer_depth")) {
 	  int previous_event_buffer_depth = general_config.fetch_integer("previous_event_buffer_depth");
 	  DT_THROW_IF(previous_event_buffer_depth <= 0, std::domain_error, "Invalid negative previous event buffer depth!");
-	  std::clog << "previous_event_buffer_depth = "  << previous_event_buffer_depth << std::endl;
 	  set_previous_event_buffer_depth((unsigned int) previous_event_buffer_depth);
 	}
       }
@@ -220,17 +216,17 @@ namespace snemo {
 
       datatools::properties calo_config;
       calo_config = mconfig_.get_section("calorimeter");
-      calo_config.tree_dump(std::clog, "Calorimeter config from multi properties");
+      // calo_config.tree_dump(std::clog, "Calorimeter config from multi properties");
       _calo_algo_.initialize(calo_config);
 
       datatools::properties tracker_config;
       tracker_config = mconfig_.get_section("tracker");
-      tracker_config.tree_dump(std::clog, "Tracker config from multi properties");
+      // tracker_config.tree_dump(std::clog, "Tracker config from multi properties");
       _tracker_algo_.initialize(tracker_config);
 
       datatools::properties coinc_config;
       coinc_config = mconfig_.get_section("coincidence");
-      coinc_config.tree_dump(std::clog, "Coincidence config from multi properties");
+      // coinc_config.tree_dump(std::clog, "Coincidence config from multi properties");
       _coinc_algo_.initialize(coinc_config);
 
       _initialized_ = true;

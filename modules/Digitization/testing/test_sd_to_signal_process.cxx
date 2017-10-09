@@ -23,7 +23,7 @@ int main( int  argc_ , char **  argv_ )
   falaise::initialize(argc_, argv_);
   int error_code = EXIT_SUCCESS;
   datatools::logger::priority logging = datatools::logger::PRIO_FATAL;
-  
+
   int iarg = 1;
   bool is_input_file = false;
   std::string input_filename;
@@ -43,13 +43,13 @@ int main( int  argc_ , char **  argv_ )
     std::clog << "Test program for class 'snemo::digitization::sd_to_signal_algo' !" << std::endl;
     std::string manager_config_file;
 
-manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf";
+manager_config_file = "@falaise:config/snemo/demonstrator/geometry/4.0/manager.conf";
     datatools::fetch_path_with_env (manager_config_file);
     datatools::properties manager_config;
     datatools::properties::read_config (manager_config_file,
 					manager_config);
     geomtools::manager my_manager;
-   
+
     manager_config.update ("build_mapping", true);
     if (manager_config.has_key ("mapping.excluded_categories"))
       {
@@ -59,14 +59,14 @@ manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.c
 
     std::string pipeline_simulated_data_filename;
     std::string SD_bank_label = "SD";
-    
+
     if(is_input_file){
       pipeline_simulated_data_filename = input_filename;
     }else{
       pipeline_simulated_data_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio";
     }
 
-    
+
     dpp::input_module reader;
     datatools::properties reader_config;
     reader_config.store ("logging.priority", "debug");
@@ -77,7 +77,7 @@ manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.c
     reader.tree_dump (std::clog, "Simulated data reader module");
 
     datatools::things ER;
-    
+
     snemo::digitization::sd_to_geiger_signal_algo sd_2_geiger_signal(my_manager);
     sd_2_geiger_signal.initialize();
 
@@ -89,22 +89,22 @@ manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.c
       {
 	reader.process(ER);
 	// A plain `mctools::simulated_data' object is stored here :
-	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label)) 
+	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label))
 	  {
 	    // Access to the "SD" bank with a stored `mctools::simulated_data' :
 	    const mctools::simulated_data & SD = ER.get<mctools::simulated_data>(SD_bank_label);
 
 	    snemo::digitization::signal_data signal_data;
 	    if( SD.has_step_hits("gg"))
-	      {		  
+	      {
 		sd_2_geiger_signal.process(SD, signal_data);
 	      }
 	    if( SD.has_step_hits("calo"))
-	      {		  
+	      {
 		sd_2_calo_signal.process(SD, signal_data);
 	      }
 	    signal_data.tree_dump(std::clog, "Signal data : ", "INFO : ");
-	  }     
+	  }
 	ER.clear();
 
 	psd_count++;
