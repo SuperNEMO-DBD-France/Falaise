@@ -224,7 +224,7 @@ for i in range(0,number_of_hits):#range(len(data[0])):
             logging.debug("")
             logging.debug("Calcul from Jihane's values :")
             # Baseline :
-            baseline_adc_fraction_jihane=baseline_raw/16.
+            baseline_adc_fraction_jihane=baseline_raw // 2 / 8
             baseline_volt_jihane = float("{0:.6f}".format((baseline_raw / 16.) * adc_count_constant)) # OK
 
             baseline_16_first_samples=[]
@@ -232,23 +232,26 @@ for i in range(0,number_of_hits):#range(len(data[0])):
                 baseline_16_first_samples.append((waveform_data[y_col][j]))
             #print("Baseline 16 first samples", baseline_16_first_samples)
             baseline_recalculated=np.mean(baseline_16_first_samples)
-            baseline_recalculated_adc_to_zero=np.mean(baseline_16_first_samples)-2048
-            baseline_recalculated_raw_to_zero=baseline_recalculated_adc_to_zero*16.
-            baseline_recalculated_volt_to_zero=baseline_recalculated_adc_to_zero*adc_count_constant
+            baseline_recalculated_raw=(baseline_recalculated - 2048)*8. *2.
+            baseline_recalculated_casted=(np.sum(baseline_16_first_samples) // 2) / 8. # round due to Dominique cast
+
+            baseline_recalculated_volt_to_zero=(baseline_recalculated_casted-2048)*adc_count_constant
             logging.debug("Baseline Raw Jihane : %s", baseline_raw)
+            logging.debug("Baseline Raw ADC Jihane : %s", baseline_adc_fraction_jihane)
             logging.debug("Baseline Volt Jihane : %s", baseline_volt)
-            logging.debug("Baseline moi mean recalculated RAW to zero : %s", baseline_recalculated_raw_to_zero)
-            logging.debug("Baseline moi mean recalculated volt to zero : %s", baseline_recalculated_volt_to_zero)
-            logging.debug("Baseline moi mean recalculated : %s", baseline_recalculated)
-            logging.debug("Baseline moi mean recalculated ADC to zero : %s", baseline_recalculated_adc_to_zero)
+            logging.debug("Baseline moi recalculated : %s", baseline_recalculated)
+            logging.debug("Baseline moi recalculated RAW : %s", baseline_recalculated_raw)
+            logging.debug("Baseline moi recalculated RAW casted : %s", baseline_recalculated_casted)
+            logging.debug("Baseline moi recalculated volt : %s", baseline_recalculated_volt_to_zero)
+
             baseline_mean_raw_jihane.append(baseline_raw)
-            baseline_mean_raw_diff.append(baseline_raw - baseline_recalculated_raw_to_zero)
+            baseline_mean_raw_diff.append(baseline_raw - baseline_recalculated_raw)
 
             # Peak :
             peak_adc_fraction_jihane=peak_raw/8.
             peak_volt_jihane = float("{0:.6f}".format(peak_adc_fraction_jihane * adc_count_constant)) # OK
             peak_cell, peak_value = min(enumerate(waveform_data[y_col]), key=operator.itemgetter(1))
-            peak_recalculated_adc=float("{0:.4f}".format(peak_value-baseline_recalculated))
+            peak_recalculated_adc=float("{0:.4f}".format(peak_value-baseline_recalculated_casted))
             peak_recalculated_raw=peak_recalculated_adc*8.
             logging.debug("")
             logging.debug("Peak raw Jihane (extremum) : %s", peak_raw)
@@ -264,16 +267,46 @@ for i in range(0,number_of_hits):#range(len(data[0])):
 
             # Dynamic charge :
             charge_length=992 # in samples
-            charge_lower_bound=peak_cell-64 # sample number
-            charge_upper_bound=1024 # sample number
+            # Charge bounds like in settings :
+            charge_lower_bound= peak_cell-64 # sample number
+            charge_upper_bound= 1024 # charge_lower_bound+charge_length # sample number
+
+            charge_effective_length=charge_upper_bound-charge_lower_bound
+            charge_effective_length_test=charge_upper_bound-charge_lower_bound
+
             charge_adc_samples=[]
+            charge_adc_samples_with_begin=[]
+
             for j in range(charge_lower_bound, charge_upper_bound):
-                charge_adc_samples.append(float("{0:.4f}".format(waveform_data[y_col][j]-baseline_recalculated)))
+                charge_adc_samples.append(float("{0:.4f}".format(waveform_data[y_col][j]-baseline_recalculated_casted)))
+                charge_adc_samples_with_begin.append(float("{0:.4f}".format(waveform_data[y_col][j]-baseline_recalculated_casted)))
+                if j == charge_upper_bound - 1:
+                # check if begin samples are used in the charge calculation
+                    for k in range(0, charge_lower_bound - 32):
+                        charge_adc_samples_with_begin.append(float("{0:.4f}".format(waveform_data[y_col][k]-baseline_recalculated_casted)))
+
+            charge_test_on_length_wo_baseline=[]
+            # Charge bounds test de la fin de la baseline; fin + length
+            charge_lower_bound_test=16
+            charge_upper_bound_test= 1008
+            for j in range(charge_lower_bound_test, charge_upper_bound_test):
+                charge_test_on_length_wo_baseline.append(float("{0:.4f}".format(waveform_data[y_col][j]-baseline_recalculated_casted)))
+            charge_test_on_length_plus_one_wo_baseline=charge_test_on_length_wo_baseline[:] # Don't forget the [:] to copy the list and don't get only the reference to the variable !!!
+            charge_test_on_length_plus_one_wo_baseline.append(float("{0:.4f}".format(waveform_data[y_col][charge_upper_bound_test+1]-baseline_recalculated_casted)))
+            print(len(charge_test_on_length_wo_baseline),len(charge_test_on_length_plus_one_wo_baseline))
             #logging.debug(charge_adc_samples)
             charge_recalculated=np.sum(charge_adc_samples)
+            charge_recalculated_with_begin=np.sum(charge_adc_samples_with_begin)
+            charge_recalculated_test_on_length=np.sum(charge_test_on_length_wo_baseline)
+            charge_recalculated_test_on_length_plus_one=np.sum(charge_test_on_length_plus_one_wo_baseline)
+
             logging.debug("")
+            logging.debug("Charge effective length (upper - lower bound) : %s", charge_effective_length)
             logging.debug("Charge ADC Jihane : %s", charge_raw)
-            logging.debug("Charge moi recalculated : %s", charge_recalculated)
+            logging.debug("Charge moi recalculated [peak cell -64; 1024] : %s", charge_recalculated)
+            logging.debug("Charge moi recalculated [peak cell -64; 1024] + [0; peak_cell -64 -32] : %s", charge_recalculated_with_begin)
+            logging.debug("Charge moi recalculated [16; 1008] (charge_length=992) : %s", charge_recalculated_test_on_length)
+            logging.debug("Charge moi recalculated [16; 1009] (charge_length=993) : %s", charge_recalculated_test_on_length_plus_one)
             logging.debug("")
             charge_jihane.append(charge_raw)
             charge_diff.append(int(charge_raw-charge_recalculated))
@@ -287,7 +320,7 @@ for i in range(0,number_of_hits):#range(len(data[0])):
             rising_already_crossed_adc=False
             for j in range(charge_lower_bound, len(waveform_data[y_col])):
                 sample_value_adc=waveform_data[y_col][j]
-                sample_value_adc=waveform_data[y_col][j]-baseline_recalculated
+                sample_value_adc=waveform_data[y_col][j]-baseline_recalculated_casted
                 # logging.debug("Sample value adc", sample_value_adc)
                 # logging.debug("Sample value ADC", sample_value_adc)
                 if (falling_already_crossed_adc == False and sample_value_adc <= edge_to_cross_adc_jihane):
@@ -308,11 +341,11 @@ for i in range(0,number_of_hits):#range(len(data[0])):
             logging.debug("Rising cell Jihane : %s", rising_cell)
             logging.debug("Rising cell moi : %s", rising_cell_adc)
             falling_cell_sample_value=waveform_data[y_col][falling_cell_adc]#  + np.mean(baseline_recalculated_adc_to_zero)#-baseline_rawrecalculated
-            falling_cell_plus_one_sample_value=waveform_data[y_col][falling_cell_adc+1] #+ np.mean(baseline_recalculated_adc_to_zero)#-baseline_recalculated
+            falling_cell_plus_one_sample_value=waveform_data[y_col][falling_cell_adc+1] #+ np.mean(baseline_recalculated_adc_to_zero)#-baseline_recalculated_casted
             # logging.debug("Falling cell sample value : %s", falling_cell_sample_value)
             # logging.debug("Falling cell+1 sample value : %s", falling_cell_plus_one_sample_value)
             rising_cell_sample_value=waveform_data[y_col][rising_cell_adc]#  + np.mean(baseline_recalculated_adc_to_zero)#-baseline_rawrecalculated
-            rising_cell_plus_one_sample_value=waveform_data[y_col][rising_cell_adc+1] #+ np.mean(baseline_recalculated_adc_to_zero)#-baseline_recalculated
+            rising_cell_plus_one_sample_value=waveform_data[y_col][rising_cell_adc+1] #+ np.mean(baseline_recalculated_adc_to_zero)#-baseline_recalculated_casted
             # logging.debug("Rising cell sample value : %s", rising_cell_sample_value)
             # logging.debug("Rising cell+1 sample value : %s", rising_cell_plus_one_sample_value)
 
@@ -320,8 +353,8 @@ for i in range(0,number_of_hits):#range(len(data[0])):
             falling_ya=0
             falling_yb=255
             x1=edge_to_cross_adc_jihane
-            falling_xa=falling_cell_sample_value-baseline_recalculated # ADC value
-            falling_xb=falling_cell_plus_one_sample_value-baseline_recalculated # ADC value
+            falling_xa=falling_cell_sample_value-baseline_recalculated_casted # ADC value
+            falling_xb=falling_cell_plus_one_sample_value-baseline_recalculated_casted # ADC value
             falling_offset_recalculated = 0
             if (falling_xb - falling_xa) != 0:
                 falling_offset_recalculated=falling_ya + (falling_yb - falling_ya) * ((x1 - falling_xa) / (falling_xb - falling_xa))
@@ -334,8 +367,8 @@ for i in range(0,number_of_hits):#range(len(data[0])):
             rising_ya=0
             rising_yb=255
             x2=edge_to_cross_adc_jihane
-            rising_xa=rising_cell_sample_value-baseline_recalculated # ADC value
-            rising_xb=rising_cell_plus_one_sample_value-baseline_recalculated # ADC value
+            rising_xa=rising_cell_sample_value-baseline_recalculated_casted # ADC value
+            rising_xb=rising_cell_plus_one_sample_value-baseline_recalculated_casted # ADC value
             rising_offset_recalculated = 0
             if (rising_xb - rising_xa) != 0:
                 rising_offset_recalculated=rising_ya + (rising_yb - rising_ya) * ((x2 - rising_xa) / (rising_xb - rising_xa))
@@ -358,7 +391,7 @@ for i in range(0,number_of_hits):#range(len(data[0])):
             logging.debug("")
             edge_line = []
             for i in range(0, len(waveform_data[y_col])):
-                edge_line.append(baseline_recalculated+edge_to_cross_adc_jihane)
+                edge_line.append(baseline_recalculated_casted+edge_to_cross_adc_jihane)
 
             if show_waveforms:
                 plt.plot(waveform_data[x_col], waveform_data[y_col], 'r')
