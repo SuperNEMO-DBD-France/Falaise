@@ -9,6 +9,7 @@ from math import *
 import logging
 import random
 import math
+import waveform_datamodel
 
 def check_value(a, b):
     if (a==b):
@@ -450,6 +451,10 @@ for i in range(0,number_of_hits):#range(len(data[0])):
 
                 mean_baseline_mod_8_samples[1][effective_hit_number].append(abs(baseline_raw_calc_mean))
                 mean_sigma_baseline_mod_8_samples[1][effective_hit_number].append(sigma_baseline_raw_calc_mean)
+
+            baseline_reference_16_samples = baseline_raw_mod_8[1]
+            logging.debug("Baseline ref 16 samples values = %s", baseline_reference_16_samples)
+
 
             # logging.debug(baseline_raw_mod_8)
             # logging.debug(sigma_baseline_raw_mod_8)
