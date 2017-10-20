@@ -17,11 +17,11 @@
 #include <geomtools/base_hit.ipp>
 
 namespace snemo {
-  
+
   namespace digitization {
 
 		template<class Archive>
-		void calo_tp::serialize (Archive            & ar,
+		void calo_tp::serialize (Archive & ar,
 														 const unsigned int /* version_ */)
 		{
 			// inherit from the 'base_hit' mother class:
@@ -36,12 +36,12 @@ namespace snemo {
 				{
 					ar & boost::serialization::make_nvp ("clocktick_25ns", _clocktick_25ns_);
 				}
-		
+
 			if (_store & STORE_TP)
 				{
 					ar & boost::serialization::make_nvp ("TP", _tp_);
 				}
-			
+
 			return;
 		}
 

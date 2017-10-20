@@ -88,8 +88,6 @@ namespace snemo {
 	    }
 	}
 
-      std::clog << "Minimum time event : " << time_min_event << std::endl;
-
       for (std::size_t i = 0; i < number_of_hits; i++)
 	{
 	  const calo_signal & a_calo_signal  = signal_data_.get_calo_signals()[i].get();
@@ -117,9 +115,6 @@ namespace snemo {
 	      // double relative_time             = a_calo_signal.get_signal_time() - time_min_event; // before, to check if this deletion has no influence on trigger programs
 	      uint32_t a_calo_signal_clocktick = _clocktick_ref_ + clock_utils::CALO_FEB_SHIFT_CLOCKTICK_NUMBER;
 
-	      std::clog << "Calo signal absolute time = " << a_calo_signal.get_signal_time() << std::endl;
-	      std::clog << "A CT 25                   = " << a_calo_signal_clocktick << std::endl;
-
 	      // Calo signal in another CT25
 	      if (a_calo_signal.get_signal_time() > 25) // 25 in nanosecond, other CT 25, increment
 		{
@@ -135,7 +130,6 @@ namespace snemo {
 		      existing_index = j;
 		    }
 		}
-	      std::clog << "A CT 25 no existing = " << a_calo_signal_clocktick << std::endl << std::endl;
 
 	      if (existing == false)
 		{

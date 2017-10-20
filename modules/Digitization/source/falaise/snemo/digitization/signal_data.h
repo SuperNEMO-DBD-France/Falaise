@@ -9,6 +9,8 @@
 #include <vector>
 
 // Third party:
+// - Boost :
+#include <boost/serialization/access.hpp>
 // - Bayeux/datatools :
 #include <bayeux/datatools/handle.h>
 // - Bayeux/mctools :
@@ -23,7 +25,8 @@ namespace snemo {
   namespace digitization {
 
     /// \brief Collection of signal data. Both calorimeter signals and geiger signals.
-    class signal_data //: public datatools::i_serializable // or DATATOOLS_SERIALIZABLE_CLASS
+    class signal_data
+			: public datatools::i_serializable
     {
     public :
 
@@ -123,7 +126,7 @@ namespace snemo {
       geiger_signal_collection_type _geiger_signals_; //!< Collection of geigers tracker primitive
       calo_signal_collection_type _calo_signals_;     //!< Collection of calos tracker primitive
 
-      //DATATOOLS_SERIALIZATION_DECLARATION()
+      DATATOOLS_SERIALIZATION_DECLARATION()
 
     };
 

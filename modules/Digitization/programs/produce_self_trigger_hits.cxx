@@ -8,6 +8,8 @@
 #include <datatools/io_factory.h>
 #include <datatools/clhep_units.h>
 #include <datatools/temporary_files.h>
+#include <datatools/io_factory.h>
+#include <datatools/properties.h>
 // - Bayeux/geomtools:
 #include <geomtools/manager.h>
 #include <geomtools/base_hit.h>
@@ -38,25 +40,17 @@
 #include <boost/program_options.hpp>
 
 // This project
-#include <snemo/digitization/clock_utils.h>
-#include <snemo/digitization/mapping.h>
+#include <snemo/digitization/signal_data.h>
 
-#include <snemo/digitization/sd_to_calo_signal_algo.h>
-#include <snemo/digitization/signal_to_calo_tp_algo.h>
-#include <snemo/digitization/calo_tp_to_ctw_algo.h>
-
-#include <snemo/digitization/sd_to_geiger_signal_algo.h>
-#include <snemo/digitization/signal_to_geiger_tp_algo.h>
-#include <snemo/digitization/geiger_tp_to_ctw_algo.h>
-
-#include <snemo/digitization/trigger_algorithm_test_time.h>
 
 
 void generate_pool_of_calo_spurious_signals(mygsl::rng * rdm_gen_,
+					    const datatools::properties & config_,
 					    const std::vector<geomtools::geom_id> & gid_collection_,
 					    snemo::digitization::signal_data & calo_tracker_spurious_signals_);
 
 void generate_pool_of_geiger_spurious_signals(mygsl::rng * rdm_gen_,
+					      const datatools::properties & config_,
 					      const std::vector<geomtools::geom_id> & gid_collection_,
 					      snemo::digitization::signal_data & calo_tracker_spurious_signals_);
 
@@ -68,9 +62,8 @@ int main( int  argc_ , char **argv_  )
 
   try {
     bool is_display = false;
-    std::string trigger_config_filename = "";
     std::string output_path = "";
-    std::size_t max_events = 0;
+    std::string config_file = "";
 
     // Parse options:
     namespace po = boost::program_options;
@@ -82,11 +75,8 @@ int main( int  argc_ , char **argv_  )
        po::value<std::string>(& output_path),
        "set the output path where produced files are created")
       ("config,c",
-       po::value<std::string>(& trigger_config_filename),
-       "set the trigger configuration file")
-      ("event_number,n",
-       po::value<std::size_t>(& max_events)->default_value(10),
-       "set the maximum number of events")
+       po::value<std::string>(& config_file),
+       "set the config file to produce self trigger events")
       ; // end of options description
 
     // Describe command line arguments :
@@ -107,7 +97,18 @@ int main( int  argc_ , char **argv_  )
       is_display = true;
     }
 
-    std::clog << "Test program for a naive 'background trigger model' !" << std::endl;
+    // Set the default output path :
+    if (output_path.empty()) output_path = "/tmp/";
+    DT_LOG_INFORMATION(logging, "Output path : " + output_path);
+    datatools::fetch_path_with_env(output_path);
+
+    // Default config file (datatools::properties format):
+    if (config_file.empty()) config_file = "${FALAISE_DIGITIZATION_DIR}/resources/self_trigger.conf";
+    datatools::fetch_path_with_env(config_file);
+    datatools::properties st_config;
+    datatools::properties::read_config(config_file, st_config);
+
+    std::clog << "Test program for a naive 'calo / tracker self trigger model' !" << std::endl;
     int32_t seed = 314158;
     mygsl::rng random_generator;
     random_generator.initialize(seed);
@@ -125,6 +126,20 @@ int main( int  argc_ , char **argv_  )
         manager_config.erase ("mapping.excluded_categories");
       }
     my_manager.initialize(manager_config);
+
+    std::string output_filename = output_path + '/' + "self_trigger_hits.data.bz2";
+    DT_LOG_INFORMATION(logging, "Serialization output file :" + output_filename);
+    // Event serializer module :
+    // dpp::output_module serializer;
+    // datatools::properties writer_config;
+    // writer_config.store ("logging.priority", "debug");
+    // writer_config.store ("files.mode", "single");
+    // writer_config.store ("files.single.filename", output_filename);
+    datatools::data_writer serializer(output_filename,
+                                      datatools::using_multiple_archives);
+
+    //serializer.initialize_standalone(writer_config);
+    //serializer.tree_dump(std::clog, "Self Trigger hits writer module");
 
     unsigned int module_number = 0;
 
@@ -173,16 +188,19 @@ int main( int  argc_ , char **argv_  )
 
     // Generate pool of main wall spurious signals :
     generate_pool_of_calo_spurious_signals(&random_generator,
+					   st_config,
 					   collection_of_main_wall_gid,
 					   calo_tracker_spurious_signals);
 
     // Generate pool of xwall spurious signals :
     generate_pool_of_calo_spurious_signals(&random_generator,
+					   st_config,
 					   collection_of_xwall_gid,
 					   calo_tracker_spurious_signals);
 
     // Generate pool of gveto spurious signals :
     generate_pool_of_calo_spurious_signals(&random_generator,
+					   st_config,
 					   collection_of_gveto_gid,
 					   calo_tracker_spurious_signals);
 
@@ -204,6 +222,7 @@ int main( int  argc_ , char **argv_  )
 						      collection_of_geiger_gid);
 
     generate_pool_of_geiger_spurious_signals(&random_generator,
+					     st_config,
 					     collection_of_geiger_gid,
 					     calo_tracker_spurious_signals);
 
@@ -232,21 +251,20 @@ int main( int  argc_ , char **argv_  )
     */
 
     // Display 5 first calo and tracker signals
-    for (std::size_t icalo = 0; icalo < 5; icalo++)
-      {
-    	temp_signals.get_calo_signals()[icalo].get().tree_dump(std::clog, "A calo signal #" + std::to_string(icalo));
-      }
+    // for (std::size_t icalo = 0; icalo < 5; icalo++)
+    //   {
+    // 	temp_signals.get_calo_signals()[icalo].get().tree_dump(std::clog, "A calo signal #" + std::to_string(icalo));
+    //   }
 
-    for (std::size_t igeiger = 0; igeiger < 5; igeiger++)
-      {
-    	temp_signals.get_geiger_signals()[igeiger].get().tree_dump(std::clog, "A geiger signal #" + std::to_string(igeiger));
-      }
+    // for (std::size_t igeiger = 0; igeiger < 5; igeiger++)
+    //   {
+    // 	temp_signals.get_geiger_signals()[igeiger].get().tree_dump(std::clog, "A geiger signal #" + std::to_string(igeiger));
+    //   }
 
     std::clog << std::endl << "Building events from spurious signals..." << std::endl;
 
     std::clog << "Event window (in us) " << event_window / CLHEP::microsecond << std::endl;
     std::size_t event_counter = 0;
-
 
     // // For testing purpose :
     // snemo::digitization::signal_data test_signals;
@@ -356,9 +374,12 @@ int main( int  argc_ , char **argv_  )
 	if (number_of_calo_in_event != 0 || number_of_geiger_in_event != 0)
 	  {
 	    collection_of_events.push_back(event_signals);
-	    std::clog << "Event #" << event_counter
-	    	      << " Number of calo in event   : " << number_of_calo_in_event
-	    	      << " Number of geiger in event : " << number_of_geiger_in_event << std::endl;
+	    // std::clog << "Event #" << event_counter
+	    // 	      << " Number of calo in event   : " << number_of_calo_in_event
+	    // 	      << " Number of geiger in event : " << number_of_geiger_in_event << std::endl;
+
+	    serializer.store(event_signals);
+
 	    event_counter++;
 	  }
       } // end of for
@@ -368,221 +389,9 @@ int main( int  argc_ , char **argv_  )
 
     std::clog << "Number of events = " << collection_of_events.size() << " event counter " << event_counter << std::endl;
 
-    /*** End of self-trigger event construction**/
-
-    /********************************************************/
-    /****  Trigger part on the self triggering signals   ****/
-    /********************************************************/
-
-    // Multi properties to configure trigger algorithm :
-    datatools::multi_properties trigger_config("name", "type", "Trigger parameters multi section configuration");
-
-    if (trigger_config_filename.empty()) {
-      trigger_config_filename = "${FALAISE_DIGITIZATION_DIR}/resources/config/snemo/common/1.0/trigger_parameters.conf";
-    }
-    datatools::fetch_path_with_env(trigger_config_filename);
-    trigger_config.read(trigger_config_filename);
-
-    // Number of events :
-    std::clog << "Number of events for the trigger = " << max_events << std::endl;
-
-    // Set the default output path :
-    if (output_path.empty()) output_path = "/tmp/";
-    DT_LOG_INFORMATION(logging, "Output path : " + output_path);
-    datatools::fetch_path_with_env(output_path);
-
-    // Electronic mapping :
-    snemo::digitization::electronic_mapping my_e_mapping;
-    my_e_mapping.set_geo_manager(my_manager);
-    my_e_mapping.set_module_number(snemo::digitization::mapping::DEMONSTRATOR_MODULE_NUMBER);
-    my_e_mapping.initialize();
-
-    // Clock manager :
-    snemo::digitization::clock_utils my_clock_manager;
-    my_clock_manager.initialize();
-
-    // Initializing signal to calo_tp algo :
-    snemo::digitization::signal_to_calo_tp_algo signal_2_calo_tp;
-    signal_2_calo_tp.initialize(my_e_mapping);
-
-    // Initializing signal to geiger_tp algo :
-    snemo::digitization::signal_to_geiger_tp_algo signal_2_geiger_tp;
-    signal_2_geiger_tp.initialize(my_e_mapping);
-
-    // Initializing calo_tp to calo_ctw algorithms for each crate :
-    snemo::digitization::calo_tp_to_ctw_algo calo_tp_2_ctw_0;
-    calo_tp_2_ctw_0.set_crate_number(snemo::digitization::mapping::MAIN_CALO_SIDE_0_CRATE);
-    calo_tp_2_ctw_0.initialize();
-    snemo::digitization::calo_tp_to_ctw_algo calo_tp_2_ctw_1;
-    calo_tp_2_ctw_1.set_crate_number(snemo::digitization::mapping::MAIN_CALO_SIDE_1_CRATE);
-    calo_tp_2_ctw_1.initialize();
-    snemo::digitization::calo_tp_to_ctw_algo calo_tp_2_ctw_2;
-    calo_tp_2_ctw_2.set_crate_number(snemo::digitization::mapping::XWALL_GVETO_CALO_CRATE);
-    calo_tp_2_ctw_2.initialize();
-
-    // Initializing geiger_tp to geiger_ctw :
-    snemo::digitization::geiger_tp_to_ctw_algo geiger_tp_2_ctw;
-    geiger_tp_2_ctw.initialize();
-
-    // Creation and initialization of trigger algorithm :
-    snemo::digitization::trigger_algorithm_test_time my_trigger_algo;
-    my_trigger_algo.set_electronic_mapping(my_e_mapping);
-    my_trigger_algo.set_clock_manager(my_clock_manager);
-    my_trigger_algo.initialize(trigger_config);
-
-    // General statistics :
-    std::size_t total_number_of_L2_decision = 0;
-    std::size_t total_number_of_CARACO_decision = 0;
-    std::size_t total_number_of_APE_decision = 0;
-    std::size_t total_number_of_DAVE_decision = 0;
-
-    std::clog << "Trigger decision computations for " << max_events << " events" << std::endl;
-    std::clog << "Size collection of events : "  << collection_of_events.size() << std::endl;
-    if (max_events >= collection_of_events.size()) max_events = collection_of_events.size();
-    for (unsigned int ievent = 0; ievent < max_events; ievent++)
-      {
-	std::clog << "Trigger event : " << ievent << std::endl;
-	//collection_of_events[ievent].tree_dump(std::clog, "*** Signal Data ***", "INFO : ");
-	my_clock_manager.compute_clockticks_ref(random_generator);
-	int32_t clocktick_25_reference  = my_clock_manager.get_clocktick_25_ref();
-	double  clocktick_25_shift      = my_clock_manager.get_shift_25();
-	int32_t clocktick_800_reference = my_clock_manager.get_clocktick_800_ref();
-	double  clocktick_800_shift     = my_clock_manager.get_shift_800();
-
-	snemo::digitization::signal_data signal_data = collection_of_events[ievent];
-
-	// signal_data.tree_dump(std::clog, "*** Signal Data ***", "INFO : ");
-	// Display of signal data for event i :
-	// for (std::size_t icalo = 0; icalo < signal_data.get_calo_signals().size(); icalo++)
-	//   {
-	//     signal_data.get_calo_signals()[icalo].get().tree_dump(std::clog, "A calo signal #" + std::to_string(icalo) + " in event #" + std::to_string(ievent));
-	//   }
-
-	// for (std::size_t igeiger = 0; igeiger < signal_data.get_geiger_signals().size(); igeiger++)
-	//   {
-	//     signal_data.get_geiger_signals()[igeiger].get().tree_dump(std::clog, "A geiger signal #" + std::to_string(igeiger) + " in event #" + std::to_string(ievent));
-	//   }
-	// my_clock_manager.tree_dump(std::clog, "Clock utils : ", "INFO : ");
-
-	snemo::digitization::calo_tp_data my_calo_tp_data;
-	// Creation of calo ctw data :
-	snemo::digitization::calo_ctw_data my_calo_ctw_data;
-	// Calo signal to calo TP :
-	if (signal_data.has_calo_signals())
-	  {
-	    // Set calo clockticks :
-	    signal_2_calo_tp.set_clocktick_reference(clocktick_25_reference);
-	    signal_2_calo_tp.set_clocktick_shift(clocktick_25_shift);
-
-	    // Signal to calo TP process :
-	    signal_2_calo_tp.process(signal_data, my_calo_tp_data);
-
-	    // for (std::size_t icalotp = 0; icalotp < my_calo_tp_data.get_calo_tps().size(); icalotp++)
-	    //   {
-	    // 	my_calo_tp_data.get_calo_tps()[icalotp].get().tree_dump(std::clog, "A calo TP #" + std::to_string(icalotp) + " in event #" + std::to_string(ievent));
-	    //   }
-
-	    // Calo TP to geiger CTW process :
-	    calo_tp_2_ctw_0.process(my_calo_tp_data, my_calo_ctw_data);
-	    calo_tp_2_ctw_1.process(my_calo_tp_data, my_calo_ctw_data);
-	    calo_tp_2_ctw_2.process(my_calo_tp_data, my_calo_ctw_data);
-
-	    // my_calo_tp_data.tree_dump(std::clog, "Calorimeter TP(s) data : ", "INFO : ");
-	    // my_calo_ctw_data.tree_dump(std::clog, "Calorimeter CTW(s) data : ", "INFO : ");
-
-	  } // end of if has calo signal
-
-	snemo::digitization::geiger_tp_data my_geiger_tp_data;
-	// Creation of geiger ctw data :
-	snemo::digitization::geiger_ctw_data my_geiger_ctw_data;
-	if (signal_data.has_geiger_signals())
-	  {
-	    // Set geiger clockticks :
-	    signal_2_geiger_tp.set_clocktick_reference(clocktick_800_reference);
-	    signal_2_geiger_tp.set_clocktick_shift(clocktick_800_shift);
-	    // Signal to geiger TP process
-	    signal_2_geiger_tp.process(signal_data, my_geiger_tp_data);
-
-	    // Geiger TP to geiger CTW process
-	    geiger_tp_2_ctw.process(my_geiger_tp_data, my_geiger_ctw_data);
-
-	    // my_geiger_tp_data.tree_dump(std::clog, "Geiger TP(s) data : ", "INFO : ");
-	    // my_geiger_ctw_data.tree_dump(std::clog, "Geiger CTW(s) data : ", "INFO : ");
-
-	  } // end of if has geiger signal
-
-	// Trigger process :
-	my_trigger_algo.process(my_calo_ctw_data,
-				my_geiger_ctw_data);
-
-	// Finale structures :
-	// Creation of outputs collection structures for calo and tracker
-	std::vector<snemo::digitization::trigger_structures::calo_summary_record> calo_collection_records = my_trigger_algo.get_calo_records_25ns_vector();
-	std::vector<snemo::digitization::trigger_structures::coincidence_calo_record> coincidence_collection_calo_records =  my_trigger_algo.get_coincidence_calo_records_1600ns_vector();
-	std::vector<snemo::digitization::trigger_structures::tracker_record>  tracker_collection_records = my_trigger_algo.get_tracker_records_vector();
-	std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records = my_trigger_algo.get_coincidence_records_vector();
-	std::vector<snemo::digitization::trigger_structures::L2_decision> L2_decision_record = my_trigger_algo.get_L2_decision_records_vector();
-
-	// for (std::size_t i = 0; i  < calo_collection_records.size(); i++) {
-	//    calo_collection_records[i].display();
-	// }
-
-	// for (std::size_t i = 0; i  < coincidence_collection_calo_records.size(); i++) {
-	//   coincidence_collection_calo_records[i].display();
-	// }
-
-	// for (std::size_t i = 0; i  < tracker_collection_records.size(); i++) {
-	//   tracker_collection_records[i].display();
-	// }
-
-	for (std::size_t i = 0; i  < coincidence_collection_records.size(); i++) {
-	  coincidence_collection_records[i].display();
-	}
-	std::size_t number_of_L2_decision = L2_decision_record.size();
-	bool caraco_decision = false;
-	// uint32_t caraco_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
-	bool delayed_decision = false;
-	// uint32_t delayed_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
-	bool already_delayed_trig = false;
-	snemo::digitization::trigger_structures::L2_trigger_mode delayed_trigger_mode = snemo::digitization::trigger_structures::L2_trigger_mode::INVALID;
-
-	if (number_of_L2_decision != 0)
-	  {
-	    for (std::size_t isize = 0; isize < number_of_L2_decision; isize++)
-	      {
-		if (L2_decision_record[isize].L2_decision_bool && L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::CARACO)
-		  {
-		    caraco_decision         = L2_decision_record[isize].L2_decision_bool;
-		    // caraco_clocktick_1600ns = L2_decision_record[isize].L2_ct_decision;
-		  }
-		else if (L2_decision_record[isize].L2_decision_bool &&  (L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE
-									 || L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE) && already_delayed_trig == false)
-		  {
-		    delayed_decision         = L2_decision_record[isize].L2_decision_bool;
-		    // delayed_clocktick_1600ns = L2_decision_record[isize].L2_ct_decision;
-		    delayed_trigger_mode     = L2_decision_record[isize].L2_trigger_mode;
-		    already_delayed_trig     = true;
-		  }
-	      }
-	  }
-	total_number_of_L2_decision += L2_decision_record.size();
-	if (caraco_decision) total_number_of_CARACO_decision++;
-	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE) total_number_of_APE_decision++;
-	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE) total_number_of_DAVE_decision++;
-
-	// std::clog << "Number of L2 decision : " << number_of_L2_decision << std::endl;
-	// std::clog << "CARACO decision :       " << caraco_decision << std::endl;
-	// std::clog << "CARACO CT1600ns :       " << caraco_clocktick_1600ns << std::endl;
-	// std::clog << "Delayed decision :      " << delayed_decision << std::endl;
-	// std::clog << "Delayed CT1600ns :      " << delayed_clocktick_1600ns << std::endl;
-	// std::clog << "Delayed trigger mode :  " << delayed_trigger_mode << std::endl;
-	my_trigger_algo.reset_data();
-	// std::clog << std::endl;
-      }
-
 
     std::ofstream ftmp;
-    ftmp.open(output_path + "background_output.dat");
+    ftmp.open(output_path + "produce_self_trigger_hits_output.dat");
 
     ftmp << "Total number of spurious calo signals  : " << calo_tracker_spurious_signals.get_number_of_calo_signals() << std::endl;
     ftmp << "Main wall number of spurious signals   : " << calo_tracker_spurious_signals.get_number_of_main_calo_signals() << std::endl;
@@ -590,38 +399,29 @@ int main( int  argc_ , char **argv_  )
     ftmp << "Gveto number of spurious signals       : " << calo_tracker_spurious_signals.get_number_of_gveto_signals() << std::endl;
     ftmp << "Geiger cell number of spurious signals : " << calo_tracker_spurious_signals.get_number_of_geiger_signals() << std::endl << std::endl;;
 
-
-    ftmp << "Size of the event window in us : " << event_window / CLHEP::microsecond << std::endl;
-    ftmp << "Number of events : " << collection_of_events.size() << std::endl;
-    ftmp << "Max events for the trigger = " << max_events << std::endl;
-    ftmp << "Total number of L2 decision : " << total_number_of_L2_decision << std::endl;
-    ftmp << "Total number of CARACO decision : " << total_number_of_CARACO_decision << std::endl;
-    ftmp << "Total number of APE decision : " << total_number_of_APE_decision << std::endl;
-    ftmp << "Total number of DAVE decision : " << total_number_of_DAVE_decision << std::endl;
-
     ftmp.close ();
 
-    if (is_display){
-      // #if GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
-      //       Gnuplot g1;
-      //       g1.cmd("set title 'Test gnuplot draw' ");
-      //       g1.cmd("set grid");
-      //       g1.cmd("set xrange [0:1]");
-      //       {
-      //         std::ostringstream plot_cmd;
-      //         plot_cmd << "plot '" << ftmp.get_filename() << "' using 1:2 with lines";
-      //         g1.cmd(plot_cmd.str());
-      //         g1.showonscreen(); // window output
-      //         geomtools::gnuplot_drawer::wait_for_key();
-      //         usleep(200);
-      //       }
-      // #endif // GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
-      //     }
+    if (is_display){}
+    // #if GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
+    //       Gnuplot g1;
+    //       g1.cmd("set title 'Test gnuplot draw' ");
+    //       g1.cmd("set grid");
+    //       g1.cmd("set xrange [0:1]");
+    //       {
+    //         std::ostringstream plot_cmd;
+    //         plot_cmd << "plot '" << ftmp.get_filename() << "' using 1:2 with lines";
+    //         g1.cmd(plot_cmd.str());
+    //         g1.showonscreen(); // window output
+    //         geomtools::gnuplot_drawer::wait_for_key();
+    //         usleep(200);
+    //       }
+    // #endif // GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
+    //     }
 
-      //     // std::clog << "Enter a value to close the program" << std::endl;
-      //     // std::string key ="";
-      //     // std::cin >> key;
-    }
+    //     // std::clog << "Enter a value to close the program" << std::endl;
+    //     // std::string key ="";
+    //     // std::cin >> key;
+
     std::clog << "The end." << std::endl;
   }
 
@@ -640,12 +440,38 @@ int main( int  argc_ , char **argv_  )
 }
 
 void generate_pool_of_calo_spurious_signals(mygsl::rng * rdm_gen_,
+					    const datatools::properties & config_,
 					    const std::vector<geomtools::geom_id> & gid_collection_,
 					    snemo::digitization::signal_data & calo_tracker_spurious_signals_)
 {
   int hit_count = 0;
-  const double time_interval = 1 * CLHEP::second; // second
-  const double calo_self_triggering_frequency = 10. / CLHEP::second; // Hertz
+  double time_interval; //= 0.1 * CLHEP::second;
+  double calo_self_triggering_frequency; // = 1. / CLHEP::second; // Hertz
+  double energy_min;
+  double energy_max;
+  datatools::invalidate(time_interval);
+  datatools::invalidate(calo_self_triggering_frequency);
+  datatools::invalidate(energy_min);
+  datatools::invalidate(energy_max);
+
+  if (config_.has_key("time_interval")) {
+    time_interval = config_.fetch_real("time_interval");
+  }
+
+  if (config_.has_key("calo.self_trigger_frequency")) {
+    calo_self_triggering_frequency = config_.fetch_real("calo.self_trigger_frequency");
+  }
+
+  if (config_.has_key("calo.energy_min")) {
+    energy_min = config_.fetch_real("calo.energy_min");
+  }
+
+  if (config_.has_key("calo.energy_max")) {
+    energy_max = config_.fetch_real("calo.energy_max");
+  }
+
+  double amplitude_min = energy_min / CLHEP::MeV * 300; // WIP : Hard coded for the moment
+  double amplitude_max = energy_max / CLHEP::MeV * 300; // WIP : Hard coded for the moment
 
   // Create spurious hits during a time interval for each calo GID :
   for (std::size_t i = 0; i < gid_collection_.size(); i++)
@@ -666,14 +492,12 @@ void generate_pool_of_calo_spurious_signals(mygsl::rng * rdm_gen_,
         distrib = "poisson";
       }
 
-      double min_amplitude = 15;  // mV (50 keV equivalent) -> unit pb ?
-      double max_amplitude = 600; // mV (2 MeV equivalent) -> unit pb ?
       for (std::size_t j = 0; j < number_of_calo_hit; j++)
         {
 	  snemo::digitization::calo_signal & a_cs = calo_tracker_spurious_signals_.add_calo_signal();
 	  a_cs.set_header(hit_count, gid_collection_[i]);
           const double timestamp = rdm_gen_->flat(0, time_interval);
-	  const double amplitude = rdm_gen_->flat(min_amplitude, max_amplitude);
+	  const double amplitude = rdm_gen_->flat(amplitude_min, amplitude_max);
 	  a_cs.set_data(timestamp, amplitude);
           hit_count++;
         }
@@ -683,13 +507,35 @@ void generate_pool_of_calo_spurious_signals(mygsl::rng * rdm_gen_,
 }
 
 void generate_pool_of_geiger_spurious_signals(mygsl::rng * rdm_gen_,
+					      const datatools::properties & config_,
 					      const std::vector<geomtools::geom_id> & gid_collection_,
 					      snemo::digitization::signal_data & calo_tracker_spurious_signals_)
 {
   int hit_count = 0;
-  const double time_interval = 1 * CLHEP::second; // second
-  const double geiger_self_triggering_frequency = 5. / CLHEP::second; // 'real' value = 0.2 Hertz
-  const double cell_dead_time = 1 * CLHEP::millisecond; // 'real' value = 1 ms
+  double time_interval; //= 0.1 * CLHEP::second;
+  double geiger_self_triggering_frequency; // = 1. / CLHEP::second; // Hertz
+  double cell_dead_time;
+  double retrigger_probability; // WIP : not implemented yet
+  datatools::invalidate(time_interval);
+  datatools::invalidate(geiger_self_triggering_frequency);
+  datatools::invalidate(cell_dead_time);
+  datatools::invalidate(retrigger_probability);
+
+  if (config_.has_key("time_interval")) {
+    time_interval = config_.fetch_real("time_interval");
+  }
+
+  if (config_.has_key("geiger.self_trigger_frequency")) {
+    geiger_self_triggering_frequency = config_.fetch_real("geiger.self_trigger_frequency");
+  }
+
+  if (config_.has_key("geiger.dead_time")) {
+    cell_dead_time = config_.fetch_real("geiger.dead_time");
+  }
+
+  if (config_.has_key("geiger.retrigger_probability")) {
+    retrigger_probability = config_.fetch_real("geiger.retrigger_probability");
+  }
 
   // Create spurious hits during a time interval for each geiger cell thanks to GID :
   for (std::size_t i = 0; i < gid_collection_.size(); i++)

@@ -8,8 +8,10 @@ set(FalaiseDigitizationPlugin_PROGRAMS
   # fldigi_spatial_distribution.cxx
   # fldigi_bismuth_0nu_analysis.cxx
   # sd_physical_cuts.cxx
+  produce_self_trigger_hits.cxx
   trigger_board_implementation.cxx
   trigger_program.cxx
+  trigger_program_on_signals.cxx
   )
 
 # Use C++11

@@ -4,6 +4,9 @@
 #define FALAISE_DIGITIZATION_PLUGIN_SNEMO_DIGITIZATION_THE_SERIALIZABLE_IPP
 
 // This project:
+#include <snemo/digitization/calo_signal.ipp>
+#include <snemo/digitization/geiger_signal.ipp>
+#include <snemo/digitization/signal_data.ipp>
 #include <snemo/digitization/calo_tp.ipp>
 #include <snemo/digitization/calo_tp_data.ipp>
 #include <snemo/digitization/calo_ctw.ipp>

@@ -100,15 +100,6 @@ int main( int  argc_ , char **argv_  )
 
     std::clog << "Test program for class 'snemo::digitization::trigger_program' !" << std::endl;
 
-    std::size_t file_counter = 0;
-    for (auto file = input_filenames.begin();
-	 file != input_filenames.end();
-	 file++)
-      {
-	std::clog << "File #" << file_counter << ' ' << *file << std::endl;
-	file_counter++;
-      }
-
     if (input_filenames.size() == 0) {
       DT_LOG_WARNING(logging, "No input file(s) !");
 
@@ -116,6 +107,14 @@ int main( int  argc_ , char **argv_  )
       input_filenames.push_back(input_default_file);
 
       DT_LOG_WARNING(logging, "Default input file : " << input_filenames[0] << " !");
+    }
+
+    std::size_t file_counter = 0;
+    for (auto file = input_filenames.begin();
+	 file != input_filenames.end();
+	 file++) {
+      std::clog << "File #" << file_counter << ' ' << *file << std::endl;
+      file_counter++;
     }
 
     DT_LOG_INFORMATION(logging, "List of input file(s) : ");

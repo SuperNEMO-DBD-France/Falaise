@@ -20,7 +20,8 @@ namespace snemo {
   namespace digitization {
 
     /// \brief The calo tracker signal
-    class calo_signal : public geomtools::base_hit
+    class calo_signal
+			: public geomtools::base_hit
     {
     public :
 
@@ -79,7 +80,7 @@ namespace snemo {
 			double _signal_time_; //!< Calorimeter signal time
       double _amplitude_;   //!< Amplitude
 
-      // DATATOOLS_SERIALIZATION_DECLARATION();
+			DATATOOLS_SERIALIZATION_DECLARATION()
 
     };
 

@@ -48,6 +48,7 @@ list(APPEND FalaiseDigitizationPlugin_HEADERS
   source/falaise/snemo/digitization/tracker_sliding_zone.h
 
   source/falaise/snemo/digitization/calo_signal.h
+  source/falaise/snemo/digitization/calo_signal.ipp
   source/falaise/snemo/digitization/calo_signal_simple_shape.h
   source/falaise/snemo/digitization/calo_feb_data.h
   source/falaise/snemo/digitization/calo_tp.h
@@ -61,6 +62,7 @@ list(APPEND FalaiseDigitizationPlugin_HEADERS
   source/falaise/snemo/digitization/calo_ctw_data.ipp
 
   source/falaise/snemo/digitization/geiger_signal.h
+  source/falaise/snemo/digitization/geiger_signal.ipp
   source/falaise/snemo/digitization/geiger_tp.h
   source/falaise/snemo/digitization/geiger_tp_data.h
   source/falaise/snemo/digitization/geiger_tp.h
@@ -75,6 +77,7 @@ list(APPEND FalaiseDigitizationPlugin_HEADERS
   source/falaise/snemo/digitization/geiger_ctw_data.ipp
 
   source/falaise/snemo/digitization/signal_data.h
+  source/falaise/snemo/digitization/signal_data.ipp
 
   source/falaise/snemo/digitization/sd_to_calo_signal_algo.h
   source/falaise/snemo/digitization/sd_to_geiger_signal_algo.h

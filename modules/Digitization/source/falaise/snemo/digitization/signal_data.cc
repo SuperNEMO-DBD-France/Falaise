@@ -17,7 +17,8 @@ namespace snemo {
   namespace digitization {
 
     // Serial tag for datatools::serialization::i_serializable interface :
-    // DATATOOLS_SERIALIZATION_SERIAL_TAG_IMPLEMENTATION(signal_data, "snemo::digitalization::signal_data")
+		DATATOOLS_SERIALIZATION_SERIAL_TAG_IMPLEMENTATION(signal_data,
+																											"snemo::digitalization::signal_data")
 
     signal_data::signal_data()
     {
