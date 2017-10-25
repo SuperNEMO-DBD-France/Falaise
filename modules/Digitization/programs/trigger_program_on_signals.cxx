@@ -49,7 +49,7 @@ int main( int  argc_ , char **argv_  )
     std::string input_filename;
     std::string trigger_config_filename = "";
     std::string output_path = "";
-    std::size_t max_events = 0;
+    // std::size_t max_events = 0;
 
     // Parse options:
     namespace po = boost::program_options;
@@ -66,9 +66,9 @@ int main( int  argc_ , char **argv_  )
       ("config,c",
        po::value<std::string>(& trigger_config_filename),
        "set the trigger configuration file")
-      ("event_number,n",
-       po::value<std::size_t>(& max_events)->default_value(10),
-       "set the maximum number of events")
+      // ("event_number,n",
+      //  po::value<std::size_t>(& max_events)->default_value(10),
+      //  "set the maximum number of events")
       ; // end of options description
 
     // Describe command line arguments :
@@ -87,15 +87,21 @@ int main( int  argc_ , char **argv_  )
 
     else if (vm.count("display")) {
       is_display = true;
+      DT_LOG_INFORMATION(logging, "Display mode activated : " + is_display);
     }
 
-    std::clog << "Trigger program with an input of signal data only !" << std::endl;
+    DT_LOG_INFORMATION(logging, "Trigger program with an input of signal data only !");
 
     if (input_filename.empty()) {
       DT_LOG_WARNING(logging, "No input file(s) !");
       input_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/calo_tracker_self_trigger_default.data.bz2";
       datatools::fetch_path_with_env(input_filename);
     }
+
+    // Set the default output path :
+    if (output_path.empty()) output_path = "/tmp/";
+    DT_LOG_INFORMATION(logging, "Output path : " + output_path);
+    datatools::fetch_path_with_env(output_path);
 
     int32_t seed = 314158;
     mygsl::rng random_generator;
@@ -118,8 +124,20 @@ int main( int  argc_ , char **argv_  )
     DT_LOG_INFORMATION(logging, "Deserialization input file :" + input_filename);
     datatools::data_reader deserializer(input_filename, datatools::using_multiple_archives);
 
-    std::string output_filename = output_path + '/' + "trigger_program_on_signals.dat";
-    DT_LOG_INFORMATION(logging, "Trigger output file :" + output_filename);
+    std::string output_stat_filename = output_path + '/' + "output_trigger.stat";
+    DT_LOG_INFORMATION(logging, "Trigger statistics output file :" + output_stat_filename);
+
+    std::string output_details_filename = output_path + '/' + "output_trigger.log";
+    DT_LOG_INFORMATION(logging, "Trigger details output file :" + output_details_filename);
+
+    // open filestreams :
+    std::ofstream statstream;
+    statstream.open(output_stat_filename);
+    statstream << "Welcome on self trigger statistic file" << std::endl << std::endl;
+
+    std::ofstream detstream;
+    detstream.open(output_details_filename);
+    detstream << "Welcome on self trigger details log file" << std::endl << std::endl;
 
     /********************************************************/
     /****  Trigger part on the self triggering signals   ****/
@@ -135,12 +153,7 @@ int main( int  argc_ , char **argv_  )
     trigger_config.read(trigger_config_filename);
 
     // Number of events :
-    std::clog << "Number of events for the trigger = " << max_events << std::endl;
-
-    // Set the default output path :
-    if (output_path.empty()) output_path = "/tmp/";
-    DT_LOG_INFORMATION(logging, "Output path : " + output_path);
-    datatools::fetch_path_with_env(output_path);
+    //    std::clog << "Number of events for the trigger = " << max_events << std::endl;
 
     // Electronic mapping :
     snemo::digitization::electronic_mapping my_e_mapping;
@@ -187,14 +200,15 @@ int main( int  argc_ , char **argv_  )
     std::size_t total_number_of_APE_decision = 0;
     std::size_t total_number_of_DAVE_decision = 0;
 
-    std::clog << "Trigger decision computations for " << max_events << " events" << std::endl;
+    //std::clog << "Trigger decision computations for " << max_events << " events" << std::endl;
 
     std::size_t number_of_events_deserialized = 0;
 
     while (deserializer.has_record_tag()) {
       //DT_LOG_DEBUG(logging, "Entering has record tag...");
       if (number_of_events_deserialized % 10000 == 0) {
-	std::clog << "Trigger event : " << number_of_events_deserialized << std::endl;
+	DT_LOG_INFORMATION(logging, "Trigger event : " + std::to_string(number_of_events_deserialized));
+	detstream << "Trigger event : " << number_of_events_deserialized << std::endl;
       }
 
       my_clock_manager.compute_clockticks_ref(random_generator);
@@ -243,33 +257,49 @@ int main( int  argc_ , char **argv_  )
 
 	// Finale structures :
 	// Creation of outputs collection structures for calo and tracker
-	std::vector<snemo::digitization::trigger_structures::calo_summary_record> calo_collection_records = my_trigger_algo.get_calo_records_25ns_vector();
-	std::vector<snemo::digitization::trigger_structures::coincidence_calo_record> coincidence_collection_calo_records =  my_trigger_algo.get_coincidence_calo_records_1600ns_vector();
-	std::vector<snemo::digitization::trigger_structures::tracker_record>  tracker_collection_records = my_trigger_algo.get_tracker_records_vector();
-	std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records = my_trigger_algo.get_coincidence_records_vector();
-	std::vector<snemo::digitization::trigger_structures::L2_decision> L2_decision_record = my_trigger_algo.get_L2_decision_records_vector();
+	auto calo_collection_records = my_trigger_algo.get_calo_records_25ns_vector();
+	auto coincidence_collection_calo_records =  my_trigger_algo.get_coincidence_calo_records_1600ns_vector();
+	auto tracker_collection_records = my_trigger_algo.get_tracker_records_vector();
+	auto coincidence_collection_records = my_trigger_algo.get_coincidence_records_vector();
+	auto L1_calo_decision_records = my_trigger_algo.get_L1_calo_decision_records_vector();
+	auto L2_decision_record = my_trigger_algo.get_L2_decision_records_vector();
 
+	// Display all information of trigger event if coincidence in details filestream
+	if (coincidence_collection_records.size() != 0) {
 
-	// for (std::size_t i = 0; i  < calo_collection_records.size(); i++) {
-	//    calo_collection_records[i].display();
-	// }
+	  detstream  << "******* Event number #" << number_of_events_deserialized <<" ********" << std::endl;
+	  statstream << "******* Event number #" << number_of_events_deserialized <<" ********" << std::endl;
 
-	// for (std::size_t i = 0; i  < coincidence_collection_calo_records.size(); i++) {
-	//   coincidence_collection_calo_records[i].display();
-	// }
+	  for (std::size_t i = 0; i  < calo_collection_records.size(); i++) {
+	    calo_collection_records[i].display(detstream);
+	  }
 
-	// for (std::size_t i = 0; i  < tracker_collection_records.size(); i++) {
-	//   tracker_collection_records[i].display();
-	// }
+	  for (std::size_t i = 0; i  < coincidence_collection_calo_records.size(); i++) {
+	    coincidence_collection_calo_records[i].display(detstream);
+	  }
 
-	for (std::size_t i = 0; i  < coincidence_collection_records.size(); i++) {
-	  coincidence_collection_records[i].display();
+	  for (std::size_t i = 0; i  < tracker_collection_records.size(); i++) {
+	    tracker_collection_records[i].display(detstream);
+	  }
+
+	  for (std::size_t i = 0; i  < coincidence_collection_records.size(); i++) {
+	    coincidence_collection_records[i].display(detstream);
+	  }
+
+	  for (std::size_t i = 0; i  < L1_calo_decision_records.size(); i++) {
+	    L1_calo_decision_records[i].display(detstream);
+	  }
+
+	  for (std::size_t i = 0; i  < L2_decision_record.size(); i++) {
+	    L2_decision_record[i].display(detstream);
+	  }
 	}
+
 	std::size_t number_of_L2_decision = L2_decision_record.size();
 	bool caraco_decision = false;
-	// uint32_t caraco_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
+	uint32_t caraco_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
 	bool delayed_decision = false;
-	// uint32_t delayed_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
+	uint32_t delayed_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
 	bool already_delayed_trig = false;
 	snemo::digitization::trigger_structures::L2_trigger_mode delayed_trigger_mode = snemo::digitization::trigger_structures::L2_trigger_mode::INVALID;
 
@@ -297,41 +327,34 @@ int main( int  argc_ , char **argv_  )
 	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE) total_number_of_APE_decision++;
 	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE) total_number_of_DAVE_decision++;
 
-	// std::clog << "Number of L2 decision : " << number_of_L2_decision << std::endl;
-	// std::clog << "CARACO decision :       " << caraco_decision << std::endl;
-	// std::clog << "CARACO CT1600ns :       " << caraco_clocktick_1600ns << std::endl;
-	// std::clog << "Delayed decision :      " << delayed_decision << std::endl;
-	// std::clog << "Delayed CT1600ns :      " << delayed_clocktick_1600ns << std::endl;
-	// std::clog << "Delayed trigger mode :  " << delayed_trigger_mode << std::endl;
+	if (caraco_decision || delayed_decision) {
+	  detstream << "Number of L2 decision :  " << number_of_L2_decision << std::endl;
+	  detstream << "CARACO decision :        " << caraco_decision << std::endl;
+	  detstream << "CARACO CT1600ns :        " << caraco_clocktick_1600ns << std::endl;
+	  detstream << "Delayed decision :       " << delayed_decision << std::endl;
+	  detstream << "Delayed CT1600ns :       " << delayed_clocktick_1600ns << std::endl;
+	  detstream << "Delayed trigger mode :   " << delayed_trigger_mode << std::endl << std::endl;
+
+	  statstream << "Number of L2 decision : " << number_of_L2_decision << std::endl;
+	  statstream << "CARACO decision :       " << caraco_decision << std::endl;
+	  statstream << "CARACO CT1600ns :       " << caraco_clocktick_1600ns << std::endl;
+	  statstream << "Delayed decision :      " << delayed_decision << std::endl;
+	  statstream << "Delayed CT1600ns :      " << delayed_clocktick_1600ns << std::endl;
+	  statstream << "Delayed trigger mode :  " << delayed_trigger_mode << std::endl << std::endl;
+	}
 	my_trigger_algo.reset_data();
 
 	number_of_events_deserialized++;
       }
-
-
     } // end of while
 
-    if (is_display){
-      // #if GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
-      //       Gnuplot g1;
-      //       g1.cmd("set title 'Test gnuplot draw' ");
-      //       g1.cmd("set grid");
-      //       g1.cmd("set xrange [0:1]");
-      //       {
-      //         std::ostringstream plot_cmd;
-      //         plot_cmd << "plot '" << ftmp.get_filename() << "' using 1:2 with lines";
-      //         g1.cmd(plot_cmd.str());
-      //         g1.showonscreen(); // window output
-      //         geomtools::gnuplot_drawer::wait_for_key();
-      //         usleep(200);
-      //       }
-      // #endif // GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
-      //     }
+    DT_LOG_INFORMATION(logging, "Number of events deserialized events : " + std::to_string(number_of_events_deserialized));
+    statstream << "Number of events deserialized events : " << std::to_string(number_of_events_deserialized) << std::endl;
+    detstream  << "Number of events deserialized events : " << std::to_string(number_of_events_deserialized) << std::endl;
 
-      //     // std::clog << "Enter a value to close the program" << std::endl;
-      //     // std::string key ="";
-      //     // std::cin >> key;
-    }
+    // close filestreams :
+    statstream.close();
+    detstream.close();
 
     deserializer.reset();
     std::clog << "The end." << std::endl;

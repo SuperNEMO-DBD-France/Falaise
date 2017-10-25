@@ -238,9 +238,6 @@ int main( int  argc_ , char **argv_  )
 
     // Event builder of spurious signal to do :
     snemo::digitization::signal_data temp_signals = calo_tracker_spurious_signals;
-    std::vector<snemo::digitization::signal_data> collection_of_events;
-    const double event_window = 100 * CLHEP::microsecond; // us : window tunable
-    double event_stepper = 1.6 * CLHEP::microsecond;
 
     /*   Strategy to build events :
 	 <-----> event window (fix)
@@ -261,36 +258,40 @@ int main( int  argc_ , char **argv_  )
     // 	temp_signals.get_geiger_signals()[igeiger].get().tree_dump(std::clog, "A geiger signal #" + std::to_string(igeiger));
     //   }
 
+    for (std::size_t icalo = temp_signals.get_calo_signals().size() - 1; icalo >= temp_signals.get_calo_signals().size() - 10; icalo--)
+      {
+    	temp_signals.get_calo_signals()[icalo].get().tree_dump(std::clog, "A calo signal #" + std::to_string(icalo));
+      }
+
+    for (std::size_t igeiger = temp_signals.get_geiger_signals().size() - 1 ; igeiger >= temp_signals.get_geiger_signals().size() - 10; igeiger--)
+      {
+    	temp_signals.get_geiger_signals()[igeiger].get().tree_dump(std::clog, "A geiger signal #" + std::to_string(igeiger));
+      }
+
     std::clog << std::endl << "Building events from spurious signals..." << std::endl;
 
-    std::clog << "Event window (in us) " << event_window / CLHEP::microsecond << std::endl;
-    std::size_t event_counter = 0;
 
-    // // For testing purpose :
-    // snemo::digitization::signal_data test_signals;
-    // double max_amplitude = 600;
-    // for (std::size_t j = 0; j < 10; j++)
-    //   {
-    // 	geomtools::geom_id a_gid(1302,0,0,j,4);
-    // 	snemo::digitization::calo_signal & a_cs = test_signals.add_calo_signal();
-    // 	a_cs.set_header(j, a_gid);
-    // 	const double timestamp = random_generator.flat(0, 100) * j * CLHEP::microsecond;
-    // 	a_cs.set_data(timestamp, max_amplitude);
-    //   }
-
-    // std::sort(test_signals.grab_calo_signals().begin(),
-    // 	      test_signals.grab_calo_signals().end(),
-    // 	      snemo::digitization::calo_signal::compare_handle_by_timestamp());
-    // for (std::size_t i = 0; i < 10; i++)
-    //   {
-    // 	test_signals.get_calo_signals()[i].get().tree_dump(std::clog, "A test calo signal #"+ std::to_string(i));
-    //   }
 
     /****************************************/
     /****  Event building from signals   ****/
     /****************************************/
+    std::vector<snemo::digitization::signal_data> collection_of_events;
+    double time_interval;
+    double event_window; // = 100 * CLHEP::microsecond; // us : window tunable
+    double event_stepper = 1.6 * CLHEP::microsecond;
+    std::size_t event_counter = 0;
+    datatools::invalidate(time_interval);
+    datatools::invalidate(event_window);
 
-    for (unsigned int event_tstart = 0 * CLHEP::microsecond; event_tstart < 1 * CLHEP::second; event_tstart += event_stepper)
+    if (st_config.has_key("time_interval")) {
+      time_interval = st_config.fetch_real("time_interval");
+    }
+    if (st_config.has_key("event_window_integration")) {
+      event_window = st_config.fetch_real("event_window_integration");
+    }
+
+    std::clog << "Event window (in us) " << event_window / CLHEP::microsecond << std::endl;
+    for (unsigned int event_tstart = 0 * CLHEP::microsecond; event_tstart < time_interval; event_tstart += event_stepper)
       {
 	unsigned int event_tstop = event_tstart + event_window;
 	// std::clog << "Event_tstart = " << event_tstart << " Event_tstop " << event_tstop << std::endl;
