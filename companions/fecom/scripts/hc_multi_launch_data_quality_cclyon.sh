@@ -6,10 +6,10 @@ debug=1
 
 echo "Starting..." >&2
 
-echo "Are you sure to process ? "
-echo "If yes, edit this file and comment exit at the begining"
-echo "Exiting" 
-exit 1
+#echo "Are you sure to process ? "
+#echo "If yes, edit this file and comment exit at the begining"
+#echo "Exiting" 
+#exit 1
 
 function usage(){
     echo "--------------"
