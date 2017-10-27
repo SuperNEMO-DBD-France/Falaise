@@ -9,7 +9,6 @@ from math import *
 import logging
 import random
 import math
-import waveform_datamodel
 
 def check_value(a, b):
     if (a==b):
@@ -158,7 +157,7 @@ for i in range (1,32):
 output_waveform_filename="waveforms_diff_values.dat"
 output_waveform_filestream=open(output_dir+output_waveform_filename, 'w')
 
-for i in range(0,number_of_hits):#range(len(data[0])):
+for i in range(0,number_of_hits):
     logging.debug("")
     logging.debug("*************************************************************")
     logging.debug("*********************NEW HIT*********************************")
@@ -320,7 +319,6 @@ for i in range(0,number_of_hits):#range(len(data[0])):
             falling_already_crossed_adc=False
             rising_already_crossed_adc=False
             for j in range(charge_lower_bound, len(waveform_data[y_col])):
-                sample_value_adc=waveform_data[y_col][j]
                 sample_value_adc=waveform_data[y_col][j]-baseline_recalculated_casted
                 # logging.debug("Sample value adc", sample_value_adc)
                 # logging.debug("Sample value ADC", sample_value_adc)
@@ -442,8 +440,8 @@ for i in range(0,number_of_hits):#range(len(data[0])):
             mean_sigma_baseline_mod_8_samples[1].append([])
             for j in range(1, 32):
                 baseline_raw_calc=[]
-                for j in range(0, 8*j):
-                    baseline_raw_calc.append((waveform_data[y_col][j]-2048)*16)
+                for k in range(0, 8*j):
+                    baseline_raw_calc.append((waveform_data[y_col][k]-2048)*16)
                 baseline_raw_calc_mean=np.mean(baseline_raw_calc)
                 sigma_baseline_raw_calc_mean=math.sqrt(abs(baseline_raw_calc_mean))
                 baseline_raw_mod_8.append(baseline_raw_calc_mean)
@@ -516,6 +514,7 @@ if (print_histos):
 
     output_histos_png="output_histos.png"
     output_histos_pdf="output_histos.pdf"
+
     f.savefig(output_dir+output_histos_png)
     f.savefig(output_dir+output_histos_pdf)
 
