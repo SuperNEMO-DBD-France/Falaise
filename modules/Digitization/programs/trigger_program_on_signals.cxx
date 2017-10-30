@@ -265,41 +265,41 @@ int main( int  argc_ , char **argv_  )
 	auto L2_decision_record = my_trigger_algo.get_L2_decision_records_vector();
 
 	// Display all information of trigger event if coincidence in details filestream
-	if (coincidence_collection_records.size() != 0) {
+	// if (coincidence_collection_records.size() != 0) {
 
-	  detstream  << "******* Event number #" << number_of_events_deserialized <<" ********" << std::endl;
-	  statstream << "******* Event number #" << number_of_events_deserialized <<" ********" << std::endl;
+	//   detstream  << "******* Event number #" << number_of_events_deserialized <<" ********" << std::endl;
+	//   statstream << "******* Event number #" << number_of_events_deserialized <<" ********" << std::endl;
 
-	  for (std::size_t i = 0; i  < calo_collection_records.size(); i++) {
-	    calo_collection_records[i].display(detstream);
-	  }
+	//   for (std::size_t i = 0; i  < calo_collection_records.size(); i++) {
+	//     calo_collection_records[i].display(detstream);
+	//   }
 
-	  for (std::size_t i = 0; i  < coincidence_collection_calo_records.size(); i++) {
-	    coincidence_collection_calo_records[i].display(detstream);
-	  }
+	//   for (std::size_t i = 0; i  < coincidence_collection_calo_records.size(); i++) {
+	//     coincidence_collection_calo_records[i].display(detstream);
+	//   }
 
-	  for (std::size_t i = 0; i  < tracker_collection_records.size(); i++) {
-	    tracker_collection_records[i].display(detstream);
-	  }
+	//   for (std::size_t i = 0; i  < tracker_collection_records.size(); i++) {
+	//     tracker_collection_records[i].display(detstream);
+	//   }
 
-	  for (std::size_t i = 0; i  < coincidence_collection_records.size(); i++) {
-	    coincidence_collection_records[i].display(detstream);
-	  }
+	//   for (std::size_t i = 0; i  < coincidence_collection_records.size(); i++) {
+	//     coincidence_collection_records[i].display(detstream);
+	//   }
 
-	  for (std::size_t i = 0; i  < L1_calo_decision_records.size(); i++) {
-	    L1_calo_decision_records[i].display(detstream);
-	  }
+	//   for (std::size_t i = 0; i  < L1_calo_decision_records.size(); i++) {
+	//     L1_calo_decision_records[i].display(detstream);
+	//   }
 
-	  for (std::size_t i = 0; i  < L2_decision_record.size(); i++) {
-	    L2_decision_record[i].display(detstream);
-	  }
-	}
+	//   for (std::size_t i = 0; i  < L2_decision_record.size(); i++) {
+	//     L2_decision_record[i].display(detstream);
+	//   }
+	// }
 
 	std::size_t number_of_L2_decision = L2_decision_record.size();
 	bool caraco_decision = false;
-	uint32_t caraco_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
+	//uint32_t caraco_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
 	bool delayed_decision = false;
-	uint32_t delayed_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
+	// uint32_t delayed_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
 	bool already_delayed_trig = false;
 	snemo::digitization::trigger_structures::L2_trigger_mode delayed_trigger_mode = snemo::digitization::trigger_structures::L2_trigger_mode::INVALID;
 
@@ -327,29 +327,34 @@ int main( int  argc_ , char **argv_  )
 	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE) total_number_of_APE_decision++;
 	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE) total_number_of_DAVE_decision++;
 
-	if (caraco_decision || delayed_decision) {
-	  detstream << "Number of L2 decision :  " << number_of_L2_decision << std::endl;
-	  detstream << "CARACO decision :        " << caraco_decision << std::endl;
-	  detstream << "CARACO CT1600ns :        " << caraco_clocktick_1600ns << std::endl;
-	  detstream << "Delayed decision :       " << delayed_decision << std::endl;
-	  detstream << "Delayed CT1600ns :       " << delayed_clocktick_1600ns << std::endl;
-	  detstream << "Delayed trigger mode :   " << delayed_trigger_mode << std::endl << std::endl;
+	// if (caraco_decision || delayed_decision) {
+	//   detstream << "Number of L2 decision :  " << number_of_L2_decision << std::endl;
+	//   detstream << "CARACO decision :        " << caraco_decision << std::endl;
+	//   detstream << "CARACO CT1600ns :        " << caraco_clocktick_1600ns << std::endl;
+	//   detstream << "Delayed decision :       " << delayed_decision << std::endl;
+	//   detstream << "Delayed CT1600ns :       " << delayed_clocktick_1600ns << std::endl;
+	//   detstream << "Delayed trigger mode :   " << delayed_trigger_mode << std::endl << std::endl;
 
-	  statstream << "Number of L2 decision : " << number_of_L2_decision << std::endl;
-	  statstream << "CARACO decision :       " << caraco_decision << std::endl;
-	  statstream << "CARACO CT1600ns :       " << caraco_clocktick_1600ns << std::endl;
-	  statstream << "Delayed decision :      " << delayed_decision << std::endl;
-	  statstream << "Delayed CT1600ns :      " << delayed_clocktick_1600ns << std::endl;
-	  statstream << "Delayed trigger mode :  " << delayed_trigger_mode << std::endl << std::endl;
-	}
+	//   statstream << "Number of L2 decision : " << number_of_L2_decision << std::endl;
+	//   statstream << "CARACO decision :       " << caraco_decision << std::endl;
+	//   statstream << "CARACO CT1600ns :       " << caraco_clocktick_1600ns << std::endl;
+	//   statstream << "Delayed decision :      " << delayed_decision << std::endl;
+	//   statstream << "Delayed CT1600ns :      " << delayed_clocktick_1600ns << std::endl;
+	//   statstream << "Delayed trigger mode :  " << delayed_trigger_mode << std::endl << std::endl;
+	// }
 	my_trigger_algo.reset_data();
 
 	number_of_events_deserialized++;
       }
     } // end of while
 
+
     DT_LOG_INFORMATION(logging, "Number of events deserialized events : " + std::to_string(number_of_events_deserialized));
     statstream << "Number of events deserialized events : " << std::to_string(number_of_events_deserialized) << std::endl;
+    statstream << "Number of events with CARACO decision : " << std::to_string(total_number_of_CARACO_decision) << std::endl;
+    statstream << "Number of events with delayed (APE | DAVE) decision : " << std::to_string(total_number_of_APE_decision + total_number_of_DAVE_decision) << std::endl;
+
+
     detstream  << "Number of events deserialized events : " << std::to_string(number_of_events_deserialized) << std::endl;
 
     // close filestreams :

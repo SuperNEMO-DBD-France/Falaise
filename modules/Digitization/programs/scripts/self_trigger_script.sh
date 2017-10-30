@@ -74,7 +74,7 @@ then
 fi
 
 # Search and replace ST trigger configuration file for a given run
-st_time_interval=0.1 # s
+st_time_interval=0.01 # s
 st_calo_freq=100 # Hz
 st_tracker_freq=1000 # Hz
 
