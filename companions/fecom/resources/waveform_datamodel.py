@@ -51,8 +51,12 @@ class waveform_recalc():
             'rising_time':0
         }
 
-        self.baseline_mod_8_samples=[]
-        self.sigma_baseline_mod_8_samples=[]
+        self.analysis = {
+            'baseline_mod_8_samples':[],
+            'sigma_baseline_mod_8_samples':[],
+            'baseline_mod_8_samples_normalized':[],
+            'sigma_baseline_mod_8_samples_normalized':[]
+        }
 
     def parse_waveform(self, waveform_data_line):
         sample_number=0
@@ -63,24 +67,38 @@ class waveform_recalc():
 
     def recalcul_from_waveform(self):
         # Baseline modulo 8 samples :
-        for i in range (1, 32):
+        for i in range (1, 33):
             baseline_X_samples_calc=[]
             for j in range (0, 8*i):
                 baseline_X_samples_calc.append((self.waveform_data[self.y_col][j]-2048)*16)
             baseline_X_samples_calc_mean = np.mean(baseline_X_samples_calc)
             sigma_baseline_X_samples_calc_mean=math.sqrt(abs(baseline_X_samples_calc_mean))
-            self.baseline_mod_8_samples.append(baseline_X_samples_calc_mean)
-            self.sigma_baseline_mod_8_samples.append(sigma_baseline_X_samples_calc_mean)
-        logging.debug("Baseline value modulo 8 samples : %s", self.baseline_mod_8_samples)
-        logging.debug("Sigma baseline value modulo 8 samples : %s", self.sigma_baseline_mod_8_samples)
+            self.analysis['baseline_mod_8_samples'].append(baseline_X_samples_calc_mean)
+            self.analysis['sigma_baseline_mod_8_samples'].append(sigma_baseline_X_samples_calc_mean)
+        logging.debug("Baseline value modulo 8 samples : %s", self.analysis['baseline_mod_8_samples'])
+        logging.debug("Sigma baseline value modulo 8 samples : %s", self.analysis['sigma_baseline_mod_8_samples'])
 
         # Rescale baseline modulo 8 samples to value at 16 sample (percentage) :
+        samples = []
+        for i in range (0, len(self.analysis['baseline_mod_8_samples'])):
+            # TODO : take into account negative baseline to positive
+            # ex : baseline 16 samples = -3, baseline 8 samples = 4, normalization = X3
+            # take the fact if baseline ref 16 samples = 0
 
 
+            self.analysis['baseline_mod_8_samples_normalized'].append(1 + ((self.analysis['baseline_mod_8_samples'][i] - self.analysis['baseline_mod_8_samples'][1]) / self.analysis['baseline_mod_8_samples'][1]))
+            self.analysis['sigma_baseline_mod_8_samples_normalized'].append(1 + ((self.analysis['sigma_baseline_mod_8_samples'][i] - self.analysis['sigma_baseline_mod_8_samples'][1]) / self.analysis['sigma_baseline_mod_8_samples'][1]))
+            samples.append(8 + i*8)
 
+        logging.debug("Number of samples : %s", samples)
+        logging.debug("Baseline normalized : %s", self.analysis['baseline_mod_8_samples_normalized'])
+        #logging.debug("Sigma Baseline normalized : %s", self.analysis['sigma_baseline_mod_8_samples_normalized'])
+
+        # plt.plot(samples, self.analysis['baseline_mod_8_samples_normalized'], 'r+')
+        # plt.show()
 
         # Baseline calculation :
-        self.metadata['baseline_raw'] = self.baseline_mod_8_samples[1] # [1] is for 16 samples
+        self.metadata['baseline_raw'] = self.analysis['baseline_mod_8_samples'][1] # [1] is for 16 samples
         self.metadata['baseline_adc'] = self.metadata['baseline_raw'] // 2 / 8.
         self.metadata['baseline_adc_real'] = self.metadata['baseline_raw'] / 16.
         self.metadata['baseline_volt'] = self.metadata['baseline_adc'] * self.adc_count_constant
@@ -141,10 +159,6 @@ class waveform_recalc():
         self.metadata['falling_time'] = (self.metadata['falling_cell'] + self.metadata['falling_offset'] / 256.) * self.tsampling
         self.metadata['rising_time'] = (self.metadata['rising_cell'] + self.metadata['rising_offset'] / 256.) * self.tsampling
 
-
-
-
-
     def offset_linear_interpol(self, xa, xb):
         ya = 0
         yb = 255
@@ -168,8 +182,13 @@ class waveform_recalc():
         print(self.waveform_data[self.x_col], self.waveform_data[self.y_col])
 
 
+
+
+
+
 class waveform_histos():
     def __init__(self):
+        self.number_of_signals = 0
         # General histos :
         # Signal distrib :
         self.baseline_distrib = []
@@ -196,22 +215,26 @@ class waveform_histos():
         self.diff_rising_time = []
 
         # Analysis and optimization :
-        self.mean_baseline_mod_8_samples=[[],[ [] ]]
-        self.mean_sigma_baseline_mod_8_samples=[[],[ [] ]]
-        for i in range (1,32):
-            self.mean_baseline_mod_8_samples[0].append(i)
-            self.mean_sigma_baseline_mod_8_samples[0].append(i)
+        self.mean_baseline_mod_8_samples_all_values=[[], []]
+
+        self.mean_baseline_mod_8_samples=[[],[]]
+        self.mean_sigma_baseline_mod_8_samples=[[],[]]
+        for i in range (0,32):
+            self.mean_baseline_mod_8_samples[0].append(8 + i * 8)
+            self.mean_baseline_mod_8_samples_all_values[0].append(8 + i * 8)
+            self.mean_baseline_mod_8_samples_all_values[1].append(0)
+            self.mean_sigma_baseline_mod_8_samples[0].append(8 + i * 8)
 
 
-    def add_signal_to_histos(self, metadata_jihane, metadata_recalc):
-        logging.debug("Tree dump Jihane's metadata")
-        for item in sorted(metadata_jihane.items()):
-            logging.debug('%s', item)
-        logging.debug("")
-        logging.debug("Tree dump recalculated metadata")
-        for item in sorted(metadata_recalc.items()):
-            logging.debug('%s', item)
-        logging.debug("")
+    def add_signal_to_histos(self, metadata_jihane, metadata_recalc, analysis_recalc):
+        # logging.debug("Tree dump Jihane's metadata")
+        # for item in sorted(metadata_jihane.items()):
+        #     logging.debug('%s', item)
+        # logging.debug("")
+        # logging.debug("Tree dump recalculated metadata")
+        # for item in sorted(metadata_recalc.items()):
+        #     logging.debug('%s', item)
+        # logging.debug("")
 
         # Append signal distribution (from jihane values) :
         self.baseline_distrib.append(metadata_jihane['baseline_raw'])
@@ -239,6 +262,14 @@ class waveform_histos():
 
         # Don't forget to convert offset (1/256 ns into ns or ps)
 
+        # Analysis part :
+        for i in range (0, len(self.mean_baseline_mod_8_samples_all_values[1])):
+            self.mean_baseline_mod_8_samples_all_values[1][i] = (self.mean_baseline_mod_8_samples_all_values[1][i] * self.number_of_signals + analysis_recalc['baseline_mod_8_samples_normalized'][i]) / (self.number_of_signals + 1)
+        print(self.mean_baseline_mod_8_samples_all_values[1])
+        print(len(self.mean_baseline_mod_8_samples_all_values[1]))
+
+
+        self.number_of_signals+=1
 
     def print_histos(self):
         # First window : raw signal distribution (baseline, peak, charge ...)
@@ -298,6 +329,5 @@ class waveform_histos():
 
         n, bins, patches = ax1[1,4].hist(self.diff_rising_time, 100)
         ax1[1, 4].set_title('Rising time differences')
-
 
         plt.show()

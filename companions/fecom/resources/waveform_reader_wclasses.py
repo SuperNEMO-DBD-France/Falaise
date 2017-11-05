@@ -160,7 +160,7 @@ for i in range(0, number_of_hits):
             wf_recalc.recalcul_from_waveform()
             #wf_recalc.tree_dump()
 
-            wf_histos.add_signal_to_histos(metadata, wf_recalc.metadata)
+            wf_histos.add_signal_to_histos(metadata, wf_recalc.metadata, wf_recalc.analysis)
 
             # wf_histos.mean_baseline_mod_8_samples.append(...
 
