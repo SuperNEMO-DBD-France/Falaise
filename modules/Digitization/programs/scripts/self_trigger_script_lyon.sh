@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# self_trigger_script.sh
+# self_trigger_script_lyon.sh
 
 debug=1
 
@@ -12,13 +12,13 @@ echo "Goal : Produce self trigger hits and pack them into events @ 1600 ns."
 echo "--------------"
 echo "How to use it"
 echo " "
-echo "$ ./self_trigger_script [OPTIONS] [ARGUMENTS]"
+echo "$ ./self_trigger_script_lyon [OPTIONS] [ARGUMENTS]"
 echo ""
 echo "Allowed options: "
 echo "-h  [ --help ]     produce help message"
 echo "-r  [--run-number] set the run number"
 echo " "
-echo "./self_trigger_script"
+echo "./self_trigger_script_lyon"
 echo " "
 echo "--------------"
 echo "Example : "
@@ -51,7 +51,7 @@ then
     exit 1
 fi
 
-SW_PATH="${SW_WORK_DIR}/Falaise/build-git/BuildProducts/bin/"
+SW_PATH="${SW_WORK_DIR}/Falaise/build/BuildProducts/bin/"
 
 ##### Self Trigger (ST) part #####
 ST_SW_NAME="falaisedigitizationplugin-produce_self_trigger_hits"
