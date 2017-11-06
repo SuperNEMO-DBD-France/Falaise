@@ -30,6 +30,9 @@ echo " "
 
 START_DATE=`date "+%Y-%m-%d"`
 run_number=UNDEFINED
+st_time_interval=UNDEFINED # s
+st_calo_freq=UNDEFINED # Hz
+st_tracker_freq=UNDEFINED # Hz
 
 while [ -n "$1" ];
 do
@@ -42,6 +45,15 @@ do
     if [ "x$arg" = "x-r" ]; then
 	run_number=$arg_value
     fi
+    if [ "x$arg" = "x-s" ]; then
+	st_time_interval=$arg_value
+    fi
+    if [ "x$arg" = "x-c" ]; then
+	st_calo_freq=$arg_value
+    fi
+    if [ "x$arg" = "x-t" ]; then
+	st_tracker_freq=$arg_value
+    fi
     shift 2
 done
 
@@ -50,13 +62,17 @@ then
     echo "ERROR : ${run_number} is not defined : FAILED and EXIT !"
     exit 1
 fi
+echo "RUN_NUMBER=" $run_number
+echo "TIME INTERVAL=" ${st_time_interval}
+echo "CALO FREQ=" ${st_calo_freq}
+echo "TRACKER FREQ=" ${st_tracker_freq}
 
-SW_PATH="${SW_WORK_DIR}/Falaise/build-git/BuildProducts/bin/"
 
+SW_PATH="${SW_WORK_DIR}/Falaise/build/BuildProducts/bin/"
 ##### Self Trigger (ST) part #####
 ST_SW_NAME="falaisedigitizationplugin-produce_self_trigger_hits"
 
-ST_OUTPUT_PATH="${SW_WORK_DIR}/analysis/self_trigger/run_${run_number}/"
+ST_OUTPUT_PATH="${SW_WORK_DIR}/Analysis/self_trigger/run_${run_number}/"
 mkdir -p ${ST_OUTPUT_PATH}
 if [ $? -eq 1 ];
 then
@@ -65,7 +81,7 @@ then
 fi
 
 ST_BASE_CONFIG_FILE="${FALAISE_DIGITIZATION_DIR}/resources/self_trigger.conf"
-ST_RUN_CONFIG_FILE="${SW_WORK_DIR}/analysis/self_trigger/run_${run_number}/self_trigger.conf"
+ST_RUN_CONFIG_FILE="${SW_WORK_DIR}/Analysis/self_trigger/run_${run_number}/self_trigger.conf"
 cp ${ST_BASE_CONFIG_FILE} ${ST_RUN_CONFIG_FILE}
 if [ $? -eq 1 ];
 then
@@ -73,14 +89,16 @@ then
     exit 0
 fi
 
-# Search and replace ST trigger configuration file for a given run
-st_time_interval=0.01 # s
-st_calo_freq=1000 # Hz
-st_tracker_freq=10000 # Hz
 
 `cat ${ST_RUN_CONFIG_FILE} | sed -i s/"time_interval : real as time = 1 s"/"time_interval : real as time = ${st_time_interval} s"/g ${ST_RUN_CONFIG_FILE}`
 `cat ${ST_RUN_CONFIG_FILE} | sed -i s/"calo.self_trigger_frequency : real as frequency = 10 Hz"/"calo.self_trigger_frequency : real as frequency = ${st_calo_freq} Hz"/g ${ST_RUN_CONFIG_FILE}`
 `cat ${ST_RUN_CONFIG_FILE} | sed -i s/"geiger.self_trigger_frequency : real as frequency = 5 Hz"/"geiger.self_trigger_frequency : real as frequency = ${st_tracker_freq} Hz"/g ${ST_RUN_CONFIG_FILE}`
+
+echo "SW name : ${ST_SW_PATH}/${ST_SW_NAME}"
+echo "ST Config name : ${ST_RUN_CONFIG_FILE} "
+echo "Trigger config file name ${TRIGGER_CONFIG_FILE}"
+echo "Output path : ${ST_OUTPUT_PATH}"
+
 
 ${SW_PATH}/${ST_SW_NAME} -c ${ST_RUN_CONFIG_FILE} -o ${ST_OUTPUT_PATH}
 ST_OUTPUT_FILE="${ST_OUTPUT_PATH}/self_trigger_hits.data.bz2"
