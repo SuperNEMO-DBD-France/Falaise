@@ -200,6 +200,8 @@ int main( int  argc_ , char **argv_  )
     std::size_t total_number_of_APE_decision = 0;
     std::size_t total_number_of_DAVE_decision = 0;
 
+    std::size_t total_number_of_decision_non_sucessive = 0;
+    std::size_t decision_last_event_number = 0;
     //std::clog << "Trigger decision computations for " << max_events << " events" << std::endl;
 
     std::size_t number_of_events_deserialized = 0;
@@ -323,9 +325,34 @@ int main( int  argc_ , char **argv_  )
 	      }
 	  }
 	total_number_of_L2_decision += L2_decision_record.size();
-	if (caraco_decision) total_number_of_CARACO_decision++;
-	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE) total_number_of_APE_decision++;
-	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE) total_number_of_DAVE_decision++;
+	if (caraco_decision) {
+	  detstream << "Event number : " << number_of_events_deserialized << std::endl;
+	  detstream << "***** CARACO DECISION *****" << std::endl << std::endl;
+
+	  if (number_of_events_deserialized != decision_last_event_number + 1) total_number_of_decision_non_sucessive += 1;
+
+	  decision_last_event_number = number_of_events_deserialized;
+	  total_number_of_CARACO_decision++;
+	}
+
+	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE)
+	  {
+	    detstream << "Event number : " << number_of_events_deserialized << std::endl;
+	    detstream << "***** APE DECISION *****" << std::endl << std::endl;
+	    if (number_of_events_deserialized != decision_last_event_number + 1) total_number_of_decision_non_sucessive += 1;
+
+	    decision_last_event_number = number_of_events_deserialized;
+	    total_number_of_APE_decision++;
+	  }
+	if (delayed_decision && delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE)
+	  {
+	    detstream << "Event number : " << number_of_events_deserialized << std::endl;
+	    detstream << "***** DAVE DECISION *****" << std::endl << std::endl;
+	    if (number_of_events_deserialized != decision_last_event_number + 1) total_number_of_decision_non_sucessive += 1;
+
+	    decision_last_event_number = number_of_events_deserialized;
+	    total_number_of_DAVE_decision++;
+	  }
 
 	// if (caraco_decision || delayed_decision) {
 	//   detstream << "Number of L2 decision :  " << number_of_L2_decision << std::endl;
@@ -349,13 +376,17 @@ int main( int  argc_ , char **argv_  )
     } // end of while
 
 
-    DT_LOG_INFORMATION(logging, "Number of events deserialized events : " + std::to_string(number_of_events_deserialized));
-    statstream << "Number of events deserialized events : " << std::to_string(number_of_events_deserialized) << std::endl;
+    DT_LOG_INFORMATION(logging, "Total number of events : " + std::to_string(number_of_events_deserialized));
+    statstream << "Total number of events : " << std::to_string(number_of_events_deserialized) << std::endl;
+    statstream << "Number of decision non successive : " << std::to_string(total_number_of_decision_non_sucessive) << std::endl;
     statstream << "Number of events with CARACO decision : " << std::to_string(total_number_of_CARACO_decision) << std::endl;
     statstream << "Number of events with delayed (APE | DAVE) decision : " << std::to_string(total_number_of_APE_decision + total_number_of_DAVE_decision) << std::endl;
 
 
-    detstream  << "Number of events deserialized events : " << std::to_string(number_of_events_deserialized) << std::endl;
+    detstream << "Total number of events : " << std::to_string(number_of_events_deserialized) << std::endl;
+    detstream << "Number of decision non successive : " << std::to_string(total_number_of_decision_non_sucessive) << std::endl;
+    detstream << "Number of events with CARACO decision : " << std::to_string(total_number_of_CARACO_decision) << std::endl;
+    detstream << "Number of events with delayed (APE | DAVE) decision : " << std::to_string(total_number_of_APE_decision + total_number_of_DAVE_decision) << std::endl;
 
     // close filestreams :
     statstream.close();

@@ -75,8 +75,8 @@ fi
 
 # Search and replace ST trigger configuration file for a given run
 st_time_interval=0.01 # s
-st_calo_freq=100 # Hz
-st_tracker_freq=1000 # Hz
+st_calo_freq=1000 # Hz
+st_tracker_freq=10000 # Hz
 
 `cat ${ST_RUN_CONFIG_FILE} | sed -i s/"time_interval : real as time = 1 s"/"time_interval : real as time = ${st_time_interval} s"/g ${ST_RUN_CONFIG_FILE}`
 `cat ${ST_RUN_CONFIG_FILE} | sed -i s/"calo.self_trigger_frequency : real as frequency = 10 Hz"/"calo.self_trigger_frequency : real as frequency = ${st_calo_freq} Hz"/g ${ST_RUN_CONFIG_FILE}`

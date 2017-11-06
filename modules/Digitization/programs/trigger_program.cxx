@@ -100,6 +100,11 @@ int main( int  argc_ , char **argv_  )
 
     std::clog << "Test program for class 'snemo::digitization::trigger_program' !" << std::endl;
 
+    // Set the default output path :
+    if (output_path.empty()) output_path = "/tmp/";
+    DT_LOG_INFORMATION(logging, "Output path : " + output_path);
+    datatools::fetch_path_with_env(output_path);
+
     if (input_filenames.size() == 0) {
       DT_LOG_WARNING(logging, "No input file(s) !");
 
@@ -167,11 +172,6 @@ int main( int  argc_ , char **argv_  )
     reader_config.tree_dump(std::clog, "Input module configuration parameters: ");
     reader.initialize_standalone(reader_config);
     reader.tree_dump(std::clog, "Simulated data reader module");
-
-    // Set the default output path :
-    if (output_path.empty()) output_path = "/tmp/";
-    DT_LOG_INFORMATION(logging, "Output path : " + output_path);
-    datatools::fetch_path_with_env(output_path);
 
     // Electronic mapping :
     snemo::digitization::electronic_mapping my_e_mapping;
@@ -348,6 +348,44 @@ int main( int  argc_ , char **argv_  )
 
     int psd_count = 0; // Event counter
 
+    // Trigger output writers :
+    // Fake trigger writer
+    std::string fake_trigger_filename = output_path + "fake_trigger_SD.brio";
+    dpp::output_module ft_writer;
+    datatools::properties ft_config;
+    ft_config.store ("logging.priority", "debug");
+    ft_config.store ("files.mode", "single");
+    ft_config.store ("files.single.filename", fake_trigger_filename);
+    ft_writer.initialize_standalone (ft_config);
+
+    // Caraco trigger writer
+    std::string caraco_trigger_filename = output_path + "caraco_trigger_SD.brio";
+    dpp::output_module caraco_writer;
+    datatools::properties caraco_config;
+    caraco_config.store ("logging.priority", "debug");
+    caraco_config.store ("files.mode", "single");
+    caraco_config.store ("files.single.filename", caraco_trigger_filename);
+    caraco_writer.initialize_standalone (caraco_config);
+
+    // Real trigger writer
+    std::string alpha_trigger_filename = output_path + "alpha_trigger_SD.brio";
+    dpp::output_module alpha_writer;
+    datatools::properties alpha_config;
+    alpha_config.store ("logging.priority", "debug");
+    alpha_config.store ("files.mode", "single");
+    alpha_config.store ("files.single.filename", alpha_trigger_filename);
+    alpha_writer.initialize_standalone (alpha_config);
+
+    // Statistics for trigger output
+    std::size_t total_number_of_events = 0;
+    std::size_t total_number_of_fake_trigger_events = 0;
+    std::size_t total_number_of_fake_delayed_trigger_events = 0;
+    std::size_t total_number_of_real_trigger_events = 0;
+    std::size_t total_number_of_caraco_trigger_events = 0;
+    std::size_t total_number_of_delayed_trigger_events = 0;
+    std::size_t total_number_of_ape_trigger_events = 0;
+    std::size_t total_number_of_dave_trigger_events = 0;
+
     while (!reader.is_terminated())
       {
     	reader.process(ER);
@@ -370,8 +408,59 @@ int main( int  argc_ , char **argv_  )
     	    // Creation of geiger ctw data :
     	    snemo::digitization::geiger_ctw_data my_geiger_ctw_data;
 
+	    std::size_t number_of_main_calo_hits = 0;
+	    std::size_t number_of_xwall_calo_hits = 0;
+	    std::size_t number_of_geiger_hits = 0;
+	    bool has_delayed_geiger = false;
+	    static const int MAXIMUM_DELAYED_TIME = 10000;  // in ns
     	    if (SD.has_step_hits("calo") || SD.has_step_hits("xcalo") || SD.has_step_hits("gveto") || SD.has_step_hits("gg"))
     	      {
+		if (SD.has_step_hits("calo")) number_of_main_calo_hits = SD.get_number_of_step_hits("calo");
+		if (SD.has_step_hits("xcalo")) number_of_xwall_calo_hits = SD.get_number_of_step_hits("xcalo");
+		if (SD.has_step_hits("gg"))
+		  {
+		    number_of_geiger_hits = SD.get_number_of_step_hits("gg");
+		    // New sd bank
+		    mctools::simulated_data flaged_sd = SD;
+		    for (size_t ihit = 0; ihit < number_of_geiger_hits; ihit++)
+		      {
+			mctools::base_step_hit & geiger_hit = flaged_sd.grab_step_hit("gg", ihit);
+			for (size_t jhit = ihit + 1; jhit < number_of_geiger_hits; jhit++)
+			  {
+			    mctools::base_step_hit & other_geiger_hit = flaged_sd.grab_step_hit("gg", jhit);
+			    if (geiger_hit.get_geom_id() == other_geiger_hit.get_geom_id())
+			      {
+				const double gg_hit_time       = geiger_hit.get_time_start();
+				const double other_gg_hit_time = other_geiger_hit.get_time_start();
+				if (gg_hit_time > other_gg_hit_time)
+				  {
+				    bool geiger_already_hit = true;
+				    if (!geiger_hit.get_auxiliaries().has_flag("geiger_already_hit")) geiger_hit.grab_auxiliaries().store("geiger_already_hit", geiger_already_hit);
+				  }
+				else
+				  {
+				    bool geiger_already_hit = true;
+				    if (!other_geiger_hit.get_auxiliaries().has_flag("geiger_already_hit")) other_geiger_hit.grab_auxiliaries().store("geiger_already_hit", geiger_already_hit);
+				  }
+			      }
+			  }
+		      }
+
+		    mctools::simulated_data::hit_handle_collection_type BSHC = flaged_sd.get_step_hits("gg");
+		    for (mctools::simulated_data::hit_handle_collection_type::const_iterator i = BSHC.begin();
+			 i != BSHC.end();
+			 i++)
+		      {
+			const mctools::base_step_hit & BSH = i->get();
+			if (BSH.get_auxiliaries().has_flag("geiger_already_hit") || BSH.get_auxiliaries().has_flag("other_geiger_already_hit")) {}
+			else
+			  {
+			    double time_start = BSH.get_time_start();
+			    if (time_start > MAXIMUM_DELAYED_TIME) has_delayed_geiger = true;
+			  }
+		      }
+		  }
+
     		// Creation of a signal data object to store calo & geiger signals :
     		snemo::digitization::signal_data signal_data;
 
@@ -470,21 +559,51 @@ int main( int  argc_ , char **argv_  )
     	    	  }
     	      }
 
-	    for (std::size_t i = 0; i  < calo_collection_records.size(); i++) {
-	      calo_collection_records[i].display();
-	    }
+	    // for (std::size_t i = 0; i  < calo_collection_records.size(); i++) {
+	    //   calo_collection_records[i].display();
+	    // }
 
-	    for (std::size_t i = 0; i  < coincidence_collection_calo_records.size(); i++) {
-	      coincidence_collection_calo_records[i].display();
-	    }
+	    // for (std::size_t i = 0; i  < coincidence_collection_calo_records.size(); i++) {
+	    //   coincidence_collection_calo_records[i].display();
+	    // }
 
-	    for (std::size_t i = 0; i  < tracker_collection_records.size(); i++) {
-	      tracker_collection_records[i].display();
-	    }
+	    // for (std::size_t i = 0; i  < tracker_collection_records.size(); i++) {
+	    //   tracker_collection_records[i].display();
+	    // }
 
-	    for (std::size_t i = 0; i  < coincidence_collection_records.size(); i++) {
-	      coincidence_collection_records[i].display();
-	    }
+	    // for (std::size_t i = 0; i  < coincidence_collection_records.size(); i++) {
+	    //   coincidence_collection_records[i].display();
+	    // }
+	    std::size_t total_number_of_calo_hits = number_of_main_calo_hits + number_of_xwall_calo_hits;
+
+	    if (total_number_of_calo_hits >= 1 && number_of_geiger_hits >= 3)
+	      {
+		ft_writer.process(ER);
+		total_number_of_fake_trigger_events++;
+	      }
+	    if (caraco_decision && has_delayed_geiger)
+	      {
+		total_number_of_fake_delayed_trigger_events++;
+	      }
+
+	    bool real_trigger_decision = false;
+	    if (caraco_decision)
+	      {
+		caraco_writer.process(ER);
+		total_number_of_caraco_trigger_events++;
+		real_trigger_decision = true;
+	      }
+	    if (delayed_decision)
+	      {
+		alpha_writer.process(ER);
+		total_number_of_delayed_trigger_events++;
+		if (delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE) total_number_of_ape_trigger_events++;
+		if (delayed_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE) total_number_of_dave_trigger_events++;
+
+		real_trigger_decision = true;
+	      }
+
+	    if (real_trigger_decision) total_number_of_real_trigger_events++;
 
     	    DT_LOG_INFORMATION(logging, "Number of L2 decision : " << number_of_L2_decision);
     	    DT_LOG_INFORMATION(logging, "CARACO decision :       " << caraco_decision);
@@ -496,12 +615,30 @@ int main( int  argc_ , char **argv_  )
     	    my_trigger_algo.reset_data();
 
     	  } //end of if has bank label "SD"
+	total_number_of_events++;
 
     	ER.clear();
     	psd_count++;
     	if (debug) std::clog << "DEBUG : psd count " << psd_count << std::endl;
     	DT_LOG_NOTICE(logging, "Simulated data #" << psd_count);
       } // end of reader is terminated
+
+    // Display some stats
+
+    std::string output_stat_filename = output_path + '/' + "output_trigger.stat";
+    std::ofstream statstream;
+    statstream.open(output_stat_filename);
+    statstream << "Welcome on trigger statistic file" << std::endl << std::endl;
+
+    statstream << "Total number of events : " << total_number_of_events << std::endl;
+    statstream << "Total number of fake trigger events : " << total_number_of_fake_trigger_events << std::endl;
+    statstream << "Total number of fake trigger delayed events : " << total_number_of_fake_delayed_trigger_events << std::endl;
+    statstream << "Total number of real trigger events : " << total_number_of_real_trigger_events << std::endl;
+    statstream << "Total number of caraco trigger events : " << total_number_of_caraco_trigger_events << std::endl;
+    statstream << "Total number of delayed trigger events : " << total_number_of_delayed_trigger_events << std::endl;
+    statstream << "Total number of ape trigger events : " << total_number_of_ape_trigger_events << std::endl;
+    statstream << "Total number of dave trigger events : " << total_number_of_dave_trigger_events << std::endl;
+    statstream << "The end." << std::endl;
 
     std::clog << "The end." << std::endl;
   }
