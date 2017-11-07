@@ -390,31 +390,31 @@ int main( int  argc_ , char **argv_  )
       {
     	reader.process(ER);
     	DT_LOG_WARNING(logging, "Event #" << psd_count);
-    	// A plain `mctools::simulated_data' object is stored here :
-    	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label))
-    	  {
-    	    // Access to the "SD" bank with a stored `mctools::simulated_data' :
-    	    const mctools::simulated_data & SD = ER.get<mctools::simulated_data>(SD_bank_label);
+	// A plain `mctools::simulated_data' object is stored here :
+	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label))
+	  {
+	    // Access to the "SD" bank with a stored `mctools::simulated_data' :
+	    const mctools::simulated_data & SD = ER.get<mctools::simulated_data>(SD_bank_label);
 
-    	    my_clock_manager.compute_clockticks_ref(random_generator);
-    	    int32_t clocktick_25_reference  = my_clock_manager.get_clocktick_25_ref();
-    	    double  clocktick_25_shift      = my_clock_manager.get_shift_25();
-    	    int32_t clocktick_800_reference = my_clock_manager.get_clocktick_800_ref();
-    	    double  clocktick_800_shift     = my_clock_manager.get_shift_800();
+	    my_clock_manager.compute_clockticks_ref(random_generator);
+	    int32_t clocktick_25_reference  = my_clock_manager.get_clocktick_25_ref();
+	    double  clocktick_25_shift      = my_clock_manager.get_shift_25();
+	    int32_t clocktick_800_reference = my_clock_manager.get_clocktick_800_ref();
+	    double  clocktick_800_shift     = my_clock_manager.get_shift_800();
 
-    	    // Creation of calo ctw data :
-    	    snemo::digitization::calo_ctw_data my_calo_ctw_data;
+	    // Creation of calo ctw data :
+	    snemo::digitization::calo_ctw_data my_calo_ctw_data;
 
-    	    // Creation of geiger ctw data :
-    	    snemo::digitization::geiger_ctw_data my_geiger_ctw_data;
+	    // Creation of geiger ctw data :
+	    snemo::digitization::geiger_ctw_data my_geiger_ctw_data;
 
 	    std::size_t number_of_main_calo_hits = 0;
 	    std::size_t number_of_xwall_calo_hits = 0;
 	    std::size_t number_of_geiger_hits = 0;
 	    bool has_delayed_geiger = false;
 	    static const int MAXIMUM_DELAYED_TIME = 10000;  // in ns
-    	    if (SD.has_step_hits("calo") || SD.has_step_hits("xcalo") || SD.has_step_hits("gveto") || SD.has_step_hits("gg"))
-    	      {
+	    if (SD.has_step_hits("calo") || SD.has_step_hits("xcalo") || SD.has_step_hits("gveto") || SD.has_step_hits("gg"))
+	      {
 		if (SD.has_step_hits("calo")) number_of_main_calo_hits = SD.get_number_of_step_hits("calo");
 		if (SD.has_step_hits("xcalo")) number_of_xwall_calo_hits = SD.get_number_of_step_hits("xcalo");
 		if (SD.has_step_hits("gg"))
@@ -461,103 +461,103 @@ int main( int  argc_ , char **argv_  )
 		      }
 		  }
 
-    		// Creation of a signal data object to store calo & geiger signals :
-    		snemo::digitization::signal_data signal_data;
+		// Creation of a signal data object to store calo & geiger signals :
+		snemo::digitization::signal_data signal_data;
 
-    		// Processing Calo signal :
-    		sd_2_calo_signal.process(SD, signal_data);
+		// Processing Calo signal :
+		sd_2_calo_signal.process(SD, signal_data);
 
-    		// Processing Geiger signal :
-    		sd_2_geiger_signal.process(SD, signal_data);
+		// Processing Geiger signal :
+		sd_2_geiger_signal.process(SD, signal_data);
 
-    		if (logging == datatools::logger::PRIO_TRACE) {
-    		  signal_data.tree_dump(std::clog, "*** Signal Data ***", "INFO : ");
-    		  my_clock_manager.tree_dump(std::clog, "Clock utils : ", "INFO : ");
-    		}
+		if (logging == datatools::logger::PRIO_TRACE) {
+		  signal_data.tree_dump(std::clog, "*** Signal Data ***", "INFO : ");
+		  my_clock_manager.tree_dump(std::clog, "Clock utils : ", "INFO : ");
+		}
 
-    		snemo::digitization::calo_tp_data my_calo_tp_data;
-    		// Calo signal to calo TP :
-    		if (signal_data.has_calo_signals())
-    		  {
-    		    // Set calo clockticks :
-    		    signal_2_calo_tp.set_clocktick_reference(clocktick_25_reference);
-    		    signal_2_calo_tp.set_clocktick_shift(clocktick_25_shift);
+		snemo::digitization::calo_tp_data my_calo_tp_data;
+		// Calo signal to calo TP :
+		if (signal_data.has_calo_signals())
+		  {
+		    // Set calo clockticks :
+		    signal_2_calo_tp.set_clocktick_reference(clocktick_25_reference);
+		    signal_2_calo_tp.set_clocktick_shift(clocktick_25_shift);
 
-    		    // Signal to calo TP process :
-    		    signal_2_calo_tp.process(signal_data, my_calo_tp_data);
+		    // Signal to calo TP process :
+		    signal_2_calo_tp.process(signal_data, my_calo_tp_data);
 
-    		    // Calo TP to geiger CTW process :
-    		    calo_tp_2_ctw_0.process(my_calo_tp_data, my_calo_ctw_data);
-    		    calo_tp_2_ctw_1.process(my_calo_tp_data, my_calo_ctw_data);
-    		    calo_tp_2_ctw_2.process(my_calo_tp_data, my_calo_ctw_data);
+		    // Calo TP to geiger CTW process :
+		    calo_tp_2_ctw_0.process(my_calo_tp_data, my_calo_ctw_data);
+		    calo_tp_2_ctw_1.process(my_calo_tp_data, my_calo_ctw_data);
+		    calo_tp_2_ctw_2.process(my_calo_tp_data, my_calo_ctw_data);
 
-    		    if (logging == datatools::logger::PRIO_TRACE) {
-    		      my_calo_tp_data.tree_dump(std::clog, "Calorimeter TP(s) data : ", "INFO : ");
-    		      my_calo_ctw_data.tree_dump(std::clog, "Calorimeter CTW(s) data : ", "INFO : ");
-    		    }
+		    if (logging == datatools::logger::PRIO_TRACE) {
+		      my_calo_tp_data.tree_dump(std::clog, "Calorimeter TP(s) data : ", "INFO : ");
+		      my_calo_ctw_data.tree_dump(std::clog, "Calorimeter CTW(s) data : ", "INFO : ");
+		    }
 
-    		  } // end of if has calo signal
-    		snemo::digitization::geiger_tp_data my_geiger_tp_data;
-    		if (signal_data.has_geiger_signals())
-    		  {
-    		    // Set geiger clockticks :
-    		    signal_2_geiger_tp.set_clocktick_reference(clocktick_800_reference);
-    		    signal_2_geiger_tp.set_clocktick_shift(clocktick_800_shift);
-    		    // Signal to geiger TP process
-    		    signal_2_geiger_tp.process(signal_data, my_geiger_tp_data);
+		  } // end of if has calo signal
+		snemo::digitization::geiger_tp_data my_geiger_tp_data;
+		if (signal_data.has_geiger_signals())
+		  {
+		    // Set geiger clockticks :
+		    signal_2_geiger_tp.set_clocktick_reference(clocktick_800_reference);
+		    signal_2_geiger_tp.set_clocktick_shift(clocktick_800_shift);
+		    // Signal to geiger TP process
+		    signal_2_geiger_tp.process(signal_data, my_geiger_tp_data);
 
-    		    // Geiger TP to geiger CTW process
-    		    geiger_tp_2_ctw.process(my_geiger_tp_data, my_geiger_ctw_data);
+		    // Geiger TP to geiger CTW process
+		    geiger_tp_2_ctw.process(my_geiger_tp_data, my_geiger_ctw_data);
 
-    		    if (logging == datatools::logger::PRIO_TRACE) {
-    		      my_geiger_tp_data.tree_dump(std::clog, "Geiger TP(s) data : ", "INFO : ");
-    		      my_geiger_ctw_data.tree_dump(std::clog, "Geiger CTW(s) data : ", "INFO : ");
-    		    }
+		    if (logging == datatools::logger::PRIO_TRACE) {
+		      my_geiger_tp_data.tree_dump(std::clog, "Geiger TP(s) data : ", "INFO : ");
+		      my_geiger_ctw_data.tree_dump(std::clog, "Geiger CTW(s) data : ", "INFO : ");
+		    }
 
-    		  } // end of if has geiger signal
+		  } // end of if has geiger signal
 
-    	      } // end of if has "calo" || "xcalo" || "gveto" || "gg" step hits
+	      } // end of if has "calo" || "xcalo" || "gveto" || "gg" step hits
 
-    	    // Trigger process
-    	    my_trigger_algo.process(my_calo_ctw_data,
-    				    my_geiger_ctw_data);
+	    // Trigger process
+	    my_trigger_algo.process(my_calo_ctw_data,
+				    my_geiger_ctw_data);
 
-    	    // Finale structures :
+	    // Finale structures :
 
-    	    // Creation of outputs collection structures for calo and tracker
-    	    std::vector<snemo::digitization::trigger_structures::calo_summary_record> calo_collection_records = my_trigger_algo.get_calo_records_25ns_vector();
-    	    std::vector<snemo::digitization::trigger_structures::coincidence_calo_record> coincidence_collection_calo_records =  my_trigger_algo.get_coincidence_calo_records_1600ns_vector();
-    	    std::vector<snemo::digitization::trigger_structures::tracker_record>  tracker_collection_records = my_trigger_algo.get_tracker_records_vector();
-    	    std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records = my_trigger_algo.get_coincidence_records_vector();
-    	    std::vector<snemo::digitization::trigger_structures::L2_decision> L2_decision_record = my_trigger_algo.get_L2_decision_records_vector();
+	    // Creation of outputs collection structures for calo and tracker
+	    std::vector<snemo::digitization::trigger_structures::calo_summary_record> calo_collection_records = my_trigger_algo.get_calo_records_25ns_vector();
+	    std::vector<snemo::digitization::trigger_structures::coincidence_calo_record> coincidence_collection_calo_records =  my_trigger_algo.get_coincidence_calo_records_1600ns_vector();
+	    std::vector<snemo::digitization::trigger_structures::tracker_record>  tracker_collection_records = my_trigger_algo.get_tracker_records_vector();
+	    std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records = my_trigger_algo.get_coincidence_records_vector();
+	    std::vector<snemo::digitization::trigger_structures::L2_decision> L2_decision_record = my_trigger_algo.get_L2_decision_records_vector();
 
-    	    uint16_t number_of_L2_decision = L2_decision_record.size();
-    	    bool caraco_decision = false;
-    	    uint32_t caraco_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
-    	    bool delayed_decision = false;
-    	    uint32_t delayed_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
-    	    bool already_delayed_trig = false;
-    	    snemo::digitization::trigger_structures::L2_trigger_mode delayed_trigger_mode = snemo::digitization::trigger_structures::L2_trigger_mode::INVALID;
+	    uint16_t number_of_L2_decision = L2_decision_record.size();
+	    bool caraco_decision = false;
+	    uint32_t caraco_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
+	    bool delayed_decision = false;
+	    uint32_t delayed_clocktick_1600ns = snemo::digitization::clock_utils::INVALID_CLOCKTICK;
+	    bool already_delayed_trig = false;
+	    snemo::digitization::trigger_structures::L2_trigger_mode delayed_trigger_mode = snemo::digitization::trigger_structures::L2_trigger_mode::INVALID;
 
-    	    if (number_of_L2_decision != 0)
-    	      {
-    	    	for (unsigned int isize = 0; isize < number_of_L2_decision; isize++)
-    	    	  {
-    	    	    if (L2_decision_record[isize].L2_decision_bool && L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::CARACO)
-    	    	      {
-    	    		caraco_decision         = L2_decision_record[isize].L2_decision_bool;
-    	    		caraco_clocktick_1600ns = L2_decision_record[isize].L2_ct_decision;
-    	    	      }
-    	    	    else if (L2_decision_record[isize].L2_decision_bool &&  (L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE
-    	    								     || L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE) && already_delayed_trig == false)
-    	    	      {
-    	    		delayed_decision         = L2_decision_record[isize].L2_decision_bool;
-    	    		delayed_clocktick_1600ns = L2_decision_record[isize].L2_ct_decision;
-    	    		delayed_trigger_mode     = L2_decision_record[isize].L2_trigger_mode;
-    	    		already_delayed_trig     = true;
-    	    	      }
-    	    	  }
-    	      }
+	    if (number_of_L2_decision != 0)
+	      {
+		for (unsigned int isize = 0; isize < number_of_L2_decision; isize++)
+		  {
+		    if (L2_decision_record[isize].L2_decision_bool && L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::CARACO)
+		      {
+			caraco_decision         = L2_decision_record[isize].L2_decision_bool;
+			caraco_clocktick_1600ns = L2_decision_record[isize].L2_ct_decision;
+		      }
+		    else if (L2_decision_record[isize].L2_decision_bool &&  (L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::APE
+									     || L2_decision_record[isize].L2_trigger_mode == snemo::digitization::trigger_structures::L2_trigger_mode::DAVE) && already_delayed_trig == false)
+		      {
+			delayed_decision         = L2_decision_record[isize].L2_decision_bool;
+			delayed_clocktick_1600ns = L2_decision_record[isize].L2_ct_decision;
+			delayed_trigger_mode     = L2_decision_record[isize].L2_trigger_mode;
+			already_delayed_trig     = true;
+		      }
+		  }
+	      }
 
 	    // for (std::size_t i = 0; i  < calo_collection_records.size(); i++) {
 	    //   calo_collection_records[i].display();
@@ -605,22 +605,23 @@ int main( int  argc_ , char **argv_  )
 
 	    if (real_trigger_decision) total_number_of_real_trigger_events++;
 
-    	    DT_LOG_INFORMATION(logging, "Number of L2 decision : " << number_of_L2_decision);
-    	    DT_LOG_INFORMATION(logging, "CARACO decision :       " << caraco_decision);
-    	    DT_LOG_INFORMATION(logging, "CARACO CT1600ns :       " << caraco_clocktick_1600ns);
-    	    DT_LOG_INFORMATION(logging, "Delayed decision :      " << delayed_decision);
-    	    DT_LOG_INFORMATION(logging, "Delayed CT1600ns :      " << delayed_clocktick_1600ns);
-    	    DT_LOG_INFORMATION(logging, "Delayed trigger mode :  " << delayed_trigger_mode);
+	    DT_LOG_INFORMATION(logging, "Number of L2 decision : " << number_of_L2_decision);
+	    DT_LOG_INFORMATION(logging, "CARACO decision :       " << caraco_decision);
+	    DT_LOG_INFORMATION(logging, "CARACO CT1600ns :       " << caraco_clocktick_1600ns);
+	    DT_LOG_INFORMATION(logging, "Delayed decision :      " << delayed_decision);
+	    DT_LOG_INFORMATION(logging, "Delayed CT1600ns :      " << delayed_clocktick_1600ns);
+	    DT_LOG_INFORMATION(logging, "Delayed trigger mode :  " << delayed_trigger_mode);
 
-    	    my_trigger_algo.reset_data();
+	    my_trigger_algo.reset_data();
 
-    	  } //end of if has bank label "SD"
+	  } //end of if has bank label "SD"
 	total_number_of_events++;
 
-    	ER.clear();
-    	psd_count++;
-    	if (debug) std::clog << "DEBUG : psd count " << psd_count << std::endl;
-    	DT_LOG_NOTICE(logging, "Simulated data #" << psd_count);
+	ER.clear();
+	psd_count++;
+	if (debug) std::clog << "DEBUG : psd count " << psd_count << std::endl;
+	DT_LOG_NOTICE(logging, "Simulated data #" << psd_count);
+
       } // end of reader is terminated
 
     // Display some stats
