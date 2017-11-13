@@ -146,6 +146,8 @@ rising_cell_jihane =[]
 rising_cell_diff = []
 falling_offset_diff=[]
 rising_offset_diff=[]
+falling_time_diff=[]
+rising_time_diff=[]
 
 mean_baseline_mod_8_samples=[[],[ [] ]]
 mean_sigma_baseline_mod_8_samples=[[],[ [] ]]
@@ -293,7 +295,7 @@ for i in range(0,number_of_hits):
                 charge_test_on_length_wo_baseline.append(float("{0:.4f}".format(waveform_data[y_col][j]-baseline_recalculated_casted)))
             charge_test_on_length_plus_one_wo_baseline=charge_test_on_length_wo_baseline[:] # Don't forget the [:] to copy the list and don't get only the reference to the variable !!!
             charge_test_on_length_plus_one_wo_baseline.append(float("{0:.4f}".format(waveform_data[y_col][charge_upper_bound_test+1]-baseline_recalculated_casted)))
-            print(len(charge_test_on_length_wo_baseline),len(charge_test_on_length_plus_one_wo_baseline))
+            #print(len(charge_test_on_length_wo_baseline),len(charge_test_on_length_plus_one_wo_baseline))
             #logging.debug(charge_adc_samples)
             charge_recalculated=np.sum(charge_adc_samples)
             charge_recalculated_with_begin=np.sum(charge_adc_samples_with_begin)
@@ -387,18 +389,25 @@ for i in range(0,number_of_hits):
             logging.debug("Rising time Jihane : %s", rising_time)
             logging.debug("Rising time moi : %s", rising_time_recalculated)
 
+            falling_time_diff.append(falling_time - falling_time_recalculated)
+            rising_time_diff.append(rising_time - rising_time_recalculated)
+
             logging.debug("")
             edge_line = []
+            zero_line = []
             for i in range(0, len(waveform_data[y_col])):
                 edge_line.append(baseline_recalculated_casted+edge_to_cross_adc_jihane)
+                zero_line.append(2048)
+
 
             if show_waveforms:
                 plt.plot(waveform_data[x_col], waveform_data[y_col], 'r')
-                plt.plot(falling_cell,     waveform_data[y_col][falling_cell], 'bo')
-                plt.plot(falling_cell+1,   waveform_data[y_col][falling_cell+1], 'bo')
-                plt.plot(rising_cell+1,    waveform_data[y_col][rising_cell+1], 'yo')
-                plt.plot(rising_cell,      waveform_data[y_col][rising_cell], 'yo')
-                plt.plot(edge_line, 'g')
+                # plt.plot(falling_cell,     waveform_data[y_col][falling_cell], 'bo')
+                # plt.plot(falling_cell+1,   waveform_data[y_col][falling_cell+1], 'bo')
+                # plt.plot(rising_cell+1,    waveform_data[y_col][rising_cell+1], 'yo')
+                # plt.plot(rising_cell,      waveform_data[y_col][rising_cell], 'yo')
+                # plt.plot(edge_line, 'g')
+                plt.plot(zero_line, 'black')
                 plt.show()
 
 
@@ -518,6 +527,29 @@ if (print_histos):
     f.savefig(output_dir+output_histos_png)
     f.savefig(output_dir+output_histos_pdf)
 
+    # f1, ax1 = plt.subplots(2, 2, figsize=(18,18))
+    # n, bins, patches = ax1[0,0].hist(charge_jihane, 50)
+    # ax1[0, 0].set_title('Raw charge distribution')
+
+    # n, bins, patches = ax1[1,0].hist(charge_diff, 50)
+    # ax1[1, 0].set_title('Charge adc differences')
+
+    f1, ax1 = plt.subplots(2, 2, figsize=(18,18))
+    n, bins, patches = ax1[0,0].hist(rising_offset_diff, 100)
+    ax1[0, 0].set_title('Rising offset differences')
+    ax1[0,0].set_xlabel('Time (/256 ns)')
+    ax1[0,0].set_xlim(-256,256)
+
+    n, bins, patches = ax1[1,0].hist(falling_offset_diff, 100)
+    ax1[1, 0].set_title('Falling offset differences')
+    ax1[1,0].set_xlabel('Time (/256 ns)')
+    ax1[1,0].set_xlim(-256,256)
+
+    # f1, ax1 = plt.subplots(1, 2, figsize=(18,18))
+    # n, bins, patches = ax1[0,0].hist(charge_jihane, 50)
+    # ax1[0, 0].set_title('Charge raw Jihane')
+    # n, bins, patches = ax1[0,1].hist(charge_diff, 50)
+    # ax1[0, 1].set_title('Charge diff')
 
     # for i in range (0, effective_hit_number):
     #     RGB=(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
@@ -525,5 +557,4 @@ if (print_histos):
     # ax[0, 5].set_title('Baseline evolution last hit')
 
     plt.show()
-
-# end of program
+    # end of program
