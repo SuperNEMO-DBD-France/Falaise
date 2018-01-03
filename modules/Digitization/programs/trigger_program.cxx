@@ -1,4 +1,4 @@
-// test_trigger_algorithm_test_time.cxx
+// trigger_program.cxx
 // Standard libraries :
 #include <iostream>
 

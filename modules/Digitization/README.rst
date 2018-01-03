@@ -62,5 +62,6 @@ CTW : Crate Trigger Word
 
 To  run the  examples, you  have  to export  the environment  variable
 $FALAISE_DIGITIZATION_TESTING_DIR  and give  the path  to the  testing
-directory    of   the    Digitization    module.     (ex   :    export
-FALAISE_DIGITIZATION_TESTING_DIR=~/data/Falaise/Falaise-trunk/modules/Digitization/testing)
+directory    of   the    Digitization    module.
+export FALAISE_DIGITIZATION_TESTING_DIR=~/data/Falaise/Falaise-trunk/modules/Digitization/testing
+export FALAISE_DIGITIZATION_RESOURCES_DIR=~/data/Falaise/Falaise-trunk/modules/Digitization/resources
