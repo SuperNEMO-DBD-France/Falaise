@@ -85,17 +85,22 @@ class waveform_recalc():
             # ex : baseline 16 samples = -3, baseline 8 samples = 4, normalization = X3
             # take the fact if baseline ref 16 samples = 0
 
-
+            # TO REWORK :
+            # 1st attempt
             self.analysis['baseline_mod_8_samples_normalized'].append(1 + ((self.analysis['baseline_mod_8_samples'][i] - self.analysis['baseline_mod_8_samples'][1]) / self.analysis['baseline_mod_8_samples'][1]))
             self.analysis['sigma_baseline_mod_8_samples_normalized'].append(1 + ((self.analysis['sigma_baseline_mod_8_samples'][i] - self.analysis['sigma_baseline_mod_8_samples'][1]) / self.analysis['sigma_baseline_mod_8_samples'][1]))
+
+
             samples.append(8 + i*8)
 
-        logging.debug("Number of samples : %s", samples)
+        logging.debug("Samples : %s", samples)
         logging.debug("Baseline normalized : %s", self.analysis['baseline_mod_8_samples_normalized'])
-        #logging.debug("Sigma Baseline normalized : %s", self.analysis['sigma_baseline_mod_8_samples_normalized'])
+        logging.debug("Sigma Baseline normalized : %s", self.analysis['sigma_baseline_mod_8_samples_normalized'])
 
-        # plt.plot(samples, self.analysis['baseline_mod_8_samples_normalized'], 'r+')
-        # plt.show()
+        plt.plot(samples, self.analysis['baseline_mod_8_samples_normalized'], 'r+')
+        plt.xlabel("Number of samples")
+        plt.ylabel("Baseline normalized")
+        plt.show()
 
         # Baseline calculation :
         self.metadata['baseline_raw'] = self.analysis['baseline_mod_8_samples'][1] # [1] is for 16 samples

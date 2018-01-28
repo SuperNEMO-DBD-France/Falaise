@@ -56,7 +56,7 @@ for opt, arg in opts:
 
 # Default input file :
 if not filename:
-    filename = "Run_40.dat"
+    filename = "input_waveforms/Run_40.dat"
     input_file = filename
     filestream = open(input_file, 'r')
 
@@ -156,16 +156,16 @@ for i in range(0, number_of_hits):
 
             wf_recalc=wf_dat.waveform_recalc()
             wf_recalc.parse_waveform(waveform_data_line)
-            # wf_recalc.print_raw_waveform()
+            if (show_waveforms):
+                wf_recalc.print_raw_waveform()
             wf_recalc.recalcul_from_waveform()
             #wf_recalc.tree_dump()
 
             wf_histos.add_signal_to_histos(metadata, wf_recalc.metadata, wf_recalc.analysis)
 
-            # wf_histos.mean_baseline_mod_8_samples.append(...
-
 
 
 # Outside signal loop
 
-#wf_histos.print_histos()
+if print_histos:
+    wf_histos.print_histos()

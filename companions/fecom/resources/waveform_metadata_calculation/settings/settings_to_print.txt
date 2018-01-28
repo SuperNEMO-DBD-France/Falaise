@@ -1,0 +1,55 @@
+SUPERNEMO SETTINGS FILE Software Version V1.12   ===
+	== CONTROL BOARD CONTROLLER FPGA FIRMWARE VERSION : V2.4.12 ==
+	== CONTROL BOARD FRONT-END FPGA FIRMWARE VERSION : V2.4.12 ==
+	== Tracker Trigger Option: TRACKER_TRIGGER_L2_AND_SELF_TRIGGER ==
+	== Tracker L2 Option: L2= L1 + delay <= 1000 µs ==
+	== Tracker Trigger Option: CALO_SELF_TRIGGER_AND_L1 ==
+	== Calo L1 Option: Multiplicity >= 1 ==
+	== RUN TYPE : CALO_AND_TRACKER ==
+== CALORIMETER FRONT-END BOARDS PARAMETERS ==
+	== CALO FEBs COMMON PARAMETERS ==
+   == CALO FEBs SAMPLING PERIOD: 0.390625 ns ==
+   == CALO FEBs POSTRIG: 125.000000 ns ==
+   == CALO FEBs NB OF COLUMNS TO READ: 64  (1 column = 16 Samples) ==
+	== CALO FEBs INDIVIDUAL PARAMETERS (PER BOARD) ==
+		== CALO FEB SLOT 2 PARAMETERS ==
+		== CALO FEB CONTROLLER FPGA FIRMWARE VERSION V15.7.9 ==
+		== CALO FEB FRONT-END FPGA FIRMWARE VERSION V15.7.9 ==
+		== CALO FEB: Front-End 0 SamBlock 0 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 0 SamBlock 0 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 0 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 0 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 0 SamBlock 0 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 0 SamBlock 0 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 0 SamBlock 0 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 0 SamBlock 0 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 0 SamBlock 0 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 0 SamBlock 0 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 0 SamBlock 0 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 0 SamBlock 0 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 0 SamBlock 0 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 0 SamBlock 0 CFD RATIO: 4 /16 ==
+		== CALO FEB: Front-End 0 SamBlock 1 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 0 SamBlock 1 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 0 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 0 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 0 SamBlock 1 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 0 SamBlock 1 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 0 SamBlock 1 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 0 SamBlock 1 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 0 SamBlock 1 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 0 SamBlock 1 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 0 SamBlock 1 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 0 SamBlock 1 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 0 SamBlock 1 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 0 SamBlock 1 CFD RATIO: 4 /16 ==

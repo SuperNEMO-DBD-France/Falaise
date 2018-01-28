@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from math import *
 
 #np.set_printoptions(threshold=np.nan)
-filename_1= 'waveform.txt'
-filename_2= 'waveform2.txt'
-filename_3= 'waveform3.txt'
+filename_1= 'input_waveforms/waveform.txt'
+filename_2= 'input_waveforms/waveform2.txt'
+filename_3= 'input_waveforms/waveform3.txt'
 
-calibfile_1="calib_ch1.txt"
-calibfile_3="calib_ch3.txt"
+calibfile_1="input_waveforms/calib_ch1.txt"
+calibfile_3="input_waveforms/calib_ch3.txt"
 
 file_used=filename_3
 calibfile_used=calibfile_3
@@ -208,16 +208,16 @@ for i in range(0, len(y_corrected_volt)):
 
 # plt.plot(y3-2048, 'y')
 # plt.show()
-=======
+
 import numpy as np
 import operator
 
-data_file = np.genfromtxt('waveform.txt', delimiter=' ')
+data_file = np.genfromtxt(filename_1, delimiter=' ')
 x, y = data_file.transpose()
 # print(x)
 print("Raw values   : ", y)
 
-calib_file = np.genfromtxt('calib.txt', delimiter=' ')
+calib_file = np.genfromtxt(calibfile_1, delimiter=' ')
 y_calib=calib_file.transpose()/16
 print("Calib values : ", y_calib)
 

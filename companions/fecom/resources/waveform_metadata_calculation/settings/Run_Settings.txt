@@ -1,0 +1,566 @@
+==== SUPERNEMO SETTINGS FILE Software Version V1.12   ===
+	== CONTROL BOARD CONTROLLER FPGA FIRMWARE VERSION : V2.4.12 ==
+	== CONTROL BOARD FRONT-END FPGA FIRMWARE VERSION : V2.4.12 ==
+	== Tracker Trigger Option: TRACKER_TRIGGER_L2_AND_SELF_TRIGGER ==
+	== Tracker L2 Option: L2= L1 + delay <= 1000 µs ==
+	== Tracker Trigger Option: CALO_SELF_TRIGGER_AND_L1 ==
+	== Calo L1 Option: Multiplicity >= 1 ==
+	== RUN TYPE : CALO_AND_TRACKER ==
+== TRACKER FRONT-END BOARDS PARAMETERS ==
+	== TRACKER FEB SLOT 12 PARAMETERS ==
+	== TRACKER FEB FIRMWARE VERSION V1.1 .11==
+	== FEAST 0 PARAMETERS ==
+		== FEAST 0 VCPT: 1.135484 Volts =
+		== FEAST 0 VLNT Ch0-26: 1.612903 Volts =
+		== FEAST 0 VLNT Ch27-52: 1.612903 Volts =
+		== FEAST 0 VHPT: 1.706452 Volts =
+		== FEAST 0 VHNT: 1.596774 Volts =
+		== FEAST 0 Ch 0 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 0 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 1 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 1 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 2 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 2 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 3 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 3 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 4 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 4 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 5 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 5 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 6 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 6 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 7 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 7 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 8 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 8 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 9 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 9 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 10 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 10 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 11 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 11 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 12 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 12 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 13 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 13 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 14 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 14 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 15 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 15 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 16 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 16 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 17 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 17 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 18 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 18 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 19 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 19 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 20 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 20 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 21 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 21 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 22 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 22 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 23 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 23 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 24 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 24 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 25 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 25 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 26 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 26 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 27 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 27 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 28 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 28 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 29 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 29 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 30 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 30 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 31 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 31 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 32 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 32 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 33 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 33 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 34 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 34 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 35 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 35 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 36 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 36 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 37 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 37 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 38 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 38 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 39 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 39 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 40 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 40 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 41 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 41 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 42 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 42 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 43 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 43 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 44 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 44 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 45 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 45 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 46 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 46 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 47 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 47 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 48 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 48 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 49 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 49 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 50 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 50 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 51 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 51 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 52 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 52 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 53 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 53 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 0 Ch 0 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 0 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 0 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 2 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 2 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 2 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 4 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 4 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 4 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 6 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 6 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 6 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 8 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 8 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 8 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 10 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 10 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 10 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 12 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 12 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 12 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 14 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 14 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 14 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 16 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 16 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 16 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 20 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 20 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 20 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 22 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 22 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 22 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 24 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 24 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 24 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 26 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 26 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 26 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 28 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 28 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 28 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 30 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 30 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 30 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 32 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 32 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 32 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 34 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 34 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 34 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 36 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 36 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 36 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 38 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 38 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 38 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 40 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 40 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 40 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 42 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 42 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 42 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 44 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 44 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 44 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 46 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 46 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 46 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 48 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 48 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 48 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 50 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 50 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 50 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 52 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 52 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 52 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Ch 0 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 0 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 0 Ch 0 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 Cathodic Gain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 0 TimeStamp Data Size: 3 (1 = TWO_WORDS, 2= THREE_WORDS, 3 = FOUR_WORDS) ==
+	== FEAST 1 PARAMETERS ==
+		== FEAST 1 VCPT: 1.135484 Volts =
+		== FEAST 1 VLNT Ch0-26: 1.612903 Volts =
+		== FEAST 1 VLNT Ch27-52: 1.612903 Volts =
+		== FEAST 1 VHPT: 1.706452 Volts =
+		== FEAST 1 VHNT: 1.596774 Volts =
+		== FEAST 1 Ch 0 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 0 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 1 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 1 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 2 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 2 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 3 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 3 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 4 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 4 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 5 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 5 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 6 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 6 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 7 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 7 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 8 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 8 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 9 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 9 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 10 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 10 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 11 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 11 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 12 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 12 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 13 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 13 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 14 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 14 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 15 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 15 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 16 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 16 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 17 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 17 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 18 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 18 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 19 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 19 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 20 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 20 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 21 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 21 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 22 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 22 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 23 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 23 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 24 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 24 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 25 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 25 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 26 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 26 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 27 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 27 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 28 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 28 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 29 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 29 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 30 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 30 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 31 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 31 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 32 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 32 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 33 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 33 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 34 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 34 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 35 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 35 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 36 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 36 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 37 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 37 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 38 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 38 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 39 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 39 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 40 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 40 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 41 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 41 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 42 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 42 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 43 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 43 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 44 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 44 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 45 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 45 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 46 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 46 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 47 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 47 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 48 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 48 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 49 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 49 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 50 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 50 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 51 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 51 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 52 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 52 MODE: 0 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 53 DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 53 MODE: 1 (0 = ANODIC, 1 = CATHODIC) ==
+		== FEAST 1 Ch 0 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 0 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 0 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 2 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 2 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 2 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 4 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 4 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 4 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 6 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 6 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 6 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 8 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 8 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 8 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 10 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 10 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 10 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 12 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 12 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 12 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 14 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 14 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 14 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 16 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 16 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 16 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 20 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 20 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 20 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 22 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 22 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 22 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 24 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 24 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 24 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 26 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 26 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 26 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 28 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 28 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 28 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 30 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 30 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 30 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 32 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 32 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 32 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 34 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 34 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 34 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 36 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 36 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 36 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 38 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 38 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 38 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 40 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 40 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 40 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 42 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 42 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 42 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 44 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 44 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 44 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 46 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 46 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 46 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 48 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 48 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 48 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 50 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 50 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 50 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 52 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 52 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 52 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Ch 0 (Anodic) TRIGGER_DISABLE: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 0 (Anodic) OFFSET: 0 (0 = FALSE, 1 = TRUE) ==
+		== FEAST 1 Ch 0 (Anodic) AnodicGain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 Cathodic Gain: 3 (0 = Gain_20, 1= Gain_40, 2 = Gain_60, 3 = Gain_80) ==
+		== FEAST 1 TimeStamp Data Size: 3 (1 = TWO_WORDS, 2= THREE_WORDS, 3 = FOUR_WORDS) ==
+== CALORIMETER FRONT-END BOARDS PARAMETERS ==
+	== CALO FEBs COMMON PARAMETERS ==
+   == CALO FEBs SAMPLING PERIOD: 0.390625 ns ==
+   == CALO FEBs POSTRIG: 125.000000 ns ==
+   == CALO FEBs NB OF COLUMNS TO READ: 64  (1 column = 16 Samples) ==
+	== CALO FEBs INDIVIDUAL PARAMETERS (PER BOARD) ==
+		== CALO FEB SLOT 2 PARAMETERS ==
+		== CALO FEB CONTROLLER FPGA FIRMWARE VERSION V15.7.9 ==
+		== CALO FEB FRONT-END FPGA FIRMWARE VERSION V15.7.9 ==
+		== CALO FEB: Front-End 0 SamBlock 0 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 0 SamBlock 0 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 0 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 0 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 0 SamBlock 0 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 0 SamBlock 0 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 0 SamBlock 0 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 0 SamBlock 0 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 0 SamBlock 0 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 0 SamBlock 0 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 0 SamBlock 0 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 0 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 0 SamBlock 0 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 0 SamBlock 0 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 0 SamBlock 0 CFD RATIO: 4 /16 ==
+		== CALO FEB: Front-End 0 SamBlock 1 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 0 SamBlock 1 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 0 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 0 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 0 SamBlock 1 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 0 SamBlock 1 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 0 SamBlock 1 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 0 SamBlock 1 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 0 SamBlock 1 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 0 SamBlock 1 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 0 SamBlock 1 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 0 SamBlock 1 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 0 SamBlock 1 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 0 SamBlock 1 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 0 SamBlock 1 CFD RATIO: 4 /16 ==
+		== CALO FEB: Front-End 1 SamBlock 0 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 1 SamBlock 0 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 1 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 1 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 1 SamBlock 0 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 0 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 0 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 0 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 1 SamBlock 0 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 1 SamBlock 0 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 1 SamBlock 0 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 0 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 1 SamBlock 0 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 1 SamBlock 0 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 1 SamBlock 0 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 0 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 1 SamBlock 0 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 1 SamBlock 0 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 1 SamBlock 0 CFD RATIO: 4 /16 ==
+		== CALO FEB: Front-End 1 SamBlock 1 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 1 SamBlock 1 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 1 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 1 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 1 SamBlock 1 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 1 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 1 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 1 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 1 SamBlock 1 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 1 SamBlock 1 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 1 SamBlock 1 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 1 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 1 SamBlock 1 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 1 SamBlock 1 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 1 SamBlock 1 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 1 SamBlock 1 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 1 SamBlock 1 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 1 SamBlock 1 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 1 SamBlock 1 CFD RATIO: 4 /16 ==
+		== CALO FEB: Front-End 2 SamBlock 0 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 2 SamBlock 0 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 2 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 2 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 2 SamBlock 0 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 0 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 0 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 0 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 2 SamBlock 0 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 2 SamBlock 0 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 2 SamBlock 0 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 0 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 2 SamBlock 0 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 2 SamBlock 0 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 2 SamBlock 0 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 0 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 2 SamBlock 0 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 2 SamBlock 0 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 2 SamBlock 0 CFD RATIO: 4 /16 ==
+		== CALO FEB: Front-End 2 SamBlock 1 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 2 SamBlock 1 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 2 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 2 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 2 SamBlock 1 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 1 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 1 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 1 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 2 SamBlock 1 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 2 SamBlock 1 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 2 SamBlock 1 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 1 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 2 SamBlock 1 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 2 SamBlock 1 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 2 SamBlock 1 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 2 SamBlock 1 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 2 SamBlock 1 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 2 SamBlock 1 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 2 SamBlock 1 CFD RATIO: 4 /16 ==
+		== CALO FEB: Front-End 3 SamBlock 0 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 3 SamBlock 0 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 3 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 3 SamBlock 0 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 3 SamBlock 0 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 0 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 0 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 0 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 3 SamBlock 0 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 3 SamBlock 0 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 3 SamBlock 0 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 0 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 3 SamBlock 0 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 3 SamBlock 0 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 3 SamBlock 0 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 0 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 3 SamBlock 0 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 3 SamBlock 0 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 3 SamBlock 0 CFD RATIO: 4 /16 ==
+		== CALO FEB: Front-End 3 SamBlock 1 LOW THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 3 SamBlock 1 HIGH THRESHOLD: -0.050000 ==
+		== CALO FEB: Front-End 3 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 3 SamBlock 1 OFFSET CH0: 0.000000 ==
+		== CALO FEB: Front-End 3 SamBlock 1 SAMBLOCK ENABLE: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 1 ENABLE TRIGGER CH0: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 1 ENABLE TRIGGER CH1: 1 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 1 TRIGGER EDGE CH0: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 3 SamBlock 1 TRIGGER EDGE CH1: 1 (0= Rising, 1 = Falling) ==
+		== CALO FEB: Front-End 3 SamBlock 1 REF CELL FOR CHARGE: 16 ==
+		== CALO FEB: Front-End 3 SamBlock 1 ENABLE DYNAMIC CHARGE: 16 (0= FALSE, 1 = TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 1 NB OF SAMPLES BEFORE PEAK (PRECHARGE): 64 ==
+		== CALO FEB: Front-End 3 SamBlock 1 CHARGE LENGTH (in Samples): 992 ==
+		== CALO FEB: Front-End 3 SamBlock 1 PEAK POLARITY: 1 (0 = positive, 1= negative) ==
+		== CALO FEB: Front-End 3 SamBlock 1 FORCE BASELINE: 0 (0 = FALSE, 1= TRUE) ==
+		== CALO FEB: Front-End 3 SamBlock 1 ENFORCED BASELINE VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 3 SamBlock 1 TIME EXTRACTION METHOD: 1 (0 = Fixed Threshold, 1= CFD) ==
+		== CALO FEB: Front-End 3 SamBlock 1 FIXED THRESHOLD VALUE: 0.000000 Volts ==
+		== CALO FEB: Front-End 3 SamBlock 1 CFD RATIO: 4 /16 ==

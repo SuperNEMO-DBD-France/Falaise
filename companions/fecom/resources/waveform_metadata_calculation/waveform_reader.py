@@ -68,7 +68,7 @@ for opt, arg in opts:
 
 # Default input file :
 if not filename:
-    filename = "Run_40.dat"
+    filename = "input_waveforms/Run_40.dat"
 input_file = filename
 filestream = open(input_file, 'r')
 
