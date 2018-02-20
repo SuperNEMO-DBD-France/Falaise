@@ -1,9 +1,5 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # produce_geiger_sd_modified_script_lyon.sh
-
-debug=1
-
-echo "Starting..." >&2
 
 function usage(){
 echo "--------------"
@@ -26,6 +22,8 @@ echo " "
 }
 
 #### ->MAIN<- #####
+debug=1
+echo "Starting..." >&2
 
 START_DATE=`date "+%Y-%m-%d"`
 RUN_NUMBER=UNDEFINED
@@ -80,71 +78,102 @@ SW_NAME="falaisedigitizationplugin-produce_geiger_sd_modified"
 INPUT_PATH="/sps/nemo/scratch/golivier/SD_data_MCC_1/"
 INPUT_DIR="${INPUT_PATH}/run_${RUN_NUMBER}/"
 
-OUTPUT_PATH="${SW_WORK_DIR}/Analysis/${MODIFICATION_MODE}/run_${UNIQUE_OUTPUT_ID}/"
-mkdir -p ${OUTPUT_PATH}
+OUTPUT_RUN_PATH="${SW_WORK_DIR}/Analysis/${MODIFICATION_MODE}/input_run_${RUN_NUMBER}/"
+stat ${OUTPUT_RUN_PATH}
 if [ $? -eq 1 ];
 then
-    echo "ERROR : mkdir ${OUTPUT_PATH} FAILED !"
-    exit 0
+    echo "INFO : ${OUTPUT_RUN_PATH} does not exist !"
+    echo "INFO : mkdir -p ${OUTPUT_RUN_PATH} !"
+    mkdir -p ${OUTPUT_RUN_PATH}
+    if [ $? -eq 1 ];
+    then
+	echo "ERROR : mkdir ${OUTPUT_RUN_PATH} FAILED !"
+	exit 0
+    fi
+fi
+
+OUTPUT_PATH="${OUTPUT_RUN_PATH}/run_${UNIQUE_OUTPUT_ID}/SD_brio"
+stat ${OUTPUT_PATH}
+if [ $? -eq 1 ];
+then
+    echo "INFO : ${OUTPUT_PATH} does not exist !"
+    echo "INFO : mkdir ${OUTPUT_PATH} !"
+    mkdir -p ${OUTPUT_PATH}
+    if [ $? -eq 1 ];
+    then
+	echo "ERROR : mkdir ${OUTPUT_PATH} FAILED !"
+	exit 0
+    fi
 fi
 
 DATABASE_FILE="${SW_WORK_DIR}/Analysis/database.db"
+stat $DATABASE_FILE
+if  [ $? -eq 1 ];
+then
+    echo "INFO :  ${DATABASE_FILE} does not exist !"
+    echo "INFO : touch ${DATABASE_FILE} !"
+    touch ${DATABASE_FILE}
+    if [ $? -eq 1 ];
+    then
+	echo "ERROR : touch ${DATABASE} FAILED !"
+	exit 0
+    fi
+fi
 
 # Fill database :
-echo "${START_DATE} run_${RUN_NUMBER} ${NUMBER_OF_INPUT_FILES} ${MODIFICATION_MODE} ${UNIQUE_OUTPUT_ID} ${TRIGGER_PROBABILITY}" >> ${DATABASE_FILE}
+echo "${START_DATE} input_run_${RUN_NUMBER} ${NUMBER_OF_INPUT_FILES} ${MODIFICATION_MODE} ${UNIQUE_OUTPUT_ID} ${TRIGGER_PROBABILITY}" >> ${DATABASE_FILE}
 
 LIST_OF_INPUT_FILES=UNDEFINED
 NUMBER_OF_EVENTS=UNDEFINED
 
-if [ ${NUMBER_OF_INPUT_FILES} -eq 1 ];
-then
-    LIST_OF_INPUT_FILES=`ls ${INPUT_DIR}/output_files.d/file_0.brio`
-    NUMBER_OF_EVENTS=250000
-elif [ ${NUMBER_OF_INPUT_FILES} -eq 2 ];
-then 
-    LIST_OF_INPUT_FILES=`ls ${INPUT_DIR}/output_files.d/file_0.brio ${INPUT_DIR}/output_files.d/file_1.brio`
-    NUMBER_OF_EVENTS=500000
-elif [ ${NUMBER_OF_INPUT_FILES} -eq 3 ];
-then
-    LIST_OF_INPUT_FILES=`ls ${INPUT_DIR}/output_files.d/file_0.brio ${INPUT_DIR}/output_files.d/file_1.brio ${INPUT_DIR}/output_files.d/file_2.brio` 
-    NUMBER_OF_EVENTS=750000
-elif [ ${NUMBER_OF_INPUT_FILES} -eq 4 ];
-then
-    LIST_OF_INPUT_FILES=`ls ${INPUT_DIR}/output_files.d/file_0.brio ${INPUT_DIR}/output_files.d/file_1.brio ${INPUT_DIR}/output_files.d/file_2.brio ${INPUT_DIR}/output_files.d/file_3.brio`
-    NUMBER_OF_EVENTS=1000000
-else
-    echo "ERROR : Invalid file number, abort script !"
-    exit 0
-fi
+LIST_OF_INPUT_FILES=`ls ${INPUT_DIR}/output_files.d/*.brio | grep ".brio" -m ${NUMBER_OF_INPUT_FILES}`
+echo "[INFO] : list of files : $LIST_OF_INPUT_FILES"
+NUMBER_OF_EVENTS=`echo "250000*${NUMBER_OF_INPUT_FILES}" | bc -l`
+echo "[INFO] : nb of event : $NUMBER_OF_EVENTS"
+
+WORKER_OUTPUT_DIR=${TMPDIR}/
 
 echo "INPUT_DIR=" ${INPUT_DIR}
 echo "LIST_OF_INPUT_FILES=" ${LIST_OF_INPUT_FILES}
 echo "NUMBER_OF_EVENTS=" ${NUMBER_OF_EVENTS}
 echo "SW=" ${SW_PATH}/${SW_NAME}
 echo "OUTPUT_PATH=" ${OUTPUT_PATH}
-
-OUTPUT_FILENAME="modified_SD.brio"
-OUTPUT_FILE=${OUTPUT_PATH}/${OUTPUT_FILENAME}
-
-echo "${SW_PATH}/${SW_NAME} -i ${LIST_OF_INPUT_FILES} -o ${OUTPUT_PATH} -n ${NUMBER_OF_EVENTS} -m ${MODIFICATION_MODE} -p ${TRIGGER_PROBABILITY}"
-echo ""
-
-echo "***********"
-echo "WORKER ARCHITECTURE LOG"
-echo "***********"
-uname -a
-getconf LONG_BIT
-grep flags /proc/cpuinfo
-echo ""
+echo "WORKER_OUTPUT_DIR=" ${WORKER_OUTPUT_DIR}
 
 
-echo "***********"
-echo "LDD" 
-echo "***********"
-ldd ${SW_PATH}/${SW_NAME}
-echo ""
-echo ""
+# echo "***********"
+# echo "WORKER ARCHITECTURE LOG"
+# echo "***********"
+# uname -a
+# getconf LONG_BIT
+# grep flags /proc/cpuinfo
+# echo ""
 
 
-${SW_PATH}/${SW_NAME} -i ${LIST_OF_INPUT_FILES} -o ${OUTPUT_PATH} -n ${NUMBER_OF_EVENTS} -m ${MODIFICATION_MODE} -p ${TRIGGER_PROBABILITY}
+# echo "***********"
+# echo "LDD" 
+# echo "***********"
+# ldd ${SW_PATH}/${SW_NAME}
+# echo ""
+# echo ""
+
+echo "[CMD] : ${SW_PATH}/${SW_NAME} -i ${LIST_OF_INPUT_FILES} -o ${WORKER_OUTPUT_DIR} -n ${NUMBER_OF_EVENTS} -m ${MODIFICATION_MODE} -p ${TRIGGER_PROBABILITY}"
+
+${SW_PATH}/${SW_NAME} -i ${LIST_OF_INPUT_FILES} -o ${WORKER_OUTPUT_DIR} -n ${NUMBER_OF_EVENTS} -m ${MODIFICATION_MODE} -p ${TRIGGER_PROBABILITY}
+
+
+WORKER_LIST_OF_FILES=`ls ${WORKER_OUTPUT_DIR}/*.brio`
+
+# Copy file from worker to /sps/ 
+for file in ${WORKER_LIST_OF_FILES}
+do
+    echo "File in dir ${WORKER_OUTPUT_DIR}   : " ${file}
+    scp ${file} ${OUTPUT_PATH}
+    if  [ $? -eq 1 ];
+    then
+	echo "ERROR : scp ${file} ${OUTPUT_PATH} failed !"
+    fi 
+done
+
+
 

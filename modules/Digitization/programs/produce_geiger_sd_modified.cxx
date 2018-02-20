@@ -157,6 +157,21 @@ int main( int  argc_ , char **argv_  )
     std::clog << "max_record total = " << max_record_total << std::endl;
     std::clog << "max_events       = " << max_events << std::endl;
 
+    // SD with neighbourg trigger GG cells :
+    std::string modif_sd_filename_prefix = "modified_SD_";
+    dpp::output_module modif_sd_writer;
+    datatools::properties modif_sd_config;
+    modif_sd_config.store("logging.priority", "debug");
+    modif_sd_config.store("max_record_per_file", 100000);
+    modif_sd_config.store("files.mode", "incremental");
+    modif_sd_config.store("files.incremental.path", output_path);
+    modif_sd_config.store ("files.incremental.prefix", "modified_SD_");
+    modif_sd_config.store ("files.incremental.extension", ".brio");
+    modif_sd_config.store ("files.incremental.start", 0);
+    modif_sd_config.store ("files.incremental.increment", 1);
+    modif_sd_config.store ("files.incremental.stop", 1000);
+    modif_sd_writer.initialize_standalone(modif_sd_config);
+    
     // Event reader :
     dpp::input_module reader;
     datatools::properties reader_config;
@@ -168,15 +183,6 @@ int main( int  argc_ , char **argv_  )
     reader_config.tree_dump(std::clog, "Input module configuration parameters: ");
     reader.initialize_standalone(reader_config);
     reader.tree_dump(std::clog, "Simulated data reader module");
-
-    // SD with neighbourg trigger GG cells :
-    std::string modif_sd_filename = output_path + "modified_SD.brio";
-    dpp::output_module modif_sd_writer;
-    datatools::properties modif_sd_config;
-    modif_sd_config.store("logging.priority", "debug");
-    modif_sd_config.store("files.mode", "single");
-    modif_sd_config.store("files.single.filename", modif_sd_filename);
-    modif_sd_writer.initialize_standalone(modif_sd_config);
 
     int psd_count = 0; // Event counter
 

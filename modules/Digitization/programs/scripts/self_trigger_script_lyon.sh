@@ -96,5 +96,4 @@ then
     echo "ERROR : copy ${TRIGGER_CONFIG} into ${ST_OUTPUT_PATH/} FAILED !"
     exit 0
 fi
-
 ${SW_PATH}/${TRIGGER_SW_NAME} -i ${ST_OUTPUT_FILE} -c ${TRIGGER_CONFIG} -o ${ST_OUTPUT_PATH}

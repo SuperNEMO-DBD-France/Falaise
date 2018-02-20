@@ -62,8 +62,6 @@ echo "INPUT_FILE=" ${INPUT_FILE}
 echo "NUMBER_OF_EVENTS=" ${NUMBER_OF_EVENTS}
 
 SW_PATH="${SW_WORK_DIR}/Falaise/build/BuildProducts/bin/"
-
-##### Self Trigger (ST) part #####
 SW_NAME="falaisedigitizationplugin-trigger_program"
 
 OUTPUT_PATH="${SW_WORK_DIR}/Analysis/trigger_efficiency/run_${run_number}/"

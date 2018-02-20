@@ -357,7 +357,16 @@ int main( int  argc_ , char **argv_  )
     ft_config.store ("files.mode", "single");
     ft_config.store ("files.single.filename", fake_trigger_filename);
     ft_writer.initialize_standalone (ft_config);
-
+    
+    // No real trigger but FT writer
+    std::string ft_no_rt_filename = output_path + "ft_no_rt_SD.brio"; // rt : real trigger
+    dpp::output_module ft_no_rt_writer;
+    datatools::properties ft_no_rt_config;
+    ft_no_rt_config.store ("logging.priority", "debug");
+    ft_no_rt_config.store ("files.mode", "single");
+    ft_no_rt_config.store ("files.single.filename", ft_no_rt_filename);
+    ft_no_rt_writer.initialize_standalone (ft_no_rt_config);
+    
     // Caraco trigger writer
     std::string caraco_trigger_filename = output_path + "caraco_trigger_SD.brio";
     dpp::output_module caraco_writer;
@@ -380,6 +389,7 @@ int main( int  argc_ , char **argv_  )
     std::size_t total_number_of_events = 0;
     std::size_t total_number_of_fake_trigger_events = 0;
     std::size_t total_number_of_fake_delayed_trigger_events = 0;
+    std::size_t total_number_of_fake_trigger_no_real_trigger_events = 0;
     std::size_t total_number_of_real_trigger_events = 0;
     std::size_t total_number_of_caraco_trigger_events = 0;
     std::size_t total_number_of_delayed_trigger_events = 0;
@@ -575,11 +585,12 @@ int main( int  argc_ , char **argv_  )
 	    //   coincidence_collection_records[i].display();
 	    // }
 	    std::size_t total_number_of_calo_hits = number_of_main_calo_hits + number_of_xwall_calo_hits;
-
+	    bool ft_passed = false;
 	    if (total_number_of_calo_hits >= 1 && number_of_geiger_hits >= 3)
 	      {
 		ft_writer.process(ER);
 		total_number_of_fake_trigger_events++;
+		ft_passed = true;
 	      }
 	    if (caraco_decision && has_delayed_geiger)
 	      {
@@ -604,6 +615,12 @@ int main( int  argc_ , char **argv_  )
 	      }
 
 	    if (real_trigger_decision) total_number_of_real_trigger_events++;
+
+	    if (ft_passed && !real_trigger_decision) 
+	      {
+		ft_no_rt_writer.process(ER);
+		total_number_of_fake_trigger_no_real_trigger_events++;
+	      }
 
 	    DT_LOG_INFORMATION(logging, "Number of L2 decision : " << number_of_L2_decision);
 	    DT_LOG_INFORMATION(logging, "CARACO decision :       " << caraco_decision);
@@ -634,6 +651,7 @@ int main( int  argc_ , char **argv_  )
     statstream << "Total number of events : " << total_number_of_events << std::endl;
     statstream << "Total number of fake trigger events : " << total_number_of_fake_trigger_events << std::endl;
     statstream << "Total number of fake trigger delayed events : " << total_number_of_fake_delayed_trigger_events << std::endl;
+    statstream << "Total number of fake trigger no real trigger events : " << total_number_of_fake_trigger_no_real_trigger_events << std::endl;
     statstream << "Total number of real trigger events : " << total_number_of_real_trigger_events << std::endl;
     statstream << "Total number of caraco trigger events : " << total_number_of_caraco_trigger_events << std::endl;
     statstream << "Total number of delayed trigger events : " << total_number_of_delayed_trigger_events << std::endl;
