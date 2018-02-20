@@ -221,14 +221,21 @@ int main( int  argc_ , char **argv_  )
     my_manager.get_mapping().compute_matching_geom_id(geiger_gid_pattern,
 						      collection_of_geiger_gid);
 
+    std::clog << "DEBUG 0 : before generate pool of GG spurious " << std::endl;
     generate_pool_of_geiger_spurious_signals(&random_generator,
 					     st_config,
 					     collection_of_geiger_gid,
 					     calo_tracker_spurious_signals);
+    
+    std::clog << "DEBUG 1 : after generate pool of GG spurious " << std::endl;
+    
+    std::clog << "DEBUG 2 : size of generate pool of GG spurious " << calo_tracker_spurious_signals.get_geiger_signals().size() << std::endl;
 
     std::sort(calo_tracker_spurious_signals.grab_geiger_signals().begin(),
 	      calo_tracker_spurious_signals.grab_geiger_signals().end(),
 	      snemo::digitization::geiger_signal::compare_handle_by_timestamp());
+
+    std::clog << "DEBUG 3 : after sort pool of GG spurious " << std::endl;
 
     std::clog << "Total number of spurious calo signals  : " << calo_tracker_spurious_signals.get_number_of_calo_signals() << std::endl;
     std::clog << "Main wall number of spurious signals   : " << calo_tracker_spurious_signals.get_number_of_main_calo_signals() << std::endl;
@@ -278,8 +285,6 @@ int main( int  argc_ , char **argv_  )
     //   {
     // 	//temp_signals.get_geiger_signals()[igeiger].get().tree_dump(std::clog, "A geiger signal #" + std::to_string(igeiger));
     //   }
-
-
 
 
 
@@ -551,8 +556,12 @@ void generate_pool_of_geiger_spurious_signals(mygsl::rng * rdm_gen_,
     retrigger_probability = config_.fetch_real("geiger.retrigger_probability");
   }
 
+  std::clog << "Time interval = " << time_interval << " GG ST freq = " << geiger_self_triggering_frequency << " GG cell_dead_time = " << cell_dead_time << " GG retrigger_probability = " << retrigger_probability << std::endl;
+
+  std::clog << "GID collection size = " << gid_collection_.size() << std::endl;
+
   // Create spurious hits during a time interval for each geiger cell thanks to GID :
-  for (std::size_t i = 0; i < 1; i++) //gid_collection_.size(); i++)
+  for (std::size_t i = 0; i < gid_collection_.size(); i++)
     {
       double mean_number = time_interval * geiger_self_triggering_frequency;
       double sigma_gauss = std::sqrt(mean_number);
@@ -571,7 +580,6 @@ void generate_pool_of_geiger_spurious_signals(mygsl::rng * rdm_gen_,
         distrib = "poisson";
       }
 
-
       const geomtools::geom_id actual_gid = gid_collection_[i];
 
       // We have to generate 'number_of_geiger_hit' of the same cell in the time [0:time_interval]
@@ -583,7 +591,7 @@ void generate_pool_of_geiger_spurious_signals(mygsl::rng * rdm_gen_,
 
       double time_interval_limit = number_of_geiger_hit * cell_dead_time;
       double time_max = time_interval - time_interval_limit;
-      std::clog << "Time interval = " << time_interval << " Time int lim = " << time_interval_limit << " tmax = " << time_max << " Freq = " << geiger_self_triggering_frequency << " Mean = " << mean_number << " GG hits = " << number_of_geiger_hit << std::endl;
+      // std::clog << "Time interval = " << time_interval << " Time int lim = " << time_interval_limit << " tmax = " << time_max << " Freq = " << geiger_self_triggering_frequency << " Mean = " << mean_number << " GG hits = " << number_of_geiger_hit << std::endl;
       bool particular_case = false;
       if (time_max <= 0) {
 	// Particular case, high frequency / low dead_time or time interval too small
@@ -639,10 +647,10 @@ void generate_pool_of_geiger_spurious_signals(mygsl::rng * rdm_gen_,
 	    if (retrigger_rdm < retrigger_probability) is_retrigger = true;
 	    if (is_retrigger) {
 	      double retrigger_anodic_time = anodic_time + cell_dead_time;
-	      std::clog << "retrigger_rdm = " << retrigger_rdm << " retrigger_probability = " << retrigger_probability << " Anodic time = " << anodic_time << " Retrigger anodic time " << retrigger_anodic_time << std::endl;
+	      // std::clog << "retrigger_rdm = " << retrigger_rdm << " retrigger_probability = " << retrigger_probability << " Anodic time = " << anodic_time << " Retrigger anodic time " << retrigger_anodic_time << std::endl;
 
 	      // Add signal for retrigger hit
-	      std::clog << "Anodic time = " << anodic_time << std::endl;
+	      // std::clog << "Anodic time = " << anodic_time << std::endl;
 	      snemo::digitization::geiger_signal & a_gs = calo_tracker_spurious_signals_.add_geiger_signal();
 	      a_gs.set_header(hit_count, actual_gid);
 	      a_gs.set_data(retrigger_anodic_time);
