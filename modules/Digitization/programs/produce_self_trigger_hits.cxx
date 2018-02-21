@@ -265,15 +265,15 @@ int main( int  argc_ , char **argv_  )
     // 	temp_signals.get_geiger_signals()[igeiger].get().tree_dump(std::clog, "A geiger signal #" + std::to_string(igeiger));
     //   }
 
-    std::ofstream ggtimestream;
-    std::string gg_time_filename = output_path + "anode_timestamp.dat";
-    ggtimestream.open(gg_time_filename);
+    // std::ofstream ggtimestream;
+    // std::string gg_time_filename = output_path + "anode_timestamp.dat";
+    // ggtimestream.open(gg_time_filename);
 
-    for (std::size_t igeiger = 0; igeiger < calo_tracker_spurious_signals.get_number_of_geiger_signals(); igeiger++)
-      {
-	ggtimestream << igeiger << ' ' << calo_tracker_spurious_signals.get_geiger_signals()[igeiger].get().get_anode_avalanche_time() / CLHEP::second << std::endl;
-      }
-    ggtimestream.close();
+    // for (std::size_t igeiger = 0; igeiger < calo_tracker_spurious_signals.get_number_of_geiger_signals(); igeiger++)
+    //   {
+    // 	ggtimestream << igeiger << ' ' << calo_tracker_spurious_signals.get_geiger_signals()[igeiger].get().get_anode_avalanche_time() / CLHEP::second << std::endl;
+    //   }
+    // ggtimestream.close();
 
 
     // for (std::size_t icalo = temp_signals.get_calo_signals().size() - 1; icalo >= temp_signals.get_calo_signals().size() - 10; icalo--)
@@ -628,7 +628,7 @@ void generate_pool_of_geiger_spurious_signals(mygsl::rng * rdm_gen_,
 	  bool is_in_dead_time = false;
 	  if (anodic_time < last_anodic_time + cell_dead_time) {
 	    is_in_dead_time = true;
-	    std::clog << "In dead time, anodic time = " << anodic_time << " Last anodic time = " << last_anodic_time << " is in dt " << is_in_dead_time << std::endl;
+	    // std::clog << "In dead time, anodic time = " << anodic_time << " Last anodic time = " << last_anodic_time << " is in dt " << is_in_dead_time << std::endl;
 	  }
 
 	  if (!is_in_dead_time) {

@@ -145,8 +145,8 @@ if  [ $? -eq 1 ];
 then
     echo "ERROR : scp ${WORKER_OUTPUT_DIR}/*self* ${OUTPUT_DATA_DIR} failed !"
 fi 
-scp -r ${WORKER_OUTPUT_DIR}/anode_timestamp.dat ${OUTPUT_DATA_DIR}
-if  [ $? -eq 1 ];
-then
-    echo "ERROR : scp ${WORKER_OUTPUT_DIR}/anode_timestamp.dat ${OUTPUT_DATA_DIR} failed !"
-fi 
+# scp -r ${WORKER_OUTPUT_DIR}/anode_timestamp.dat ${OUTPUT_DATA_DIR}
+# if  [ $? -eq 1 ];
+# then
+#     echo "ERROR : scp ${WORKER_OUTPUT_DIR}/anode_timestamp.dat ${OUTPUT_DATA_DIR} failed !"
+# fi 
