@@ -10,6 +10,7 @@ set(FalaiseDigitizationPlugin_PROGRAMS
   # sd_physical_cuts.cxx
 
   produce_self_trigger_hits.cxx
+  produce_self_trigger_SD.cxx
   produce_geiger_sd_modified.cxx
   trigger_board_implementation.cxx
   trigger_program.cxx

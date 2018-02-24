@@ -156,7 +156,7 @@ int main( int  argc_ , char **argv_  )
 
     // Convert part 0 into any (*)
     for (std::size_t i = 0; i < collection_of_main_wall_gid.size(); i++) {
-      collection_of_main_wall_gid[i].set_any(5);
+      collection_of_main_wall_gid[i].set_any(4);
     }
 
     // Select calo xwall GID :
@@ -226,9 +226,9 @@ int main( int  argc_ , char **argv_  )
 					     st_config,
 					     collection_of_geiger_gid,
 					     calo_tracker_spurious_signals);
-    
+
     std::clog << "DEBUG 1 : after generate pool of GG spurious " << std::endl;
-    
+
     std::clog << "DEBUG 2 : size of generate pool of GG spurious " << calo_tracker_spurious_signals.get_geiger_signals().size() << std::endl;
 
     std::sort(calo_tracker_spurious_signals.grab_geiger_signals().begin(),
