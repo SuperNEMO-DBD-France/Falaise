@@ -34,9 +34,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/program_options.hpp>
 
-// This project
-// #include <snemo/digitization/signal_data.h>
-
 
 void generate_pool_of_calo_spurious_SD(mygsl::rng * rdm_gen_,
 				       const snemo::geometry::calo_locator & CL_,
@@ -60,6 +57,7 @@ int main( int  argc_ , char **argv_  )
     bool is_display = false;
     std::string output_path = "";
     std::string config_file = "";
+    std::string event_builder_mode = "";
 
     // Parse options:
     namespace po = boost::program_options;
@@ -73,6 +71,9 @@ int main( int  argc_ , char **argv_  )
       ("config,c",
        po::value<std::string>(& config_file),
        "set the self trigger config file to produce self trigger events")
+      ("mode,m",
+       po::value<std::string>(& event_builder_mode),
+       "set the mode to build self trigger events. Mode 'sliding_window' (default) or mode 'single_event' ")
       ; // end of options description
 
     // Describe command line arguments :
@@ -103,6 +104,9 @@ int main( int  argc_ , char **argv_  )
     datatools::fetch_path_with_env(config_file);
     datatools::properties self_trigger_config;
     datatools::properties::read_config(config_file, self_trigger_config);
+
+    // Default event mode :
+    if (event_builder_mode.empty()) event_builder_mode = "sliding_window";
 
     std::clog << "Program to add calo / tracker self trigger hit to 'SD' !" << std::endl;
 
@@ -225,131 +229,154 @@ int main( int  argc_ , char **argv_  )
 		return bsha.get_time_start() < bshb.get_time_start();
 	      });
 
-    /*************************************************/
-    // Event builder and writing into brio file part :
-    /*************************************************/
-
-    /*   Strategy to build events :
-	 <-----> event window (fix)
-	 |     |
-	 -x--x---x---x--x-----x-----x--x---x-------> time     (x : calo | tracker hits)
-	 |     |
-	 tstart  tstop    step = 1600ns (lowest step in the trigger)
-    */
-
-    // Store events with a step of 1.6us and an event window given by the conf file
-    double time_interval;
-    double event_window; // = 100 * CLHEP::microsecond; // us : window tunable
-    double event_stepper = 1.6 * CLHEP::microsecond;
     std::size_t event_counter = 0;
-    datatools::invalidate(time_interval);
-    datatools::invalidate(event_window);
+    if (event_builder_mode == "single_event") {
 
-    if (self_trigger_config.has_key("time_interval")) {
-      time_interval = self_trigger_config.fetch_real("time_interval");
-    }
-    if (self_trigger_config.has_key("event_window_integration")) {
-      event_window = self_trigger_config.fetch_real("event_window_integration");
-    }
+      datatools::things ER;
+      mctools::simulated_data * ptr_simu_data = 0;
+      ptr_simu_data = &(ER.add<mctools::simulated_data>(SD_bank_label));
+      mctools::simulated_data & self_trigger_SD = *ptr_simu_data;
+      self_trigger_SD.add_step_hits("calo", 2000);
+      self_trigger_SD.add_step_hits("xcalo", 2000);
+      self_trigger_SD.add_step_hits("gg", 2000);
 
-    std::clog << "Time interval (in s) " << time_interval / CLHEP::second << std::endl;
-    std::clog << "Event window (in us) " << event_window / CLHEP::microsecond << std::endl;
-    std::clog << "Event stepper (in us) " << event_stepper / CLHEP::microsecond << std::endl;
-    for (unsigned int event_tstart = 0 * CLHEP::microsecond; event_tstart < time_interval; event_tstart += event_stepper)
-      {
-	// Prepare new SD bank to add to the datatools::things ER (Event Record)
-	datatools::things ER;
-	mctools::simulated_data * ptr_simu_data = 0;
-	ptr_simu_data = &(ER.add<mctools::simulated_data>(SD_bank_label));
-	mctools::simulated_data & self_trigger_SD = *ptr_simu_data;
-	// self_trigger_SD.add_step_hits("calo", 200);
-	// self_trigger_SD.add_step_hits("xcalo", 200);
-	// self_trigger_SD.add_step_hits("gg", 500);
-	unsigned int event_tstop = event_tstart + event_window;
-	if (is_display) std::clog << "Event_tstart = " << event_tstart << " Event_tstop " << event_tstop << std::endl;
-
-	// Add calo step hit in current event
-	int first_calo_position = -1;
-	bool first_calo_found = false;
-	int last_calo_position = -1;
-	bool last_calo_found = false;
-	for (unsigned int i = 0; i < calo_tracker_spurious_pool.size(); i++)
-	  {
-	    if (first_calo_found == false && calo_tracker_spurious_pool[i].get_time_start() >= event_tstart) {
-	      first_calo_position = i;
-	      first_calo_found = true;
-	    }
-	    if (last_calo_found == false && calo_tracker_spurious_pool[i].get_time_start() >= event_tstop) {
-	      last_calo_position = i - 1;
-	      last_calo_found = true;
-	    }
-	    if (first_calo_found && last_calo_found) break;
-	  }
-
-	if (first_calo_position != -1 && last_calo_position != -1) {
-	  for (int icalo = first_calo_position; icalo <= last_calo_position; icalo++)
+      for (std::size_t i = 0; i < calo_tracker_spurious_pool.size(); i++)
+	{
+	  if (calo_tracker_spurious_pool[i].get_geom_id().get_type() == 1204)
 	    {
-	      if (calo_tracker_spurious_pool[icalo].get_geom_id().get_type() == 1302)
-		{
-		  self_trigger_SD.add_step_hits("calo", 20);
-		  self_trigger_SD.add_step_hit("calo") = calo_tracker_spurious_pool[icalo];
-		}
-	      else if (calo_tracker_spurious_pool[icalo].get_geom_id().get_type() == 1232)
-		{
-		  self_trigger_SD.add_step_hits("xcalo", 20);
-		  self_trigger_SD.add_step_hit("xcalo") = calo_tracker_spurious_pool[icalo];
-		}
+	      self_trigger_SD.add_step_hit("gg") = calo_tracker_spurious_pool[i];
+	    }
+	  if (calo_tracker_spurious_pool[i].get_geom_id().get_type() == 1302)
+	    {
+	      self_trigger_SD.add_step_hit("calo") = calo_tracker_spurious_pool[i];
+	    }
+	  if (calo_tracker_spurious_pool[i].get_geom_id().get_type() == 1232)
+	    {
+	      self_trigger_SD.add_step_hit("xcalo") = calo_tracker_spurious_pool[i];
 	    }
 	}
 
-	// Add tracker step hit in current event
-	int first_geiger_position = -1;
-	bool first_geiger_found = false;
-	int last_geiger_position = -1;
-	bool last_geiger_found = false;
-	for (unsigned int i = 0; i < calo_tracker_spurious_pool.size(); i++)
-	  {
-	    if (first_geiger_found == false && calo_tracker_spurious_pool[i].get_time_start() >= event_tstart) {
-	      first_geiger_position = i;
-	      first_geiger_found = true;
-	    }
-	    if (last_geiger_found == false &&  calo_tracker_spurious_pool[i].get_time_start() >= event_tstop) {
-	      last_geiger_position = i - 1;
-	      last_geiger_found = true;
-	    }
-	    if (first_geiger_found && last_geiger_found) break;
-	  }
-
-	if (first_geiger_position != -1 && last_geiger_position != -1) {
-	  for (int igeiger = first_geiger_position; igeiger <= last_geiger_position; igeiger++)
-	    {
-	      if (calo_tracker_spurious_pool[igeiger].get_geom_id().get_type() == 1204)
-		{
-		  self_trigger_SD.add_step_hits("gg", 20);
-		  self_trigger_SD.add_step_hit("gg") = calo_tracker_spurious_pool[igeiger];
-		}
-	    }
+      if (self_trigger_SD.has_step_hits("calo") || self_trigger_SD.has_step_hits("xcalo") || self_trigger_SD.has_step_hits("gg"))
+	{
+	  self_trigger_SD_writer.process(ER);
+	  // self_trigger_SD.tree_dump();
+	  event_counter++;
 	}
+    }
 
-	// ER.tree_dump();
-	// std::size_t number_of_calo_in_event = event_signals.get_calo_signals().size();
-	// std::size_t number_of_geiger_in_event = event_signals.get_geiger_signals().size();
+    else if (event_builder_mode == "sliding_window") {
+      /*************************************************/
+      // Event builder and writing into brio file part :
+      /*************************************************/
 
-	if (self_trigger_SD.has_step_hits("calo") || self_trigger_SD.has_step_hits("xcalo") || self_trigger_SD.has_step_hits("gg"))
-	  {
-	    self_trigger_SD_writer.process(ER);
-	    // self_trigger_SD.tree_dump();
-	    event_counter++;
-	  }
+      /*   Strategy to build events :
+	   <-----> event window (fix)
+	   |     |
+	   -x--x---x---x--x-----x-----x--x---x-------> time     (x : calo | tracker hits)
+	   |     |
+	   tstart  tstop    step = 1600ns (lowest step in the trigger)
+      */
+
+      // Store events with a step of 1.6us and an event window given by the conf file
+      double time_interval;
+      double event_window; // = 100 * CLHEP::microsecond; // us : window tunable
+      double event_stepper = 1.6 * CLHEP::microsecond;
+      datatools::invalidate(time_interval);
+      datatools::invalidate(event_window);
+
+      if (self_trigger_config.has_key("time_interval")) {
+	time_interval = self_trigger_config.fetch_real("time_interval");
+      }
+      if (self_trigger_config.has_key("event_window_integration")) {
+	event_window = self_trigger_config.fetch_real("event_window_integration");
       }
 
+      std::clog << "Time interval (in s) " << time_interval / CLHEP::second << std::endl;
+      std::clog << "Event window (in us) " << event_window / CLHEP::microsecond << std::endl;
+      std::clog << "Event stepper (in us) " << event_stepper / CLHEP::microsecond << std::endl;
+      for (unsigned int event_tstart = 0 * CLHEP::microsecond; event_tstart < time_interval; event_tstart += event_stepper)
+	{
+	  // Prepare new SD bank to add to the datatools::things ER (Event Record)
+	  datatools::things ER;
+	  mctools::simulated_data * ptr_simu_data = 0;
+	  ptr_simu_data = &(ER.add<mctools::simulated_data>(SD_bank_label));
+	  mctools::simulated_data & self_trigger_SD = *ptr_simu_data;
+	  unsigned int event_tstop = event_tstart + event_window;
+	  if (is_display) std::clog << "Event_tstart = " << event_tstart << " Event_tstop " << event_tstop << std::endl;
+
+	  // Add calo step hit in current event
+	  int first_calo_position = -1;
+	  bool first_calo_found = false;
+	  int last_calo_position = -1;
+	  bool last_calo_found = false;
+	  for (unsigned int i = 0; i < calo_tracker_spurious_pool.size(); i++)
+	    {
+	      if (first_calo_found == false && calo_tracker_spurious_pool[i].get_time_start() >= event_tstart) {
+		first_calo_position = i;
+		first_calo_found = true;
+	      }
+	      if (last_calo_found == false && calo_tracker_spurious_pool[i].get_time_start() >= event_tstop) {
+		last_calo_position = i - 1;
+		last_calo_found = true;
+	      }
+	      if (first_calo_found && last_calo_found) break;
+	    }
+
+	  if (first_calo_position != -1 && last_calo_position != -1) {
+	    for (int icalo = first_calo_position; icalo <= last_calo_position; icalo++)
+	      {
+		if (calo_tracker_spurious_pool[icalo].get_geom_id().get_type() == 1302)
+		  {
+		    self_trigger_SD.add_step_hits("calo", 20);
+		    self_trigger_SD.add_step_hit("calo") = calo_tracker_spurious_pool[icalo];
+		  }
+		else if (calo_tracker_spurious_pool[icalo].get_geom_id().get_type() == 1232)
+		  {
+		    self_trigger_SD.add_step_hits("xcalo", 20);
+		    self_trigger_SD.add_step_hit("xcalo") = calo_tracker_spurious_pool[icalo];
+		  }
+	      }
+	  }
+
+	  // Add tracker step hit in current event
+	  int first_geiger_position = -1;
+	  bool first_geiger_found = false;
+	  int last_geiger_position = -1;
+	  bool last_geiger_found = false;
+	  for (unsigned int i = 0; i < calo_tracker_spurious_pool.size(); i++)
+	    {
+	      if (first_geiger_found == false && calo_tracker_spurious_pool[i].get_time_start() >= event_tstart) {
+		first_geiger_position = i;
+		first_geiger_found = true;
+	      }
+	      if (last_geiger_found == false &&  calo_tracker_spurious_pool[i].get_time_start() >= event_tstop) {
+		last_geiger_position = i - 1;
+		last_geiger_found = true;
+	      }
+	      if (first_geiger_found && last_geiger_found) break;
+	    }
+
+	  if (first_geiger_position != -1 && last_geiger_position != -1) {
+	    for (int igeiger = first_geiger_position; igeiger <= last_geiger_position; igeiger++)
+	      {
+		if (calo_tracker_spurious_pool[igeiger].get_geom_id().get_type() == 1204)
+		  {
+		    self_trigger_SD.add_step_hits("gg", 20);
+		    self_trigger_SD.add_step_hit("gg") = calo_tracker_spurious_pool[igeiger];
+		  }
+	      }
+	  }
+
+	  if (self_trigger_SD.has_step_hits("calo") || self_trigger_SD.has_step_hits("xcalo") || self_trigger_SD.has_step_hits("gg"))
+	    {
+	      self_trigger_SD_writer.process(ER);
+	      // self_trigger_SD.tree_dump();
+	      event_counter++;
+	    }
+	}
+    }
 
     std::clog << "Number of events = " << event_counter << std::endl;
-
-
-    if (is_display) std::clog << "DISPLAY : :o" << std::endl;
-
-
     std::clog << "The end." << std::endl;
   }
 
