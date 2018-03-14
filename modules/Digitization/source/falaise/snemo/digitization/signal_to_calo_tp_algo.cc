@@ -79,14 +79,6 @@ namespace snemo {
       DT_THROW_IF(!is_initialized(), std::logic_error, "SD to calo TP algorithm is not initialized ! ");
 
       std::size_t number_of_hits = signal_data_.get_calo_signals().size();
-      double time_min_event = signal_data_.get_calo_signals()[0].get().get_signal_time();
-      for (std::size_t i = 0; i < number_of_hits; i++)
-	{
-	  if (signal_data_.get_calo_signals()[i].get().get_signal_time() < time_min_event)
-	    {
-	      time_min_event = signal_data_.get_calo_signals()[0].get().get_signal_time();
-	    }
-	}
 
       for (std::size_t i = 0; i < number_of_hits; i++)
 	{
@@ -106,33 +98,34 @@ namespace snemo {
 	      electronic_id.set_type(electronic_type);
 	      temporary_electronic_id.extract_to(electronic_id);
 
-	      bool calo_xt_bit    = 0; // These bits have to be checked
+	      // These bits have to be checked
+	      bool calo_xt_bit    = 0;
 	      bool calo_spare_bit = 0;
 
 	      bool existing = false;
 	      unsigned int existing_index = 0;
 
-	      // double relative_time             = a_calo_signal.get_signal_time() - time_min_event; // before, to check if this deletion has no influence on trigger programs
 	      uint32_t a_calo_signal_clocktick = _clocktick_ref_ + clock_utils::CALO_FEB_SHIFT_CLOCKTICK_NUMBER;
 
-	      // Calo signal in another CT25
-	      if (a_calo_signal.get_signal_time() > 25) // 25 in nanosecond, other CT 25, increment
+	      // Compute calo signal CT25
+	      if (a_calo_signal.get_signal_time() > 25) // nanseconds
 		{
 		  a_calo_signal_clocktick += static_cast<uint32_t>(a_calo_signal.get_signal_time()) / 25;
 		}
 
 	      for (unsigned int j = 0; j < my_calo_tp_data_.get_calo_tps().size(); j++)
-		{
-		  if (my_calo_tp_data_.get_calo_tps()[j].get().get_geom_id() == electronic_id
-		      && my_calo_tp_data_.get_calo_tps()[j].get().get_clocktick_25ns() == a_calo_signal_clocktick )
-		    {
-		      existing = true;
-		      existing_index = j;
-		    }
-		}
+	      	{
+	      	  if (my_calo_tp_data_.get_calo_tps()[j].get().get_geom_id() == electronic_id
+	      	      && my_calo_tp_data_.get_calo_tps()[j].get().get_clocktick_25ns() == a_calo_signal_clocktick )
+	      	    {
+	      	      existing = true;
+	      	      existing_index = j;
+	      	    }
+	      	}
 
 	      if (existing == false)
 		{
+		  // Create new calo TP
 		  snemo::digitization::calo_tp & calo_tp = my_calo_tp_data_.add();
 		  calo_tp.set_header(a_calo_signal.get_hit_id(),
 				     electronic_id,
@@ -145,6 +138,7 @@ namespace snemo {
 
 	      else
 		{
+		  // Update existing calo TP
 		  snemo::digitization::calo_tp & existing_calo_tp = my_calo_tp_data_.grab_calo_tps()[existing_index].grab();
 		  existing_calo_tp.update_data(calo_hit_amplitude,
 					       calo_xt_bit,
