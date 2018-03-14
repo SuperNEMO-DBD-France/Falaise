@@ -19,6 +19,7 @@ namespace snemo {
 						      "snemo::digitalization::calo_signal")
 
     constexpr double calo_signal::DELAYED_PM_TIME;
+    constexpr double calo_signal::SIGNAL_MAX_TIME;
 
     calo_signal::calo_signal()
     {

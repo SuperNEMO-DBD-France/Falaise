@@ -25,8 +25,11 @@ namespace snemo {
     {
     public :
 
-			/// Shift to take account the "drift" PM time + wires travel time
-      static constexpr double DELAYED_PM_TIME = 130.6; // It has to be recalculated, approximative time for the moment
+			/// Shift to take account the transit time from the scintillator to the PMT anode
+      static constexpr double DELAYED_PM_TIME = 62.35; // nanoseconds, ref : PHD A.Huber p.174
+
+			/// Maximum time to combine 2 calo step hits (to be moved to the ASB module later). Related to calo FEB sampling.
+			static constexpr double SIGNAL_MAX_TIME = 400; // nanoseconds, 1024 samples * 0.390625 ps
 
 			struct compare_handle_by_timestamp {
 
