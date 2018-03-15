@@ -99,7 +99,7 @@ int main( int  argc_ , char **argv_  )
     }
 
     // Use command line arguments :
-    else if (vm.count("trace")) {
+    if (vm.count("trace")) {
       logging = datatools::logger::PRIO_TRACE;
     }
 

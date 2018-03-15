@@ -39,42 +39,6 @@ int main( int  argc_ , char **argv_  )
   int error_code = EXIT_SUCCESS;
   datatools::logger::priority logging = datatools::logger::PRIO_FATAL;
 
-  // Parsing arguments
-  int iarg = 1;
-  bool is_output_path  = false;
-  bool is_help         = false;
-  std::string output_path = "";
-
-  while (iarg < argc_) {
-    std::string arg = argv_[iarg];
-    if (arg == "-op" || arg == "--output-path")
-      {
-	is_output_path = true;
-	output_path = argv_[++iarg];
-      }
-
-    else if (arg =="-h" || arg == "--help")
-      {
-	is_help = true;
-      }
-
-    iarg++;
-  }
-
-  if (is_help)
-    {
-      std::cerr << std::endl << "Usage :" << std::endl << std::endl
-		<< "$ BuildProducts/bin/falaisedigitizationplugin-test_trigger_algorithm_test_fake_ctw [OPTIONS] [ARGUMENTS]" << std::endl << std::endl
-		<< "Allowed options: " << std::endl
-		<< "-h  [ --help ]           produce help message" << std::endl
-		<< "-op [ --output path ]    set a path where all files are stored" << std::endl
-		<< "Example : " << std::endl << std::endl
-		<< "$ BuildProducts/bin/falaisedigitizationplugin-test_trigger_algorithm_test_fake_ctw -op ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default"
-		<< "If no options are set, programs have default values :" << std::endl << std::endl
-		<< "output path          = ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/" << std::endl << std::endl;
-      return 0;
-    }
-
   try {
     // boolean for debugging (display etc)
 
@@ -97,11 +61,6 @@ int main( int  argc_ , char **argv_  )
 	manager_config.erase ("mapping.excluded_categories");
       }
     my_manager.initialize (manager_config);
-
-    datatools::fetch_path_with_env(output_path);
-    if (is_output_path) output_path = output_path;
-    else output_path = "${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/";
-    datatools::fetch_path_with_env(output_path);
 
     // Electronic mapping :
     snemo::digitization::electronic_mapping my_e_mapping;

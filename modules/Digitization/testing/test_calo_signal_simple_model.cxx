@@ -25,6 +25,9 @@
 #include <geomtools/gnuplot_drawer.h>
 #endif // GEOMTOOLS_WITH_GNUPLOT_DISPLAY
 
+// Boost :
+#include <boost/program_options.hpp>
+
 // This project:
 #include <snemo/digitization/calo_signal_simple_shape.h>
 #include <snemo/digitization/calo_analog_signal.h>
@@ -40,11 +43,17 @@ int main (int argc_, char ** argv_)
 
     bool draw = false;
 
-    int iarg = 1;
-    while (iarg < argc_) {
-      std::string arg = argv_[iarg];
-      if (arg == "-D" || arg == "--draw") draw = true;
-      iarg++;
+    // Parse options:
+    namespace po = boost::program_options;
+    po::options_description opts("Allowed options");
+    opts.add_options()
+      ("help,h", "produce help message")
+      ("draw,d", "activate draw option")
+      ; // end of options description
+
+    // Use command line arguments :
+    if (vm.count("draw")) {
+      draw = true;
     }
 
     test_calo_signal_simple_model_2(draw);
@@ -72,8 +81,8 @@ void test_calo_signal_simple_model_1(bool draw_)
   std::clog << "Interpolation = " << csss1.interpolator_name() << std::endl;
   datatools::temp_file tmp_file;
   tmp_file.set_remove_at_destroy(true);
-  tmp_file.create("/tmp", "test_calo_signal_simple_model+_");  
-  
+  tmp_file.create("/tmp", "test_calo_signal_simple_model+_");
+
   tmp_file.out() << "#" << csss1.interpolator_name() << std::endl;
   for (double x = csss1.x_min (); x <= csss1.x_max() + 0.001 * dx; x += dx) {
     if (csss1.is_valid(x)) {
@@ -91,15 +100,15 @@ void test_calo_signal_simple_model_1(bool draw_)
   std::clog << "csss1(" << test_time << ") = " << csss1(test_time) << std::endl;
   datatools::temp_file tmp_file_2;
   tmp_file_2.set_remove_at_destroy(true);
-  tmp_file_2.create("/tmp", "test_calo_signal_simple_model+_");  
-  
+  tmp_file_2.create("/tmp", "test_calo_signal_simple_model+_");
+
   tmp_file_2.out() << "#" << csss1.interpolator_name() << std::endl;
   for (double x = csss1.x_min (); x <= csss1.x_max() + 0.001 * dx; x += dx) {
     if (csss1.is_valid(x)) {
       tmp_file_2.out() << x << ' ' << csss1(x) << std::endl;
     }
   }
-  
+
   if (draw_) {
 #if GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
     Gnuplot g1;
@@ -136,16 +145,16 @@ void test_calo_signal_simple_model_1(bool draw_)
 }
 
 void test_calo_signal_simple_model_2(bool draw_)
-{  
+{
   snemo::digitization::calo_signal_simple_shape csss1;
   //  std::string input_datafile = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/calo_signal_shape_1300kev_mean_8000_signals.data";
   std::string input_datafile = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/calo_signal_reference_shape_reduced_1000kev.data";
   datatools::fetch_path_with_env(input_datafile);
   csss1.load_from_file(input_datafile);
-  
+
   double energy = 750; // keV
   double time_shift = 150; // ns
-  
+
   snemo::digitization::calo_analog_signal cas1;
   cas1.set_energy_max(energy);
   cas1.set_signal_time(time_shift);
@@ -153,7 +162,7 @@ void test_calo_signal_simple_model_2(bool draw_)
 
   datatools::temp_file tmp_file;
   tmp_file.set_remove_at_destroy(true);
-  tmp_file.create("/tmp", "test_calo_signal_simple_model+_");  
+  tmp_file.create("/tmp", "test_calo_signal_simple_model+_");
 
   double dx = 0.01;
   for (double x = cas1.get_analog_signal_shape().x_min (); x <= cas1.get_analog_signal_shape().x_max() + 0.001 * dx; x += dx) {
@@ -161,7 +170,7 @@ void test_calo_signal_simple_model_2(bool draw_)
       tmp_file.out() << x << ' ' << cas1.get_analog_signal_shape()(x) << std::endl;
     }
   }
-  
+
   if (draw_) {
 #if GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
     Gnuplot g1;
@@ -193,6 +202,6 @@ void test_calo_signal_simple_model_2(bool draw_)
 
 #endif // GEOMTOOLS_WITH_GNUPLOT_DISPLAY == 1
   }
-  
+
   return;
 }
