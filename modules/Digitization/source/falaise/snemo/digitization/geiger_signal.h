@@ -24,6 +24,9 @@ namespace snemo {
     {
     public :
 
+			/// Geiger cell dead time. Can not trigger again during this physical dead time
+			static constexpr double GEIGER_DEAD_TIME = 1e6; // ns = 1 ms
+
 			struct compare_handle_by_timestamp {
 				bool operator()(const datatools::handle<geiger_signal> & ha,
 												const datatools::handle<geiger_signal> & hb)

@@ -19,6 +19,8 @@ namespace snemo {
     DATATOOLS_SERIALIZATION_SERIAL_TAG_IMPLEMENTATION(geiger_signal,
 						      "snemo::digitalization::geiger_signal")
 
+    constexpr double geiger_signal::GEIGER_DEAD_TIME;
+
     geiger_signal::geiger_signal()
     {
       datatools::invalidate(_anode_avalanche_time_);

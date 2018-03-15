@@ -115,39 +115,39 @@ namespace snemo {
 	    // New sd bank
 	    mctools::simulated_data flaged_sd = sd_;
 
-	    // We have to flag the gg cells already hit before (maybe take into account the dead time of a GG cell)
+	    // We have to flag the gg cells already hit before. Geiger dead time is taken into account and a given geiger cell can trigger again after 1 m.
 	    for (size_t ihit = 0; ihit < number_of_hits; ihit++)
 	      {
-		mctools::base_step_hit & geiger_hit = flaged_sd.grab_step_hit("gg", ihit);
-		for (size_t jhit = ihit + 1; jhit < number_of_hits; jhit++)
-		  {
-		    mctools::base_step_hit & other_geiger_hit = flaged_sd.grab_step_hit("gg", jhit);
-		    if (geiger_hit.get_geom_id() == other_geiger_hit.get_geom_id())
-		      {
-			const double gg_hit_time       = geiger_hit.get_time_start();
-			const double other_gg_hit_time = other_geiger_hit.get_time_start();
-			if (gg_hit_time > other_gg_hit_time)
-			  {
-			    bool geiger_already_hit = true;
-			    if (!geiger_hit.get_auxiliaries().has_flag("geiger_already_hit")) geiger_hit.grab_auxiliaries().store("geiger_already_hit", geiger_already_hit);
-			  }
-			else
-			  {
-			    bool geiger_already_hit = true;
-			    if (!other_geiger_hit.get_auxiliaries().has_flag("geiger_already_hit")) other_geiger_hit.grab_auxiliaries().store("geiger_already_hit", geiger_already_hit);
-			  }
-		      }
-		  }
+	    	mctools::base_step_hit & geiger_hit = flaged_sd.grab_step_hit("gg", ihit);
+
+	    	for (size_t jhit = ihit + 1; jhit < number_of_hits; jhit++)
+	    	  {
+	    	    mctools::base_step_hit & other_geiger_hit = flaged_sd.grab_step_hit("gg", jhit);
+	    	    if (geiger_hit.get_geom_id() == other_geiger_hit.get_geom_id())
+	    	      {
+	    		const double gg_hit_time       = geiger_hit.get_time_start();
+	    		const double other_gg_hit_time = other_geiger_hit.get_time_start();
+
+	    		if (gg_hit_time > other_gg_hit_time && gg_hit_time < other_gg_hit_time + geiger_signal::GEIGER_DEAD_TIME)
+	    		  {
+	    		    bool geiger_already_hit = true;
+	    		    if (!geiger_hit.get_auxiliaries().has_flag("geiger_already_hit")) geiger_hit.grab_auxiliaries().store("geiger_already_hit", geiger_already_hit);
+	    		  }
+	    		else if (other_gg_hit_time > gg_hit_time && other_gg_hit_time < gg_hit_time + geiger_signal::GEIGER_DEAD_TIME)
+	    		  {
+	    		    bool geiger_already_hit = true;
+	    		    if (!other_geiger_hit.get_auxiliaries().has_flag("geiger_already_hit")) other_geiger_hit.grab_auxiliaries().store("geiger_already_hit", geiger_already_hit);
+	    		  }
+	    	      }
+	    	  }
 	      }
 
 	    int32_t geiger_signal_hit_id = 0;
-
 	    for (size_t ihit = 0; ihit < number_of_hits; ihit++)
 	      {
 		const mctools::base_step_hit & geiger_hit = flaged_sd.get_step_hit("gg", ihit);
 
-		if (geiger_hit.get_auxiliaries().has_flag("geiger_already_hit") || geiger_hit.get_auxiliaries().has_flag("other_geiger_already_hit")) {}
-		else
+		if (!geiger_hit.get_auxiliaries().has_flag("geiger_already_hit"))
 		  {
 		    // extract the corresponding geom ID:
 		    const geomtools::geom_id & geiger_gid = geiger_hit.get_geom_id();
