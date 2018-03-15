@@ -1,4 +1,4 @@
-/// \file falaise/snemo/digitization/digitization_driver.cc
+// \file falaise/snemo/digitization/digitization_driver.cc
 
 // Ourselves:
 #include <snemo/digitization/digitization_driver.h>
@@ -50,7 +50,7 @@ namespace snemo {
     void digitization_driver::initialize(const datatools::properties & /* setup_ */ )
     {
       DT_THROW_IF (!has_geometry_manager(), std::logic_error, "No geometry manager is setup !");
-      
+
       // do something
 
       _initialized_ = true;
@@ -61,7 +61,7 @@ namespace snemo {
     {
       return _initialized_;
     }
-    
+
     void digitization_driver::reset()
     {
       return;
@@ -69,10 +69,10 @@ namespace snemo {
 
     void digitization_driver::process_digitization_algorithms(const mctools::signal::signal_data & /*SSD_*/)
     {
-      
-      
-      
-      
+
+
+
+
       return;
     }
 

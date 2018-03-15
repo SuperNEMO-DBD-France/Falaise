@@ -48,10 +48,10 @@ int main( int  argc_ , char **argv_  )
 
   // Parsing arguments
   bool is_display      = false;
-  std::string input_filename = "";
-  std::string output_path = "";
 
   std::vector<std::string> input_filenames;
+  std::string trigger_config_filename = "";
+  std::string output_path = "";
   std::size_t max_events = 0;
 
   try {
@@ -67,6 +67,9 @@ int main( int  argc_ , char **argv_  )
       ("output-path,o",
        po::value<std::string>(& output_path),
        "set the output path where produced files are created")
+      ("config,c",
+       po::value<std::string>(& trigger_config_filename),
+       "set the trigger configuration file")
       ("event_number,n",
        po::value<std::size_t>(& max_events)->default_value(10),
        "set the maximum number of events")
@@ -273,41 +276,133 @@ int main( int  argc_ , char **argv_  )
     snemo::digitization::geiger_tp_to_ctw_algo geiger_tp_2_ctw;
     geiger_tp_2_ctw.initialize();
 
-    // Loading memory from external files
-    std::string mem1 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem1.conf";
-    std::string mem2 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem2.conf";
-    std::string mem3 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem3.conf";
-    std::string mem4 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem4.conf";
-    std::string mem5 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem5.conf";
+    // Multi properties to configure trigger algorithm :
+    datatools::multi_properties trigger_config("name", "type", "Trigger parameters multi section configuration");
+    if (!trigger_config_filename.empty()) {
+      // Read trigger config from file
+      datatools::fetch_path_with_env(trigger_config_filename);
+      trigger_config.read(trigger_config_filename);
+    } else {
+      //Build trigger configuration multi properties section by section :
 
-    datatools::fetch_path_with_env(mem1);
-    datatools::fetch_path_with_env(mem2);
-    datatools::fetch_path_with_env(mem3);
-    datatools::fetch_path_with_env(mem4);
-    datatools::fetch_path_with_env(mem5);
+      /*********************/
+      /* 'General' section */
+      /*********************/
+      trigger_config.add("general", "trigger_component");
 
-    // Properties to configure trigger algorithm :
-    datatools::properties trigger_config;
-    int  calo_circular_buffer_depth = 4;
-    int  calo_threshold = 1;
-    bool inhibit_both_side_coinc = false;
-    bool inhibit_single_side_coinc = false;
-    int  coincidence_calorimeter_gate_size = 4; // Don't forget to modify at 10 CT 1600 for new trigger analysis
-    int previous_event_buffer_depth = 10; // Maximum number of PER record (with an internal counter of 1 ms)
-    bool activate_coincidence = true;
+      // Retrieve a hook to the 'general' section in the *trigger_config*:
+      datatools::multi_properties::entry & gen_entry = trigger_config.grab("general");
 
-    trigger_config.store("calo.circular_buffer_depth", calo_circular_buffer_depth);
-    trigger_config.store("calo.total_multiplicity_threshold", calo_threshold);
-    trigger_config.store("calo.inhibit_both_side",  inhibit_both_side_coinc);
-    trigger_config.store("calo.inhibit_single_side",  inhibit_single_side_coinc);
-    trigger_config.store("tracker.mem1_file", mem1);
-    trigger_config.store("tracker.mem2_file", mem2);
-    trigger_config.store("tracker.mem3_file", mem3);
-    trigger_config.store("tracker.mem4_file", mem4);
-    trigger_config.store("tracker.mem5_file", mem5);
-    trigger_config.store("coincidence.calorimeter_gate_size", coincidence_calorimeter_gate_size);
-    trigger_config.store("coincidence.previous_event_buffer_depth", previous_event_buffer_depth);
-    trigger_config.store("activate_coincidence", activate_coincidence);
+      int coincidence_calorimeter_gate_size = 5; // Gate for the calorimeter gate size at 1600ns
+      int L2_decision_coincidence_gate_size = 5; // Gate for calorimeter / tracker coincidence (5 x 1600 ns)
+      int previous_event_buffer_depth = 10;      // Maximum number of PER record (with an internal counter of 1 ms)
+      bool activate_any_coincidences = true;
+      // bool activate_calorimeter_only = false; // not used for the moment -> to perform
+
+      // Add properties in the 'general' section :
+      gen_entry.grab_properties().store("coincidence_calorimeter_gate_size",
+					coincidence_calorimeter_gate_size,
+					"The coincidence calorimeter gate (1600ns) size value");
+
+      gen_entry.grab_properties().store("L2_decision_coincidence_gate_size",
+					L2_decision_coincidence_gate_size,
+					"The L2 coincidence gate (1600ns) size value");
+
+      gen_entry.grab_properties().store("previous_event_buffer_depth",
+					previous_event_buffer_depth,
+					"The previous event buffer size value");
+
+      gen_entry.grab_properties().store("activate_any_coincidences",
+					activate_any_coincidences,
+					"Flag to activate any coincidence (CARACO, APE, DAVE...)");
+
+      // gen_entry.grab_properties().store("activate_calorimeter_only", activate_calorimeter_only);
+
+      /*************************/
+      /* 'Calorimeter' section */
+      /*************************/
+      trigger_config.add("calorimeter", "trigger_component");
+      datatools::multi_properties::entry & cal_entry = trigger_config.grab("calorimeter");
+
+      int  calo_circular_buffer_depth = 4; // Size of the circular buffer (X * 25ns) default = 4*25=100ns to cumulate calorimeter hits
+      int  calo_threshold = 1; // Number of calorimeter hit (with HT) to trigger the L1 decision
+      double low_threshold_value = 30 * 1e-3 * CLHEP::volt;
+      double high_threshold_value = 50 * 1e-3 * CLHEP::volt;
+      bool inhibit_both_side_coinc = false;
+      bool inhibit_single_side_coinc = false;
+
+      cal_entry.grab_properties().store("circular_buffer_depth",
+					calo_circular_buffer_depth,
+					"The calorimeter circular buffer depth");
+
+      cal_entry.grab_properties().store("total_multiplicity_threshold",
+					calo_threshold,
+					"The calorimeter total multiplicity threshold");
+
+      // Value to check with explicit unit and compare it with the configuration file :
+      cal_entry.grab_properties().store_with_explicit_unit("low_threshold_value",
+							   low_threshold_value,
+							   "The low threshold value in mV");
+
+      // Value to check with explicit unit and compare it with the configuration file :
+      cal_entry.grab_properties().store_with_explicit_unit("high_threshold_value",
+							   high_threshold_value,
+							   "The high threshold value in mV");
+
+      cal_entry.grab_properties().store("inhibit_both_side",
+					inhibit_both_side_coinc,
+					"Inhibit both side trigger flag");
+
+      cal_entry.grab_properties().store("inhibit_single_side",
+					inhibit_single_side_coinc,
+					"Inhibit single side trigger flag");
+
+      /*********************/
+      /* 'Tracker' section */
+      /*********************/
+      trigger_config.add("tracker", "trigger_component");
+      datatools::multi_properties::entry & tra_entry = trigger_config.grab("tracker");
+
+      // Loading memory from external files
+      std::string mem1 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem1.conf";
+      std::string mem2 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem2.conf";
+      std::string mem3 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem3.conf";
+      std::string mem4 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem4.conf";
+      std::string mem5 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem5.conf";
+      datatools::fetch_path_with_env(mem1);
+      datatools::fetch_path_with_env(mem2);
+      datatools::fetch_path_with_env(mem3);
+      datatools::fetch_path_with_env(mem4);
+      datatools::fetch_path_with_env(mem5);
+
+      tra_entry.grab_properties().store("mem1_file",
+					mem1,
+					"The memory 1 for the tracker trigger");
+      tra_entry.grab_properties().store("mem2_file",
+					mem2,
+					"The memory 2 for the tracker trigger");
+      tra_entry.grab_properties().store("mem3_file",
+					mem3,
+					"The memory 3 for the tracker trigger");
+      tra_entry.grab_properties().store("mem4_file",
+					mem4,
+					"The memory 4 for the tracker trigger");
+      tra_entry.grab_properties().store("mem5_file",
+					mem5,
+					"The memory 5 for the tracker trigger");
+
+      /*************************/
+      /* 'Coincidence' section */
+      /*************************/
+      trigger_config.add("coincidence", "trigger_component");
+      // datatools::multi_properties::entry & coinc_entry = trigger_config.grab("coincidence");
+    } // end of manual configuration
+
+    snemo::digitization::trigger_algorithm my_trigger_algo;
+    my_trigger_algo.set_electronic_mapping(my_e_mapping);
+    my_trigger_algo.set_clock_manager(my_clock_manager);
+    my_trigger_algo.initialize(trigger_config);
+    // trigger_config.tree_dump(std::clog, "My trigger config : ");
 
     // Creation of trigger display manager :
     snemo::digitization::trigger_display_manager my_trigger_display;
@@ -322,21 +417,8 @@ int main( int  argc_ , char **argv_  )
     trigger_display_config.store("coinc_1600ns", coinc_1600ns);
     my_trigger_display.initialize(trigger_display_config);
 
-    // Creation and initialization of trigger algorithm :
-    snemo::digitization::trigger_algorithm my_trigger_algo;
-    my_trigger_algo.set_electronic_mapping(my_e_mapping);
-    //my_trigger_algo.set_trigger_display_manager(my_trigger_display);
-    my_trigger_algo.initialize(trigger_config);
-
     // Internal counters
     int psd_count = 0;         // Event counter
-
-    // Open an output
-    bool tmp_file_delete = false;
-    std::string path = "${FALAISE_DIGITIZATION_TESTING_DIR}/output_default";
-    std::string prefix = "temp_";
-    my_trigger_algo.set_tmp_file(path, prefix, tmp_file_delete);
-    my_trigger_algo.grab_tracker_tmp_file().out() << "Input file : " << pipeline_simulated_data_filename << std::endl;
 
     while (!reader.is_terminated())
       {
@@ -428,20 +510,19 @@ int main( int  argc_ , char **argv_  )
 		  } // end of if has geiger signal
 
 		// Creation of outputs collection structures for calo and tracker
-		std::vector<snemo::digitization::calo_trigger_algorithm::calo_summary_record> calo_collection_records;
-		std::vector<snemo::digitization::tracker_trigger_algorithm::tracker_record>   tracker_collection_records;
-		std::vector<snemo::digitization::coincidence_trigger_algorithm::coincidence_event_record> coincidence_collection_records;
+		std::vector<snemo::digitization::trigger_structures::calo_summary_record> calo_collection_records;
+		std::vector<snemo::digitization::trigger_structures::tracker_record>   tracker_collection_records;
+		std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records;
 
 		// Reseting trigger display
 		my_trigger_display.reset_matrix_pattern();
 
-		my_trigger_algo.grab_tracker_tmp_file().out() << "Event " << psd_count << std::endl;
 		// Trigger process
 		my_trigger_algo.process(my_calo_ctw_data,
 					my_geiger_ctw_data);
 
 		// Finale structures :
-		calo_collection_records = my_trigger_algo.get_calo_records_vector();
+		calo_collection_records = my_trigger_algo.get_calo_records_25ns_vector();
 		tracker_collection_records = my_trigger_algo.get_tracker_records_vector();
 		coincidence_collection_records = my_trigger_algo.get_coincidence_records_vector();
 
@@ -457,13 +538,13 @@ int main( int  argc_ , char **argv_  )
 
 	      } // end of if has "calo" || "xcalo" || "gveto" || "gg" step hits
 
-	    std::vector<snemo::digitization::coincidence_trigger_algorithm::coincidence_calo_record> coincidence_collection_calo_records = my_trigger_algo.get_coincidence_calo_records_vector();
+	    std::vector<snemo::digitization::trigger_structures::coincidence_calo_record> coincidence_collection_calo_records = my_trigger_algo.get_coincidence_calo_records_1600ns_vector();
 
-	    raw_trigger_prompt_decision = my_trigger_algo.get_finale_decision();
-	    raw_trigger_delayed_decision = my_trigger_algo.get_delayed_finale_decision();
+	    // raw_trigger_prompt_decision = my_trigger_algo.get_finale_decision();
+	    // raw_trigger_delayed_decision = my_trigger_algo.get_delayed_finale_decision();
 
-	    if (debug) std::clog << "trigger_finale_decision         [" << raw_trigger_prompt_decision << "]" << std::endl;
-	    if (debug) std::clog << "delayed trigger_finale_decision [" << raw_trigger_delayed_decision << "]" << std::endl;
+	    // if (debug) std::clog << "trigger_finale_decision         [" << raw_trigger_prompt_decision << "]" << std::endl;
+	    // if (debug) std::clog << "delayed trigger_finale_decision [" << raw_trigger_delayed_decision << "]" << std::endl;
 
 	    if (debug) std::clog << "********************************************************************" << std::endl;
 	    if (debug) std::clog << "Total calo             = " << total_number_of_calo             << std::endl;
@@ -475,14 +556,13 @@ int main( int  argc_ , char **argv_  )
 	    if (debug) std::clog << "********************************************************************" << std::endl;
 
 	    // Write in several SD files depending of the trigger decision
+	    // if(!raw_trigger_prompt_decision) writer_1.process(ER);
+	    // else writer_2.process(ER);
 
-	    if(!raw_trigger_prompt_decision) writer_1.process(ER);
-	    else writer_2.process(ER);
+	    // if (raw_trigger_prompt_decision && !raw_trigger_delayed_decision) writer_3.process(ER);
+	    // else if (raw_trigger_prompt_decision && raw_trigger_delayed_decision) writer_4.process(ER);
 
-	    if (raw_trigger_prompt_decision && !raw_trigger_delayed_decision) writer_3.process(ER);
-	    else if (raw_trigger_prompt_decision && raw_trigger_delayed_decision) writer_4.process(ER);
-
-	    my_trigger_algo.clear_records();
+	    my_trigger_algo.reset_data();
 
 	  } //end of if has bank label "SD"
 

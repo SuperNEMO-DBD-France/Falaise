@@ -55,7 +55,7 @@ namespace snemo {
       uint32_t get_clocktick_range() const;
 
       /// Do a list of geiger crate trigger word which are in the same clocktick
-      void get_list_of_geiger_ctw_per_clocktick(uint32_t clocktick_25ns_, geiger_ctw_collection_type & ctws_) const;
+      void get_list_of_geiger_ctw_per_clocktick(uint32_t clocktick_800ns_, geiger_ctw_collection_type & ctws_) const;
 
       /// Reset the list of ctws
       void reset_ctws();

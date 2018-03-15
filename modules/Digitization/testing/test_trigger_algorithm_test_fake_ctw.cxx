@@ -1,4 +1,4 @@
-// trigger_algorithm_efficiency_validation.cxx
+// test_trigger_algorithm_test_fake_ctw.cxx
 // Standard libraries :
 #include <iostream>
 
@@ -15,16 +15,12 @@
 // Falaise:
 #include <falaise/falaise.h>
 
-// Third part : 
+// Third part :
 // GSL:
 #include <bayeux/mygsl/rng.h>
-// Root : 
-#include "TFile.h"
-#include "TTree.h"
 
 // This project :
 #include <snemo/digitization/clock_utils.h>
-#include <snemo/digitization/calo_ctw_constants.h>
 #include <snemo/digitization/mapping.h>
 
 #include <snemo/digitization/sd_to_calo_signal_algo.h>
@@ -45,18 +41,18 @@ int main( int  argc_ , char **argv_  )
 
   // Parsing arguments
   int iarg = 1;
-  bool is_display      = false;
+  bool is_output_path  = false;
   bool is_help         = false;
+  std::string output_path = "";
 
-  std::string output_path;
-  
   while (iarg < argc_) {
     std::string arg = argv_[iarg];
-    if (arg == "-d" || arg == "--display")
+    if (arg == "-op" || arg == "--output-path")
       {
-	is_display = true;
+	is_output_path = true;
+	output_path = argv_[++iarg];
       }
-    
+
     else if (arg =="-h" || arg == "--help")
       {
 	is_help = true;
@@ -65,37 +61,31 @@ int main( int  argc_ , char **argv_  )
     iarg++;
   }
 
-  if (is_help) 
+  if (is_help)
     {
       std::cerr << std::endl << "Usage :" << std::endl << std::endl
-		<< "$ BuildProducts/bin/falaisedigitizationplugin-trigger_algorithm_efficiency_validation [OPTIONS] [ARGUMENTS]" << std::endl << std::endl
+		<< "$ BuildProducts/bin/falaisedigitizationplugin-test_trigger_algorithm_test_fake_ctw [OPTIONS] [ARGUMENTS]" << std::endl << std::endl
 		<< "Allowed options: " << std::endl
 		<< "-h  [ --help ]           produce help message" << std::endl
 		<< "-op [ --output path ]    set a path where all files are stored" << std::endl
-		<< "-n  [ --number ]         set the number of events" << std::endl
 		<< "Example : " << std::endl << std::endl
-		<< "$ BuildProducts/bin/falaisedigitizationplugin-trigger_algorithm_efficiency_validation --input ${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio -op ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default" 
-		<< " --number 5" << std::endl << std::endl
+		<< "$ BuildProducts/bin/falaisedigitizationplugin-test_trigger_algorithm_test_fake_ctw -op ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default"
 		<< "If no options are set, programs have default values :" << std::endl << std::endl
-		<< "output path          = ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/" << std::endl
-		<< "number of events     = 10" << std::endl << std::endl;
+		<< "output path          = ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/" << std::endl << std::endl;
       return 0;
     }
 
   try {
     // boolean for debugging (display etc)
-    bool debug = false;
 
-    if (is_display) debug = true;
-
-    std::clog << "Test program for class 'snemo::digitization::trigger_algorithm_efficiency_validation' !" << std::endl;
+    std::clog << "Test program for class 'snemo::digitization::test_trigger_algorithm_test_fake_ctw' !" << std::endl;
     int32_t seed = 314159;
     mygsl::rng random_generator;
     random_generator.initialize(seed);
-    
+
     std::string manager_config_file;
-    
-    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf";
+
+    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/4.0/manager.conf";
     datatools::fetch_path_with_env(manager_config_file);
     datatools::properties manager_config;
     datatools::properties::read_config (manager_config_file,
@@ -107,261 +97,345 @@ int main( int  argc_ , char **argv_  )
 	manager_config.erase ("mapping.excluded_categories");
       }
     my_manager.initialize (manager_config);
-    
-    // Simulated Data "SD" bank label :
-    std::string SD_bank_label = "SD";
 
-    // Trigger Decision Data "TDD" bank label :
-    std::string TDD_bank_label = "TDD";
-    
+    datatools::fetch_path_with_env(output_path);
+    if (is_output_path) output_path = output_path;
+    else output_path = "${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/";
+    datatools::fetch_path_with_env(output_path);
+
     // Electronic mapping :
     snemo::digitization::electronic_mapping my_e_mapping;
     my_e_mapping.set_geo_manager(my_manager);
     my_e_mapping.set_module_number(snemo::digitization::mapping::DEMONSTRATOR_MODULE_NUMBER);
+    my_e_mapping.add_preconstructed_type(snemo::digitization::mapping::GEIGER_CATEGORY_TYPE);
+    my_e_mapping.add_preconstructed_type(snemo::digitization::mapping::CALO_MAIN_WALL_CATEGORY_TYPE);
     my_e_mapping.initialize();
-
     // Clock manager :
     snemo::digitization::clock_utils my_clock_manager;
-    my_clock_manager.initialize();		
- 
-    // Loading memory from external files
-    std::string mem1 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem1.conf";
-    std::string mem2 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem2.conf";
-    std::string mem3 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem3.conf";
-    std::string mem4 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem4.conf";
-    std::string mem5 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem5.conf";
-
-    datatools::fetch_path_with_env(mem1);
-    datatools::fetch_path_with_env(mem2);
-    datatools::fetch_path_with_env(mem3);
-    datatools::fetch_path_with_env(mem4);
-    datatools::fetch_path_with_env(mem5);
+    my_clock_manager.initialize();
 
     // Properties to configure trigger algorithm :
-    datatools::properties trigger_config;
-    int  calo_circular_buffer_depth = 4;
-    int  calo_threshold = 1;
-    bool inhibit_both_side_coinc = false;
-    bool inhibit_single_side_coinc = false;    
-    int  coincidence_calorimeter_gate_size = 8; // Number of CT 1600 coincidence gate for calorimeter
-    int previous_event_buffer_depth = 10; // Maximum number of PER record (with an internal counter of 1 ms)
-    bool activate_coincidence = true;
-    
-    trigger_config.store("calo.circular_buffer_depth", calo_circular_buffer_depth);
-    trigger_config.store("calo.total_multiplicity_threshold", calo_threshold);
-    trigger_config.store("calo.inhibit_both_side",  inhibit_both_side_coinc);
-    trigger_config.store("calo.inhibit_single_side",  inhibit_single_side_coinc);
-    trigger_config.store("tracker.mem1_file", mem1);
-    trigger_config.store("tracker.mem2_file", mem2); 
-    trigger_config.store("tracker.mem3_file", mem3);
-    trigger_config.store("tracker.mem4_file", mem4);
-    trigger_config.store("tracker.mem5_file", mem5);
-    trigger_config.store("coincidence.calorimeter_gate_size", coincidence_calorimeter_gate_size);
-    trigger_config.store("coincidence.previous_event_buffer_depth", previous_event_buffer_depth);
-    trigger_config.store("activate_coincidence", activate_coincidence);
+    datatools::multi_properties trigger_config;
 
-    // Creation of trigger display manager :
-    snemo::digitization::trigger_display_manager my_trigger_display;
-    datatools::properties trigger_display_config;
-    bool calo_25ns      = true;
-    bool calo_1600ns    = true;
-    bool tracker_1600ns = true;
-    bool coinc_1600ns   = true;
-    trigger_display_config.store("calo_25ns", calo_25ns);
-    trigger_display_config.store("calo_1600ns", calo_1600ns);
-    trigger_display_config.store("tracker_1600ns", tracker_1600ns);
-    trigger_display_config.store("coinc_1600ns", coinc_1600ns);
-    my_trigger_display.initialize(trigger_display_config);
-    
+    {
+      //Build trigger configuration multi properties section by section :
+
+      /*********************/
+      /* 'General' section */
+      /*********************/
+      trigger_config.add("general", "trigger_component");
+
+      // Retrieve a hook to the 'general' section in the *trigger_config*:
+      datatools::multi_properties::entry & gen_entry = trigger_config.grab("general");
+
+      int coincidence_calorimeter_gate_size = 5; // Gate for the calorimeter gate size at 1600ns
+      int L2_decision_coincidence_gate_size = 5; // Gate for calorimeter / tracker coincidence (5 x 1600 ns)
+      int previous_event_buffer_depth = 10;      // Maximum number of PER record (with an internal counter of 1 ms)
+      bool activate_any_coincidences = true;
+      // bool activate_calorimeter_only = false; // not used for the moment -> to perform
+
+      // Add properties in the 'general' section :
+      gen_entry.grab_properties().store("coincidence_calorimeter_gate_size",
+					coincidence_calorimeter_gate_size,
+					"The coincidence calorimeter gate (1600ns) size value");
+
+      gen_entry.grab_properties().store("L2_decision_coincidence_gate_size",
+					L2_decision_coincidence_gate_size,
+					"The L2 coincidence gate (1600ns) size value");
+
+      gen_entry.grab_properties().store("previous_event_buffer_depth",
+					previous_event_buffer_depth,
+					"The previous event buffer size value");
+
+      gen_entry.grab_properties().store("activate_any_coincidences",
+					activate_any_coincidences,
+					"Flag to activate any coincidence (CARACO, APE, DAVE...)");
+
+      // gen_entry.grab_properties().store("activate_calorimeter_only", activate_calorimeter_only);
+
+      /*************************/
+      /* 'Calorimeter' section */
+      /*************************/
+      trigger_config.add("calorimeter", "trigger_component");
+      datatools::multi_properties::entry & cal_entry = trigger_config.grab("calorimeter");
+
+      int  calo_circular_buffer_depth = 4; // Size of the circular buffer (X * 25ns) default = 4*25=100ns to cumulate calorimeter hits
+      int  calo_threshold = 1; // Number of calorimeter hit (with HT) to trigger the L1 decision
+      double low_threshold_value = 30 * 1e-3 * CLHEP::volt;
+      double high_threshold_value = 50 * 1e-3 * CLHEP::volt;
+      bool inhibit_both_side_coinc = false;
+      bool inhibit_single_side_coinc = false;
+
+      cal_entry.grab_properties().store("circular_buffer_depth",
+					calo_circular_buffer_depth,
+					"The calorimeter circular buffer depth");
+
+      cal_entry.grab_properties().store("total_multiplicity_threshold",
+					calo_threshold,
+					"The calorimeter total multiplicity threshold");
+
+      // Value to check with explicit unit and compare it with the configuration file :
+      cal_entry.grab_properties().store_with_explicit_unit("low_threshold_value",
+							   low_threshold_value,
+							   "The low threshold value in mV");
+
+      // Value to check with explicit unit and compare it with the configuration file :
+      cal_entry.grab_properties().store_with_explicit_unit("high_threshold_value",
+							   high_threshold_value,
+							   "The high threshold value in mV");
+
+      cal_entry.grab_properties().store("inhibit_both_side",
+					inhibit_both_side_coinc,
+					"Inhibit both side trigger flag");
+
+      cal_entry.grab_properties().store("inhibit_single_side",
+					inhibit_single_side_coinc,
+					"Inhibit single side trigger flag");
+
+      /*********************/
+      /* 'Tracker' section */
+      /*********************/
+      trigger_config.add("tracker", "trigger_component");
+      datatools::multi_properties::entry & tra_entry = trigger_config.grab("tracker");
+
+      // Loading memory from external files
+      std::string mem1 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem1.conf";
+      std::string mem2 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem2.conf";
+      std::string mem3 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem3.conf";
+      std::string mem4 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem4.conf";
+      std::string mem5 = "${FALAISE_DIGITIZATION_TESTING_DIR}/config/trigger/tracker/mem5.conf";
+      datatools::fetch_path_with_env(mem1);
+      datatools::fetch_path_with_env(mem2);
+      datatools::fetch_path_with_env(mem3);
+      datatools::fetch_path_with_env(mem4);
+      datatools::fetch_path_with_env(mem5);
+
+      tra_entry.grab_properties().store("mem1_file",
+					mem1,
+					"The memory 1 for the tracker trigger");
+      tra_entry.grab_properties().store("mem2_file",
+					mem2,
+					"The memory 2 for the tracker trigger");
+      tra_entry.grab_properties().store("mem3_file",
+					mem3,
+					"The memory 3 for the tracker trigger");
+      tra_entry.grab_properties().store("mem4_file",
+					mem4,
+					"The memory 4 for the tracker trigger");
+      tra_entry.grab_properties().store("mem5_file",
+					mem5,
+					"The memory 5 for the tracker trigger");
+
+      /*************************/
+      /* 'Coincidence' section */
+      /*************************/
+      trigger_config.add("coincidence", "trigger_component");
+      // datatools::multi_properties::entry & coinc_entry = trigger_config.grab("coincidence");
+    }
+
     // Creation and initialization of trigger algorithm :
     snemo::digitization::trigger_algorithm my_trigger_algo;
     my_trigger_algo.set_electronic_mapping(my_e_mapping);
-    //my_trigger_algo.set_trigger_display_manager(my_trigger_display);
+    my_trigger_algo.set_clock_manager(my_clock_manager);
     my_trigger_algo.initialize(trigger_config);
 
     my_clock_manager.compute_clockticks_ref(random_generator);
 
-    if (debug) my_clock_manager.tree_dump(std::clog, "Clock utils : ", "INFO : ");
-
     // Creation of calo ctw data :
     snemo::digitization::calo_ctw_data my_calo_ctw_data;
+
+    // Creation of geiger ctw data :
+    snemo::digitization::geiger_ctw_data my_geiger_ctw_data;
+
+    // Add fake CTW calo and geiger :
     {
       snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
       geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 0, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-      my_calo_ctw.set_header(42,
+      my_calo_ctw.set_header(155,
 			     my_ctw_gid,
-			     12); // hit, gid, clocktick
-      my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
-      my_calo_ctw.grab_auxiliaries().store_flag("mock");
-      my_calo_ctw.set_htm_main_wall(1);
-      int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 4;
-      my_calo_ctw.set_zoning_bit(zone_touched, true);
-      if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [0] : ", "INFO : ");
-    }    
-    {
-      snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
-      geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 0, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-      my_calo_ctw.set_header(43,
-    			     my_ctw_gid,
-    			     15); // hit, gid, clocktick
-      my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
-      my_calo_ctw.grab_auxiliaries().store_flag("mock");
-      my_calo_ctw.set_htm_main_wall(1);
-      int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 9;
-      my_calo_ctw.set_zoning_bit(zone_touched, true);
-      if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [4] : ", "INFO : ");
-    }     
-    // {
-    //   snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
-    //   geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 1, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-    //   my_calo_ctw.set_header(43,
-    // 			     my_ctw_gid,
-    // 			     13); // hit, gid, clocktick
-    //   my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
-    //   my_calo_ctw.grab_auxiliaries().store_flag("mock");
-    //   my_calo_ctw.set_htm_main_wall(1);
-    //   int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 5;
-    //   my_calo_ctw.set_zoning_bit(zone_touched, true);
-    //   if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [4] : ", "INFO : ");
-    // } 
-
-    // {
-    //   snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
-    //   geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 1, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-    //   my_calo_ctw.set_header(57,
-    // 			     my_ctw_gid,
-    // 			     1500); // hit, gid, clocktick
-    //   my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
-    //   my_calo_ctw.grab_auxiliaries().store_flag("mock");
-    //   my_calo_ctw.set_htm_main_wall(1);
-    //   int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 8;
-    //   my_calo_ctw.set_zoning_bit(zone_touched, true);
-    //   if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [1] : ", "INFO : ");
-    // }
-    // {
-    //   snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
-    //   geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 1, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-    //   my_calo_ctw.set_header(58,
-    // 			     my_ctw_gid,
-    // 			     1503); // hit, gid, clocktick
-    //   my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
-    //   my_calo_ctw.grab_auxiliaries().store_flag("mock");
-    //   my_calo_ctw.set_htm_main_wall(1);
-    //   int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 2;
-    //   my_calo_ctw.set_zoning_bit(zone_touched, true);
-    //   if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [2] : ", "INFO : ");
-    // }
-    // {
-    //   snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
-    //   geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 1, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-    //   my_calo_ctw.set_header(58,
-    // 			     my_ctw_gid,
-    // 			     1504); // hit, gid, clocktick
-    //   my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
-    //   my_calo_ctw.grab_auxiliaries().store_flag("mock");
-    //   my_calo_ctw.set_htm_main_wall(1);
-    //   int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 7;
-    //   my_calo_ctw.set_zoning_bit(zone_touched, true);
-    //   if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [2] : ", "INFO : ");
-    // }
-    // {
-    //   snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
-    //   geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 0, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-    //   my_calo_ctw.set_header(58,
-    // 			     my_ctw_gid,
-    // 			     1804); // hit, gid, clocktick
-    //   my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
-    //   my_calo_ctw.grab_auxiliaries().store_flag("mock");
-    //   my_calo_ctw.set_htm_main_wall(2);
-    //   int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 7;
-    //   my_calo_ctw.set_zoning_bit(zone_touched, true);
-    //   zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 1;
-    //   my_calo_ctw.set_zoning_bit(zone_touched, true);
-    //   if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [2] : ", "INFO : ");
-    // }
-
-    {
-      snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
-      geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 1, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-      my_calo_ctw.set_header(47,
-    			     my_ctw_gid,
-    			     155); // hit, gid, clocktick
-      my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
-      my_calo_ctw.grab_auxiliaries().store_flag("mock");
-      my_calo_ctw.set_htm_main_wall(1);
-      int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 0;
-      my_calo_ctw.set_zoning_bit(zone_touched, true);
-      if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [4] : ", "INFO : ");
-    }  
-
-    {
-      snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
-      geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 1, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
-      my_calo_ctw.set_header(47,
-    			     my_ctw_gid,
-    			     157); // hit, gid, clocktick
+			     200); // hit, gid, clocktick25ns
       my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
       my_calo_ctw.grab_auxiliaries().store_flag("mock");
       my_calo_ctw.set_htm_main_wall(1);
       int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 5;
       my_calo_ctw.set_zoning_bit(zone_touched, true);
-      my_calo_ctw.set_lto_main_wall_bit(true);
-      if (debug) my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [4] : ", "INFO : ");
+      // my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [0] : ", "INFO : ");
     }
-    
-    // snemo::digitization::geiger_ctw_data my_geiger_ctw_data;
-    // {
-    //   snemo::digitization::geiger_ctw & my_geiger_ctw = my_geiger_ctw_data.add();
-    //   geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::TRACKER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::GEIGER_RACK_ID, 1, 10);
-    //   my_geiger_ctw.set_header(86,
-    // 			       my_ctw_gid
-    // 			       );
-    //   my_geiger_ctw.grab_auxiliaries().store("author", "guillaume");
-    //   my_geiger_ctw.grab_auxiliaries().store_flag("mock");
-    // }
 
-    //clock_utils::CALO_CB_SHIFT_CLOCKTICK_NUMBER
-      
-    if (debug) my_calo_ctw_data.tree_dump(std::clog, "Calorimeter CTW(s) data : ", "INFO : ");
-		   
-    // Creation of geiger ctw data :
-    snemo::digitization::geiger_ctw_data my_geiger_ctw_data;
+    // Creation of a prompt track during 10 CT 1600:
+    for (unsigned int ict = 8; ict < 19; ict++)
+      {
+	{
+	  snemo::digitization::geiger_ctw & my_geiger_ctw = my_geiger_ctw_data.add();
+	  geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::TRACKER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::GEIGER_RACK_ID, 1, 10);
+	  my_geiger_ctw.set_header(ict+50,
+				   my_ctw_gid,
+				   ict);
+	  my_geiger_ctw.grab_auxiliaries().store("author", "guillaume");
+	  my_geiger_ctw.grab_auxiliaries().store_flag("mock");
 
-    if (debug) my_geiger_ctw_data.tree_dump(std::clog, "Geiger CTW(s) data : ", "INFO : ");
+	  std::bitset<55> geiger_information;
+	  for (unsigned int i = 0; i < 10; i++)
+	    {
+	      geiger_information.set(i, true);
+	    }
+	  unsigned int block_index = 6;
+	  my_geiger_ctw.set_55_bits_in_ctw_word(block_index, geiger_information);
+	  std::bitset<5> hardware_status (std::string("01111"));
+	  std::bitset<2> crate_id = 0x1;
+	  my_geiger_ctw.set_full_hardware_status(hardware_status);
+	  my_geiger_ctw.set_full_crate_id(crate_id);
+	  // my_geiger_ctw.tree_dump(std::clog, "My_geiger_CTW [0] : ", "INFO : ");
+	}
+      }
+
+    // Test creation of a second event calorimeter / tracker (to see the comportement of PERs)
+    // Add fake CTW calo and geiger :
+    {
+      snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
+      geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::CALORIMETER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::CALO_RACK_ID, 0, 10); // GID : [type]:[RACK],[CRATE],[BOARD]
+      my_calo_ctw.set_header(155,
+			     my_ctw_gid,
+			     16000); // hit, gid, clocktick25ns
+      my_calo_ctw.grab_auxiliaries().store("author", "guillaume");
+      my_calo_ctw.grab_auxiliaries().store_flag("mock");
+      my_calo_ctw.set_htm_main_wall(1);
+      int zone_touched = snemo::digitization::calo::ctw::W_ZW_BIT0 + 7;
+      my_calo_ctw.set_zoning_bit(zone_touched, true);
+      // my_calo_ctw.tree_dump(std::clog, "My_calo_CTW [0] : ", "INFO : ");
+    }
+
+    {
+      for (unsigned int ict = 500; ict < 512; ict++)
+	{
+	  snemo::digitization::geiger_ctw & my_geiger_ctw = my_geiger_ctw_data.add();
+	  geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::TRACKER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::GEIGER_RACK_ID, 1, 10);
+	  my_geiger_ctw.set_header(ict+50,
+				   my_ctw_gid,
+				   ict); // hit, gid, clocktick800ns
+	  my_geiger_ctw.grab_auxiliaries().store("author", "guillaume");
+	  my_geiger_ctw.grab_auxiliaries().store_flag("mock");
+
+	  std::bitset<55> geiger_information;
+	  for (unsigned int i = 0; i < 15; i++)
+	    {
+	      geiger_information.set(i, true);
+	    }
+	  unsigned int block_index = 18;
+	  my_geiger_ctw.set_55_bits_in_ctw_word(block_index, geiger_information);
+	  std::bitset<5> hardware_status (std::string("01111"));
+	  std::bitset<2> crate_id = 0x1;
+	  my_geiger_ctw.set_full_hardware_status(hardware_status);
+	  my_geiger_ctw.set_full_crate_id(crate_id);
+	  // my_geiger_ctw.tree_dump(std::clog, "My_geiger_CTW [0] : ", "INFO : ");
+	}
+    }
+
+    // An other delayed tracker event to see with which PER it will be compared:
+    {
+      // Creation of a delayed track during 3 CT 1600:
+      for (unsigned int ict = 900; ict < 906; ict++)
+	{
+	  snemo::digitization::geiger_ctw & my_geiger_ctw = my_geiger_ctw_data.add();
+	  geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::TRACKER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::GEIGER_RACK_ID, 1, 10);
+	  my_geiger_ctw.set_header(ict+50,
+				   my_ctw_gid,
+				   ict); // hit, gid, clocktick800ns
+	  my_geiger_ctw.grab_auxiliaries().store("author", "guillaume");
+	  my_geiger_ctw.grab_auxiliaries().store_flag("mock");
+
+	  std::bitset<55> geiger_information;
+	  for (unsigned int i = 0; i < 4; i++)
+	    {
+	      geiger_information.set(i, true);
+	    }
+	  unsigned int block_index = 8;
+	  my_geiger_ctw.set_55_bits_in_ctw_word(block_index, geiger_information);
+	  std::bitset<5> hardware_status (std::string("01111"));
+	  std::bitset<2> crate_id = 0x1;
+	  my_geiger_ctw.set_full_hardware_status(hardware_status);
+	  my_geiger_ctw.set_full_crate_id(crate_id);
+	  // my_geiger_ctw.tree_dump(std::clog, "My_geiger_CTW [0] : ", "INFO : ");
+	}
+    }
+
+
+    // An other far delayed tracker event to see the fall of PER counters:
+    {
+      for (unsigned int ict = 1600; ict < 1605; ict++)
+	{
+	  snemo::digitization::geiger_ctw & my_geiger_ctw = my_geiger_ctw_data.add();
+	  geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::TRACKER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::GEIGER_RACK_ID, 1, 10);
+	  my_geiger_ctw.set_header(ict+50,
+				   my_ctw_gid,
+				   ict); // hit, gid, clocktick800ns
+	  my_geiger_ctw.grab_auxiliaries().store("author", "guillaume");
+	  my_geiger_ctw.grab_auxiliaries().store_flag("mock");
+
+	  std::bitset<55> geiger_information;
+	  for (unsigned int i = 0; i < 4; i++)
+	    {
+	      geiger_information.set(i, true);
+	    }
+	  unsigned int block_index = 18;
+	  my_geiger_ctw.set_55_bits_in_ctw_word(block_index, geiger_information);
+	  std::bitset<5> hardware_status (std::string("01111"));
+	  std::bitset<2> crate_id = 0x1;
+	  my_geiger_ctw.set_full_hardware_status(hardware_status);
+	  my_geiger_ctw.set_full_crate_id(crate_id);
+	  // my_geiger_ctw.tree_dump(std::clog, "My_geiger_CTW [0] : ", "INFO : ");
+	}
+    }
+
+
+    // An other far far far delayed tracker event to see the fall of all PERs counters:
+    {
+      for (unsigned int ict = 4000; ict < 4005; ict++)
+	{
+	  snemo::digitization::geiger_ctw & my_geiger_ctw = my_geiger_ctw_data.add();
+	  geomtools::geom_id my_ctw_gid(snemo::digitization::mapping::TRACKER_CONTROL_BOARD_TYPE, snemo::digitization::mapping::GEIGER_RACK_ID, 1, 10);
+	  my_geiger_ctw.set_header(ict+50,
+				   my_ctw_gid,
+				   ict); // hit, gid, clocktick800ns
+	  my_geiger_ctw.grab_auxiliaries().store("author", "guillaume");
+	  my_geiger_ctw.grab_auxiliaries().store_flag("mock");
+
+	  std::bitset<55> geiger_information;
+	  for (unsigned int i = 0; i < 6; i++)
+	    {
+	      geiger_information.set(i, true);
+	    }
+	  unsigned int block_index = 5;
+	  my_geiger_ctw.set_55_bits_in_ctw_word(block_index, geiger_information);
+	  std::bitset<5> hardware_status (std::string("01111"));
+	  std::bitset<2> crate_id = 0x1;
+	  my_geiger_ctw.set_full_hardware_status(hardware_status);
+	  my_geiger_ctw.set_full_crate_id(crate_id);
+	  // my_geiger_ctw.tree_dump(std::clog, "My_geiger_CTW [0] : ", "INFO : ");
+	}
+    }
 
     // Creation of outputs collection structures for calo and tracker
-    std::vector<snemo::digitization::calo_trigger_algorithm::calo_summary_record> calo_collection_records;
-    std::vector<snemo::digitization::tracker_trigger_algorithm::tracker_record>   tracker_collection_records;
-    
-    // Reseting trigger display
-    my_trigger_display.reset_matrix_pattern();
+    std::vector<snemo::digitization::trigger_structures::calo_summary_record> calo_collection_records;
+    std::vector<snemo::digitization::trigger_structures::coincidence_calo_record> coincidence_collection_calo_records;
+    std::vector<snemo::digitization::trigger_structures::tracker_record>   tracker_collection_records;
+    std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records;
 
     // Trigger process
     my_trigger_algo.process(my_calo_ctw_data,
 			    my_geiger_ctw_data);
-    
+
     // Finale structures :
-    calo_collection_records = my_trigger_algo.get_calo_records_vector();
+    calo_collection_records = my_trigger_algo.get_calo_records_25ns_vector();
+    coincidence_collection_calo_records =  my_trigger_algo.get_coincidence_calo_records_1600ns_vector();
     tracker_collection_records = my_trigger_algo.get_tracker_records_vector();
- 
-    // if (debug) my_trigger_display.display_calo_trigger_25ns(my_trigger_algo);
-    // if (debug) my_trigger_display.display_calo_trigger_1600ns(my_trigger_algo);
+    coincidence_collection_records = my_trigger_algo.get_coincidence_records_vector();
 
-    std::vector<snemo::digitization::coincidence_trigger_algorithm::coincidence_calo_record> coincidence_collection_calo_records = my_trigger_algo.get_coincidence_calo_records_vector();
-
-    if (debug) std::clog << "Calo collection record size @ 25ns   = " << calo_collection_records.size() << std::endl;
-    if (debug) std::clog << "Calo collection record size @ 1600ns = " << coincidence_collection_calo_records.size() << std::endl;
-
-    bool raw_trigger_prompt_decision = my_trigger_algo.get_finale_decision();
-    bool raw_trigger_delayed_decision = my_trigger_algo.get_delayed_finale_decision();
-
-    if (debug) std::clog << "trigger_finale_decision         [" << raw_trigger_prompt_decision << "]" << std::endl;
-    if (debug) std::clog << "delayed trigger_finale_decision [" << raw_trigger_delayed_decision << "]" << std::endl;
-
-    my_trigger_algo.clear_records();
+    my_trigger_algo.reset_data();
 
     std::clog << "The end." << std::endl;
   }
+
   catch (std::exception & error) {
     DT_LOG_FATAL(logging, error.what());
     error_code = EXIT_FAILURE;
@@ -375,5 +449,3 @@ int main( int  argc_ , char **argv_  )
   falaise::terminate();
   return error_code;
 }
-
-

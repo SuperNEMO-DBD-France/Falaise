@@ -32,22 +32,6 @@ int main( int  argc_ , char ** argv_ )
   falaise::initialize(argc_, argv_);
   int error_code = EXIT_SUCCESS;
   datatools::logger::priority logging = datatools::logger::PRIO_FATAL;
-  int iarg = 1;
-  bool is_input_file = false;
-  std::string input_filename;
-  while (iarg < argc_) {
-    std::string arg = argv_[iarg];
-    if (arg == "-i" || arg == "--input") {
-      is_input_file = true;
-      input_filename=argv_[++iarg];
-    } else if (arg == "-f" || arg == "--filename") {
-      input_filename=argv_[++iarg];
-    }
-    iarg++;
-  }
-
-
-
 
   try {
     std::clog << "Test program for class 'snemo::digitization::sd_to_calo_tp_algo' !" << std::endl;
@@ -56,41 +40,20 @@ int main( int  argc_ , char ** argv_ )
     random_generator.initialize(seed);
 
     std::string manager_config_file;
-    
-    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf";
+
+    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/4.0/manager.conf";
     datatools::fetch_path_with_env (manager_config_file);
     datatools::properties manager_config;
     datatools::properties::read_config (manager_config_file,
 					manager_config);
     geomtools::manager my_manager;
-   
+
     manager_config.update ("build_mapping", true);
     if (manager_config.has_key ("mapping.excluded_categories"))
       {
 	manager_config.erase ("mapping.excluded_categories");
       }
     my_manager.initialize (manager_config);
-
-    std::string pipeline_simulated_data_filename="";
-    // std::string SD_bank_label = "SD";
-
-
-    if(is_input_file){
-      pipeline_simulated_data_filename = input_filename;
-    }
-    //else{
-   //    pipeline_simulated_data_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio";
-   //  }
-
-    
-    // dpp::input_module reader;
-    // datatools::properties reader_config;
-    // reader_config.store ("logging.priority", "debug");
-    // reader_config.store ("max_record_total", 1);
-    // reader_config.store ("files.mode", "single");
-    // reader_config.store ("files.single.filename", pipeline_simulated_data_filename);
-    // reader.initialize_standalone (reader_config);
-    // reader.tree_dump (std::clog, "Simulated data reader module");
 
     snemo::digitization::clock_utils my_clock_manager;
     my_clock_manager.initialize();
@@ -136,11 +99,11 @@ int main( int  argc_ , char ** argv_ )
     snemo::digitization::geiger_tp_data my_geiger_tp_data;
 
     if( signal_data.has_geiger_signals())
-      {		  
+      {
 	signal_2_geiger_tp.process(signal_data, my_geiger_tp_data);
 	my_geiger_tp_data.tree_dump(std::clog, "Geiger TP(s) data : ", "INFO : ");
-      }	    
-    
+      }
+
     std::clog << "The end." << std::endl;
   }
 

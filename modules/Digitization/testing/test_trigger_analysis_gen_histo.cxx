@@ -36,14 +36,14 @@ int main(int  argc_ , char ** argv_)
 
   // Parsing arguments
   int iarg = 1;
-  bool is_input_file   = false;  
-  bool is_output_path  = false;  
+  bool is_input_file   = false;
+  bool is_output_path  = false;
   bool is_event_number = false;
   bool is_run_number   = false;
   bool is_help         = false;
 
   std::string input_filename;
-  std::string output_path;  
+  std::string output_path;
   int arg_event_number  = -1;
   int arg_run_number    = -1;
 
@@ -58,13 +58,13 @@ int main(int  argc_ , char ** argv_)
     else if (arg == "-op" || arg == "--output-path")
       {
 	is_output_path = true;
-	output_path = argv_[++iarg];	
+	output_path = argv_[++iarg];
       }
 
     else if (arg == "-rn" || arg == "--run-number")
       {
 	is_run_number = true;
-	arg_run_number = atoi(argv_[++iarg]);	
+	arg_run_number = atoi(argv_[++iarg]);
       }
 
     else if (arg == "-n" || arg == "--number")
@@ -79,8 +79,8 @@ int main(int  argc_ , char ** argv_)
       }
     iarg++;
   }
-  
-  if (is_help) 
+
+  if (is_help)
     {
       std::cerr << std::endl << "Usage :" << std::endl << std::endl
 		<< "$ BuildProducts/bin/falaisedigitizationplugin-test_trigger_analysis_gen_histo [OPTIONS] [ARGUMENTS]" << std::endl << std::endl
@@ -91,22 +91,22 @@ int main(int  argc_ , char ** argv_)
 		<< "-rn [ --run-number ]     set the output run number for output files (ex : -rn 10 ::  output -> tracker_trigger_algorithm_10.brio)" << std::endl
 		<< "-n  [ --number ]         set the number of events" << std::endl
 		<< "Example : " << std::endl << std::endl
-		<< "--input ${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio" 
+		<< "--input ${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio"
 		<< " --output-path ${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/" << std::endl << std::endl;
       return 0;
     }
 
   // Process
-  try {  
+  try {
     std::clog << "Test program for class 'snemo::digitization::trigger_analysis_gen_histo' !" << std::endl;
-   
+
     // Geometry manager
     std::string manager_config_file;
-    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf";
+    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/4.0/manager.conf";
     datatools::fetch_path_with_env(manager_config_file);
     datatools::properties manager_config;
     datatools::properties::read_config (manager_config_file,
-					manager_config); 
+					manager_config);
     geomtools::manager my_manager;
     manager_config.update ("build_mapping", true);
     if (manager_config.has_key ("mapping.excluded_categories"))
@@ -122,7 +122,7 @@ int main(int  argc_ , char ** argv_)
     // Default input file :
     datatools::fetch_path_with_env(input_filename);
     if (is_input_file) pipeline_simulated_data_filename = input_filename;
-    else              pipeline_simulated_data_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio"; 
+    else              pipeline_simulated_data_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio";
     datatools::fetch_path_with_env(pipeline_simulated_data_filename);
 
     // Number of events :
@@ -130,7 +130,7 @@ int main(int  argc_ , char ** argv_)
     if (is_event_number)  event_number = arg_event_number;
     else                 event_number = 1000000;
 
-    // Set output histo name : 
+    // Set output histo name :
     std::string output_tracker_histo_1;
     std::string output_tracker_histo_2;
     std::string output_tracker_histo_3;
@@ -158,7 +158,7 @@ int main(int  argc_ , char ** argv_)
       {
 	// Default testing :
 	std::string default_path = "${FALAISE_DIGITIZATION_TESTING_DIR}/output_default/";
-	std::string default_run_number   = "999";        
+	std::string default_run_number   = "999";
 	output_tracker_histo_1 = default_path + "tracker_trigger_histo_" + default_run_number + "_1_mean.hist";
 	datatools::fetch_path_with_env(output_tracker_histo_1);
 	output_tracker_histo_2 = default_path + "tracker_trigger_histo_" + default_run_number + "_2_xy.hist";
@@ -188,7 +188,7 @@ int main(int  argc_ , char ** argv_)
     reader_config.store ("files.mode", "single");
     reader_config.store ("files.single.filename", pipeline_simulated_data_filename);
     reader.initialize_standalone (reader_config);
-    reader.tree_dump (std::clog, "Simulated data reader module");    
+    reader.tree_dump (std::clog, "Simulated data reader module");
 
     // Event record :
     datatools::things ER;
@@ -201,8 +201,8 @@ int main(int  argc_ , char ** argv_)
 	reader.process(ER);
 
 	// A plain `mctools::simulated_data' object is stored here :
-	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label)) 
-	  {	   
+	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label))
+	  {
 	    // Access to the "SD" bank with a stored `mctools::simulated_data' :
 	    const mctools::simulated_data & SD = ER.get<mctools::simulated_data>(SD_bank_label);
 	    //SD.tree_dump(std::clog, "my_SD", "SD :");
@@ -212,10 +212,10 @@ int main(int  argc_ , char ** argv_)
 		for (unsigned int i = 0; i < number_of_step_hits; i++)
 		  {
 		    const mctools::base_step_hit & base_step_hit = SD.get_step_hit("gg", i);
-	
+
 		    geomtools::vector_3d anode_position_start (0,0,0);
 		    const geomtools::vector_3d & anode_position_stop = base_step_hit.get_position_stop();
-		    
+
 		    // double x = anode_position_stop.getX();
 		    double y = anode_position_stop.getY();
 		    double z = anode_position_stop.getZ();
@@ -230,16 +230,16 @@ int main(int  argc_ , char ** argv_)
 
 		    //std::clog << "DEBUG : X = " << x << " Y = " << y << " Z = " << z << std::endl;
 		  }
-		
+
 		mean_number_of_geiger_cell.fill((number_of_step_hits + 1e-7), weight);
-	      } // end of if has "gg" step hits	 
+	      } // end of if has "gg" step hits
 	    else
 	      {
 		number_of_step_hits = 0;
 		mean_number_of_geiger_cell.fill((number_of_step_hits + 1e-7), weight);
 	      }
-	    
-	  } // end of if has bank label 
+
+	  } // end of if has bank label
 	ER.clear();
 
 	psd_count++;

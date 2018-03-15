@@ -5,7 +5,7 @@
 
 // GSL:
 #include <bayeux/mygsl/rng.h>
-// BOOST : 
+// BOOST :
 #include <boost/bimap.hpp>
 // - Bayeux/datatools:
 #include <datatools/utils.h>
@@ -40,14 +40,14 @@ int main( int  argc_ , char ** argv_  )
     random_generator.initialize(seed);
 
     std::string manager_config_file;
-    
-    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf";
+
+    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/4.0/manager.conf";
     datatools::fetch_path_with_env (manager_config_file);
     datatools::properties manager_config;
     datatools::properties::read_config (manager_config_file,
 					manager_config);
     geomtools::manager my_manager;
-   
+
     manager_config.update ("build_mapping", true);
     if (manager_config.has_key ("mapping.excluded_categories"))
       {
@@ -55,15 +55,15 @@ int main( int  argc_ , char ** argv_  )
       }
     my_manager.initialize (manager_config);
 
- 
-  
+
+
     snemo::digitization::electronic_mapping my_e_mapping;
-    
- 
+
+
 
     my_e_mapping.set_geo_manager(my_manager);
 
- 
+
 
     my_e_mapping.set_module_number(0);
     my_e_mapping.initialize();
@@ -80,7 +80,7 @@ int main( int  argc_ , char ** argv_  )
     geomtools::geom_id EID4;
     geomtools::geom_id EID5;
 
-    
+
     my_e_mapping.convert_GID_to_EID(snemo::digitization::mapping::THREE_WIRES_TRACKER_MODE, GID1, EID1);
     std::cout <<"GID1 : "<<  GID1;
     std::cout <<" ---> EID1 : "<<  EID1<<std::endl;
@@ -96,7 +96,7 @@ int main( int  argc_ , char ** argv_  )
     my_e_mapping.convert_GID_to_EID(snemo::digitization::mapping::THREE_WIRES_TRACKER_MODE, GID4, EID4);
     std::cout <<"GID4 : "<<  GID4;
     std::cout <<" ---> EID4 : "<<  EID4<<std::endl;
-    
+
     my_e_mapping.convert_GID_to_EID(snemo::digitization::mapping::THREE_WIRES_TRACKER_MODE, GID5, EID5);
     std::cout <<"GID5 : "<<  GID5;
     std::cout <<" ---> EID5 : "<<  EID5<<std::endl;
@@ -106,19 +106,13 @@ int main( int  argc_ , char ** argv_  )
       DT_LOG_FATAL(logging, error.what());
       error_code = EXIT_FAILURE;
     }
-    
+
     catch (...) {
       DT_LOG_FATAL(logging, "Unexpected error!");
       error_code = EXIT_FAILURE;
     }
-    
+
   falaise::terminate();
   return error_code;
-  
+
   }
-
-
-
-
-
-   

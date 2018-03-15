@@ -26,7 +26,6 @@ namespace snemo {
   namespace digitization {
 
 		class trigger_algorithm;
-		class trigger_algorithm_test_time;
 
     /// \brief This is the trigger display manager
     /// It can display :
@@ -125,7 +124,7 @@ namespace snemo {
 
 			/// Display few clockticks for a coincidence event 1600ns for trigger board implementation at LAL
 			void display_trigger_implementation_1600ns(std::ofstream & out_,
-																								 const trigger_algorithm_test_time & a_trigger_algo_);
+																								 const trigger_algorithm & a_trigger_algo_);
 
 			/// Fill display matrix with the initial pattern
 			void fill_matrix_pattern();

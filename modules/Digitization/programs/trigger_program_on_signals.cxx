@@ -1,4 +1,4 @@
-// test_trigger_algorithm_test_time.cxx
+// trigger_program_on_signals.cxx
 // Standard libraries :
 #include <iostream>
 
@@ -36,7 +36,7 @@
 #include <snemo/digitization/signal_to_geiger_tp_algo.h>
 #include <snemo/digitization/geiger_tp_to_ctw_algo.h>
 
-#include <snemo/digitization/trigger_algorithm_test_time.h>
+#include <snemo/digitization/trigger_algorithm.h>
 
 int main( int  argc_ , char **argv_  )
 {
@@ -189,7 +189,7 @@ int main( int  argc_ , char **argv_  )
     geiger_tp_2_ctw.initialize();
 
     // Creation and initialization of trigger algorithm :
-    snemo::digitization::trigger_algorithm_test_time my_trigger_algo;
+    snemo::digitization::trigger_algorithm my_trigger_algo;
     my_trigger_algo.set_electronic_mapping(my_e_mapping);
     my_trigger_algo.set_clock_manager(my_clock_manager);
     my_trigger_algo.initialize(trigger_config);

@@ -17,6 +17,10 @@
 // Falaise:
 #include <falaise/falaise.h>
 
+// Third part :
+// Boost :
+#include <boost/program_options.hpp>
+
 // This project :
 #include <snemo/digitization/clock_utils.h>
 #include <snemo/digitization/sd_to_calo_signal_algo.h>
@@ -31,31 +35,45 @@ int main( int  argc_ , char **argv_  )
   int error_code = EXIT_SUCCESS;
   datatools::logger::priority logging = datatools::logger::PRIO_FATAL;
 
+  std::string input_filename = "";
+  int max_events = 0;
 
-  int iarg = 1;
-  bool is_input_file = false;
-  std::string input_filename;
-  while (iarg < argc_) {
-    std::string arg = argv_[iarg];
-    if (arg == "-i" || arg == "--input") {
-      is_input_file = true;
-      input_filename=argv_[++iarg];
-    } else if (arg == "-f" || arg == "--filename") {
-      input_filename=argv_[++iarg];
-    }
-    iarg++;
+  // Parse options:
+  namespace po = boost::program_options;
+  po::options_description opts("Allowed options");
+  opts.add_options()
+    ("help,h", "produce help message")
+    ("input,i",
+     po::value<std::string>(& input_filename),
+     "set an input file")
+    ("event_number,n",
+     po::value<int>(& max_events)->default_value(10),
+     "set the maximum number of events")
+    ; // end of options description
+
+  // Describe command line arguments :
+  po::variables_map vm;
+  po::store(po::command_line_parser(argc_, argv_)
+	    .options(opts)
+	    .run(), vm);
+  po::notify(vm);
+
+  // Use command line arguments :
+  if (vm.count("help")) {
+    std::cout << "Usage : " << std::endl;
+    std::cout << opts << std::endl;
+    return(error_code);
   }
-  
 
   try {
     std::clog << "Test program for class 'snemo::digitization::calo_trigger_algorithm' !" << std::endl;
     int32_t seed = 314159;
     mygsl::rng random_generator;
     random_generator.initialize(seed);
-    
+
     std::string manager_config_file;
-    
-    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/3.0/manager.conf";
+
+    manager_config_file = "@falaise:config/snemo/demonstrator/geometry/4.0/manager.conf";
     datatools::fetch_path_with_env(manager_config_file);
     datatools::properties manager_config;
     datatools::properties::read_config (manager_config_file,
@@ -71,7 +89,7 @@ int main( int  argc_ , char **argv_  )
     std::string pipeline_simulated_data_filename;
     std::string SD_bank_label = "SD";
 
-    if(is_input_file){
+    if(!input_filename.empty()){
       pipeline_simulated_data_filename = input_filename;
     }else{
       //pipeline_simulated_data_filename = "${FALAISE_DIGITIZATION_TESTING_DIR}/data/Se82_0nubb-source_strips_bulk_SD_10_events.brio";
@@ -79,11 +97,11 @@ int main( int  argc_ , char **argv_  )
     }
     datatools::fetch_path_with_env(pipeline_simulated_data_filename);
 
-    
+
     dpp::input_module reader;
     datatools::properties reader_config;
     reader_config.store ("logging.priority", "debug");
-    reader_config.store ("max_record_total", 100);
+    reader_config.store ("max_record_total", max_events);
     reader_config.store ("files.mode", "single");
     reader_config.store ("files.single.filename", pipeline_simulated_data_filename);
     reader.initialize_standalone (reader_config);
@@ -102,13 +120,13 @@ int main( int  argc_ , char **argv_  )
 
     snemo::digitization::clock_utils my_clock_manager;
     my_clock_manager.initialize();
-    
+
     int psd_count = 0;
     while (!reader.is_terminated())
       {
 	reader.process(ER);
 	// A plain `mctools::simulated_data' object is stored here :
-	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label)) 
+	if (ER.has(SD_bank_label) && ER.is_a<mctools::simulated_data>(SD_bank_label))
 	  {
 	    // Access to the "SD" bank with a stored `mctools::simulated_data' :
 	    const mctools::simulated_data & SD = ER.get<mctools::simulated_data>(SD_bank_label);
@@ -118,9 +136,9 @@ int main( int  argc_ , char **argv_  )
 	    my_clock_manager.compute_clockticks_ref(random_generator);
 	    uint32_t clocktick_25_reference  = my_clock_manager.get_clocktick_25_ref();
 	    double  clocktick_25_shift      = my_clock_manager.get_shift_25();
-	 
+
 	    snemo::digitization::signal_data signal_data;
-	    std::vector<snemo::digitization::calo_trigger_algorithm::calo_summary_record> calo_collection_records;
+	    std::vector<snemo::digitization::trigger_structures::calo_summary_record> calo_collection_records;
 
 	    if (SD.has_step_hits("calo") || SD.has_step_hits("xcalo") || SD.has_step_hits("gveto"))
 	      {
@@ -138,7 +156,7 @@ int main( int  argc_ , char **argv_  )
 		    signal_2_calo_tp.process(signal_data, my_calo_tp_data);
 
 		    my_calo_tp_data.tree_dump(std::clog, "Calorimeter TP(s) data : ", "INFO : ");
-		  
+
 		    snemo::digitization::calo_ctw_data my_calo_ctw_data;
 		    snemo::digitization::calo_tp_to_ctw_algo calo_tp_2_ctw_0;
 		    calo_tp_2_ctw_0.set_crate_number(snemo::digitization::mapping::MAIN_CALO_SIDE_0_CRATE);
@@ -155,7 +173,6 @@ int main( int  argc_ , char **argv_  )
 		    calo_tp_2_ctw_2.process(my_calo_tp_data, my_calo_ctw_data);
 
 		    snemo::digitization::calo_trigger_algorithm my_calo_algo;
-		    my_calo_algo.set_electronic_mapping(my_e_mapping);
 		    unsigned int calo_circular_buffer_depth = 4;
 		    my_calo_algo.set_circular_buffer_depth(calo_circular_buffer_depth);
 		    // my_calo_algo.inhibit_both_side_coinc();
@@ -163,7 +180,7 @@ int main( int  argc_ , char **argv_  )
 		    unsigned int calo_threshold = 1;
 		    my_calo_algo.set_total_multiplicity_threshold(calo_threshold);
 		    my_calo_algo.initialize_simple();
-		
+
 		    // // Modification of my_calo_ctw_data for a test.
 		    // {
 		    //   snemo::digitization::calo_ctw & my_calo_ctw = my_calo_ctw_data.add();
@@ -181,17 +198,17 @@ int main( int  argc_ , char **argv_  )
 		    //   my_calo_ctw.set_zoning_word(zoning_word);
 		    //   my_calo_ctw.tree_dump(std::clog, "my_calo_CTW_data : ", "INFO : ");
 		    // }
-		
+
 		    my_calo_ctw_data.tree_dump(std::clog, "Calorimeter CTW(s) data : ", "INFO : ");
 		    my_calo_algo.process(my_calo_ctw_data, calo_collection_records);
 
-		    snemo::digitization::calo_trigger_algorithm::calo_summary_record calo_level_one_finale_decision;
+		    snemo::digitization::trigger_structures::calo_summary_record calo_level_one_finale_decision;
 		    calo_level_one_finale_decision = my_calo_algo.get_calo_level_1_finale_decision_structure();
-		
+
 		  } // end of if has calo signal
-		
+
 	      } // end of if has "calo" || "xcalo" || "gveto" step hits
-	    
+
 	  }
 	ER.clear();
 
@@ -199,7 +216,7 @@ int main( int  argc_ , char **argv_  )
 	std::clog << "DEBUG : psd count " << psd_count << std::endl;
 	DT_LOG_NOTICE(logging, "Simulated data #" << psd_count);
       }
-    
+
     std::clog << "The end." << std::endl;
   }
   catch (std::exception & error) {

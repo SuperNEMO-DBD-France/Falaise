@@ -46,7 +46,7 @@
 #include <falaise/snemo/digitization/signal_to_geiger_tp_algo.h>
 #include <falaise/snemo/digitization/calo_tp_to_ctw_algo.h>
 #include <falaise/snemo/digitization/geiger_tp_to_ctw_algo.h>
-#include <falaise/snemo/digitization/trigger_algorithm_test_time.h>
+#include <falaise/snemo/digitization/trigger_algorithm.h>
 
 
 namespace snemo {
@@ -78,7 +78,7 @@ namespace snemo {
 
       /// Reset the clusterizer
       virtual void reset();
-      
+
       /// Check the initialization status
       bool is_initialized() const;
 
@@ -86,18 +86,18 @@ namespace snemo {
       void process_digitization_algorithms(const mctools::signal::signal_data & SSD_);
 
     private:
-      
+
       // Configuration:
       bool _initialized_; //!< Initialization status
       const geomtools::manager * _geometry_manager_;  //!< The SuperNEMO geometry manager
 
       // Algorithms:
-      
+
       snemo::digitization::signal_to_calo_tp_algo _calo_signal_to_tp_algo_; //!< Calo signal algo to calo trigger primitive
       snemo::digitization::signal_to_geiger_tp_algo _geiger_signal_to_tp_algo_; //!< Geiger signal algo to geiger trigger primitive
       snemo::digitization::calo_tp_to_ctw_algo _calo_tp_to_ctw_algo_; //!< Calo TP to crate trigger word algo
       snemo::digitization::geiger_tp_to_ctw_algo _geiger_tp_to_ctw_algo_; //!< Geiger TP to crate trigger word algo
-      snemo::digitization::trigger_algorithm_test_time _trigger_algo_; //!< The trigger alogirhtm
+      snemo::digitization::trigger_algorithm _trigger_algo_; //!< The trigger alogirhtm
     };
 
   }  // end of namespace digitization

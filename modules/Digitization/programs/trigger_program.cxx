@@ -36,7 +36,7 @@
 #include <snemo/digitization/signal_to_geiger_tp_algo.h>
 #include <snemo/digitization/geiger_tp_to_ctw_algo.h>
 
-#include <snemo/digitization/trigger_algorithm_test_time.h>
+#include <snemo/digitization/trigger_algorithm.h>
 
 int main( int  argc_ , char **argv_  )
 {
@@ -339,7 +339,7 @@ int main( int  argc_ , char **argv_  )
     // trigger_config.tree_dump(std::clog, "My trigger configuration");
 
     // Creation and initialization of trigger algorithm :
-    snemo::digitization::trigger_algorithm_test_time my_trigger_algo;
+    snemo::digitization::trigger_algorithm my_trigger_algo;
     my_trigger_algo.set_electronic_mapping(my_e_mapping);
     my_trigger_algo.set_clock_manager(my_clock_manager);
     my_trigger_algo.initialize(trigger_config);
@@ -357,7 +357,7 @@ int main( int  argc_ , char **argv_  )
     ft_config.store ("files.mode", "single");
     ft_config.store ("files.single.filename", fake_trigger_filename);
     ft_writer.initialize_standalone (ft_config);
-    
+
     // No real trigger but FT writer
     std::string ft_no_rt_filename = output_path + "ft_no_rt_SD.brio"; // rt : real trigger
     dpp::output_module ft_no_rt_writer;
@@ -366,7 +366,7 @@ int main( int  argc_ , char **argv_  )
     ft_no_rt_config.store ("files.mode", "single");
     ft_no_rt_config.store ("files.single.filename", ft_no_rt_filename);
     ft_no_rt_writer.initialize_standalone (ft_no_rt_config);
-    
+
     // Caraco trigger writer
     std::string caraco_trigger_filename = output_path + "caraco_trigger_SD.brio";
     dpp::output_module caraco_writer;
@@ -616,7 +616,7 @@ int main( int  argc_ , char **argv_  )
 
 	    if (real_trigger_decision) total_number_of_real_trigger_events++;
 
-	    if (ft_passed && !real_trigger_decision) 
+	    if (ft_passed && !real_trigger_decision)
 	      {
 		ft_no_rt_writer.process(ER);
 		total_number_of_fake_trigger_no_real_trigger_events++;

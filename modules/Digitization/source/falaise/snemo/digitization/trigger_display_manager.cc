@@ -6,7 +6,6 @@
 #include <snemo/digitization/trigger_display_manager.h>
 #include <snemo/digitization/trigger_algorithm.h>
 #include <snemo/digitization/trigger_structures.h>
-#include <snemo/digitization/trigger_algorithm_test_time.h>
 
 namespace snemo {
 
@@ -372,10 +371,10 @@ namespace snemo {
     {
       DT_THROW_IF(!is_calo_25ns(), std::logic_error, "Boolean calo 25ns is not activated, it can't display ! ");
 
-      calo_trigger_algorithm::calo_summary_record a_calo_summary_record;
-      for (unsigned int i = 0; i < a_trigger_algo_._calo_records_.size(); i++)
+      trigger_structures::calo_summary_record a_calo_summary_record;
+      for (unsigned int i = 0; i < a_trigger_algo_.get_calo_records_25ns_vector().size(); i++)
     	{
-    	  if (clocktick_25ns_ == a_trigger_algo_._calo_records_[i].clocktick_25ns) a_calo_summary_record = a_trigger_algo_._calo_records_[i];
+    	  if (clocktick_25ns_ == a_trigger_algo_.get_calo_records_25ns_vector()[i].clocktick_25ns) a_calo_summary_record = a_trigger_algo_.get_calo_records_25ns_vector()[i];
     	}
 
       std::clog << "************************************************************************************" << std::endl;
@@ -420,11 +419,11 @@ namespace snemo {
 
     void trigger_display_manager::display_calo_trigger_25ns(trigger_algorithm & a_trigger_algo_)
     {
-      unsigned int vector_size = a_trigger_algo_._calo_records_.size();
+      unsigned int vector_size = a_trigger_algo_.get_calo_records_25ns_vector().size();
       if (vector_size == 0) {}
       else{
-    	uint32_t clocktick_25ns_begin = a_trigger_algo_._calo_records_[0].clocktick_25ns;
-    	uint32_t clocktick_25ns_end = a_trigger_algo_._calo_records_[vector_size - 1].clocktick_25ns;
+    	uint32_t clocktick_25ns_begin = a_trigger_algo_.get_calo_records_25ns_vector()[0].clocktick_25ns;
+    	uint32_t clocktick_25ns_end = a_trigger_algo_.get_calo_records_25ns_vector()[vector_size - 1].clocktick_25ns;
 
     	for (uint32_t iclocktick = clocktick_25ns_begin; iclocktick <= clocktick_25ns_end; iclocktick++)
     	  {
@@ -439,10 +438,10 @@ namespace snemo {
     {
       DT_THROW_IF(!is_calo_1600ns(), std::logic_error, "Boolean calo 1600ns is not activated, it can't display ! ");
 
-      coincidence_trigger_algorithm::coincidence_calo_record a_coinc_calo_record;
-      for (unsigned int i = 0; i < a_trigger_algo_._coinc_algo_._coincidence_calo_records_.size(); i++)
+      trigger_structures::coincidence_calo_record a_coinc_calo_record;
+      for (unsigned int i = 0; i < a_trigger_algo_.get_coincidence_calo_records_1600ns_vector().size(); i++)
     	{
-    	  if (clocktick_1600ns_ == a_trigger_algo_._coinc_algo_._coincidence_calo_records_[i].clocktick_1600ns) a_coinc_calo_record = a_trigger_algo_._coinc_algo_._coincidence_calo_records_[i];
+    	  if (clocktick_1600ns_ == a_trigger_algo_.get_coincidence_calo_records_1600ns_vector()[i].clocktick_1600ns) a_coinc_calo_record = a_trigger_algo_.get_coincidence_calo_records_1600ns_vector()[i];
     	}
 
       std::clog << "************************************************************************************" << std::endl;
@@ -485,12 +484,12 @@ namespace snemo {
 
     void trigger_display_manager::display_calo_trigger_1600ns(trigger_algorithm & a_trigger_algo_)
     {
-      unsigned int vector_size = a_trigger_algo_._coinc_algo_._coincidence_calo_records_.size();
+      unsigned int vector_size = a_trigger_algo_.get_coincidence_calo_records_1600ns_vector().size();
       if (vector_size == 0) {}
       else{
 
-    	uint32_t clocktick_1600ns_begin = a_trigger_algo_._coinc_algo_._coincidence_calo_records_[0].clocktick_1600ns;
-    	uint32_t clocktick_1600ns_end = a_trigger_algo_._coinc_algo_._coincidence_calo_records_[vector_size - 1].clocktick_1600ns;
+    	uint32_t clocktick_1600ns_begin = a_trigger_algo_.get_coincidence_calo_records_1600ns_vector()[0].clocktick_1600ns;
+    	uint32_t clocktick_1600ns_end = a_trigger_algo_.get_coincidence_calo_records_1600ns_vector()[vector_size - 1].clocktick_1600ns;
 
     	for (uint32_t iclocktick = clocktick_1600ns_begin; iclocktick <= clocktick_1600ns_end; iclocktick++)
     	  {
@@ -505,15 +504,15 @@ namespace snemo {
     {
       DT_THROW_IF(!is_tracker_1600ns(), std::logic_error, "Boolean tracker 1600ns is not activated, it can't display ! ");
 
-      tracker_trigger_algorithm::tracker_record a_tracker_record;
-      tracker_trigger_algorithm::geiger_matrix  a_geiger_matrix;
-      for (unsigned int i = 0; i < a_trigger_algo_._tracker_records_.size(); i++)
+      trigger_structures::tracker_record a_tracker_record;
+      trigger_structures::geiger_matrix  a_geiger_matrix;
+      for (unsigned int i = 0; i < a_trigger_algo_.get_tracker_records_vector().size(); i++)
     	{
-    	  if (clocktick_1600ns_ == a_trigger_algo_._tracker_records_[i].clocktick_1600ns
-    	      && clocktick_1600ns_ == a_trigger_algo_._tracker_algo_._geiger_matrix_records_[i].clocktick_1600ns)
+    	  if (clocktick_1600ns_ == a_trigger_algo_.get_tracker_records_vector()[i].clocktick_1600ns
+    	      && clocktick_1600ns_ == a_trigger_algo_.get_geiger_matrix_records_vector()[i].clocktick_1600ns)
     	    {
-    	      a_tracker_record = a_trigger_algo_._tracker_records_[i];
-    	      a_geiger_matrix  = a_trigger_algo_._tracker_algo_._geiger_matrix_records_[i];
+    	      a_tracker_record = a_trigger_algo_.get_tracker_records_vector()[i];
+    	      a_geiger_matrix  = a_trigger_algo_.get_geiger_matrix_records_vector()[i];
     	    }
     	}
       // check if matrix is not empty
@@ -617,12 +616,12 @@ namespace snemo {
 
     void trigger_display_manager::display_tracker_trigger_1600ns(trigger_algorithm & a_trigger_algo_)
     {
-      if (a_trigger_algo_._tracker_records_.size() == 0) {}
+      if (a_trigger_algo_.get_tracker_records_vector().size() == 0) {}
       else{
-	auto it_tracker = a_trigger_algo_._tracker_records_.begin();
-	for (; it_tracker != a_trigger_algo_._tracker_records_.end(); it_tracker++)
+	auto it_tracker = a_trigger_algo_.get_tracker_records_vector().begin();
+	for (; it_tracker != a_trigger_algo_.get_tracker_records_vector().end(); it_tracker++)
 	  {
-	    tracker_trigger_algorithm::tracker_record a_tracker_record = *it_tracker;
+	    trigger_structures::tracker_record a_tracker_record = *it_tracker;
 	    uint32_t tracker_clocktick = a_tracker_record.clocktick_1600ns;
 	    display_tracker_trigger_1600ns(a_trigger_algo_, tracker_clocktick);
 	    reset_tracker_display();
@@ -635,19 +634,19 @@ namespace snemo {
     {
       DT_THROW_IF(!is_coinc_1600ns(), std::logic_error, "Boolean coinc 1600ns is not activated, it can't display ! ");
 
-      coincidence_trigger_algorithm::coincidence_event_record a_coincidence_record;
-      for (unsigned int i = 0; i < a_trigger_algo_._coincidence_records_.size(); i++)
+      trigger_structures::coincidence_event_record a_coincidence_record;
+      for (unsigned int i = 0; i < a_trigger_algo_.get_coincidence_records_vector().size(); i++)
     	{
-	  if (clocktick_1600ns_ == a_trigger_algo_._coincidence_records_[i].clocktick_1600ns) a_coincidence_record = a_trigger_algo_._coincidence_records_[i];
+	  if (clocktick_1600ns_ == a_trigger_algo_.get_coincidence_records_vector()[i].clocktick_1600ns) a_coincidence_record = a_trigger_algo_.get_coincidence_records_vector()[i];
 	}
 
-      tracker_trigger_algorithm::geiger_matrix  a_geiger_matrix;
-      for (unsigned int i = 0; i < a_trigger_algo_._tracker_records_.size(); i++)
+      trigger_structures::geiger_matrix  a_geiger_matrix;
+      for (unsigned int i = 0; i < a_trigger_algo_.get_tracker_records_vector().size(); i++)
     	{
     	  if (clocktick_1600ns_ == a_coincidence_record.clocktick_1600ns
-    	      && clocktick_1600ns_ == a_trigger_algo_._tracker_algo_._geiger_matrix_records_[i].clocktick_1600ns)
+    	      && clocktick_1600ns_ == a_trigger_algo_.get_geiger_matrix_records_vector()[i].clocktick_1600ns)
     	    {
-    	      a_geiger_matrix  = a_trigger_algo_._tracker_algo_._geiger_matrix_records_[i];
+    	      a_geiger_matrix  = a_trigger_algo_.get_geiger_matrix_records_vector()[i];
     	    }
     	}
 
@@ -690,8 +689,8 @@ namespace snemo {
       std::clog << std::endl;
 
       std::clog << "Coincidence Clocktick : [" << a_coincidence_record.clocktick_1600ns << "]" << std::endl;
-      std::clog << "Coincidence zoning : S0 [" << a_coincidence_record.zoning_word[0] << "]" << std::endl;
-      std::clog << "                     S1 [" << a_coincidence_record.zoning_word[1] << "]" << std::endl;
+      std::clog << "Coincidence zoning : S0 [" << a_coincidence_record.coincidence_zoning_word[0] << "]" << std::endl;
+      std::clog << "                     S1 [" << a_coincidence_record.coincidence_zoning_word[1] << "]" << std::endl;
 
       std::clog << "Coincidence trigger mode : [" << a_coincidence_record.trigger_mode << "]" << std::endl;
       std::clog << "Coincidence event record decision  : [" << a_coincidence_record.decision << "]" <<  std::endl << std::endl;
@@ -723,12 +722,12 @@ namespace snemo {
 
     void trigger_display_manager::display_coincidence_trigger_1600ns(trigger_algorithm & a_trigger_algo_)
     {
-      if (a_trigger_algo_._coincidence_records_.size() == 0) {}
+      if (a_trigger_algo_.get_coincidence_records_vector().size() == 0) {}
       else{
-	auto it_coinc = a_trigger_algo_._coincidence_records_.begin();
-	for (; it_coinc != a_trigger_algo_._coincidence_records_.end(); it_coinc++)
+	auto it_coinc = a_trigger_algo_.get_coincidence_records_vector().begin();
+	for (; it_coinc != a_trigger_algo_.get_coincidence_records_vector().end(); it_coinc++)
 	  {
-	    coincidence_trigger_algorithm::coincidence_event_record a_coinc_record = *it_coinc;
+	    trigger_structures::coincidence_event_record a_coinc_record = *it_coinc;
 	    uint32_t coinc_clocktick = a_coinc_record.clocktick_1600ns;
 	    display_coincidence_trigger_1600ns(a_trigger_algo_, coinc_clocktick);
 	  }
@@ -1056,7 +1055,7 @@ namespace snemo {
     }
 
     void trigger_display_manager::display_trigger_implementation_1600ns(std::ofstream & out_,
-    									const trigger_algorithm_test_time & a_trigger_algo_)
+    									const trigger_algorithm & a_trigger_algo_)
     {
       std::vector<snemo::digitization::trigger_structures::coincidence_event_record> coincidence_collection_records = a_trigger_algo_.get_coincidence_records_vector();
 
