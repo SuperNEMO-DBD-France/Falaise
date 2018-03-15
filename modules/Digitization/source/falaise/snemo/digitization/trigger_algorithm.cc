@@ -610,38 +610,23 @@ namespace snemo {
 				     const geiger_ctw_data & geiger_ctw_data_)
     {
       _previous_event_records_.reset(new buffer_previous_event_record_type(_previous_event_circular_buffer_depth_));
-      snemo::digitization::geiger_ctw_data geiger_ctw_data_1600ns = geiger_ctw_data_;
+      snemo::digitization::geiger_ctw_data geiger_ctw_data_1600ns;
 
-      // Remove 1 of 2 gg ctw data due to data transfer limitation (CB to TB)
-      for (unsigned int i = 0; i < geiger_ctw_data_1600ns.get_geiger_ctws().size(); i++)
-	{
-	  const geiger_ctw & a_gg_ctw = geiger_ctw_data_1600ns.get_geiger_ctws()[i].get();
-	  if (a_gg_ctw.get_clocktick_800ns() % 2 == 1)
-	    {
-	      geiger_ctw_data_1600ns.grab_geiger_ctws().erase(geiger_ctw_data_1600ns.grab_geiger_ctws().begin() + i);
-	    }
-	}
-
-      // Double iteration because erase method shift the iterator and it skips some odd clockticks
-      for (unsigned int i = 0; i < geiger_ctw_data_1600ns.get_geiger_ctws().size(); i++)
-	{
-	  const geiger_ctw & a_gg_ctw = geiger_ctw_data_1600ns.get_geiger_ctws()[i].get();
-	  if (a_gg_ctw.get_clocktick_800ns() % 2 == 1)
-	    {
-	      geiger_ctw_data_1600ns.grab_geiger_ctws().erase(geiger_ctw_data_1600ns.grab_geiger_ctws().begin() + i);
-	    }
-	}
-
-      // Warning Clocktick of gg ctw is not at 800 ns but at 1600 ns (only even CT 800 are kept (1 of 2))
-      for (unsigned int i = 0; i < geiger_ctw_data_1600ns.get_geiger_ctws().size(); i++)
-	{
-	  geiger_ctw & a_gg_ctw = geiger_ctw_data_1600ns.grab_geiger_ctws()[i].grab();
-	  uint32_t gg_ctw_clocktick_1600ns = clock_utils::INVALID_CLOCKTICK;
-	  _clock_manager_->compute_clocktick_800ns_to_1600ns(a_gg_ctw.get_clocktick_800ns(),
-							     gg_ctw_clocktick_1600ns);
-	  a_gg_ctw.set_clocktick_800ns(gg_ctw_clocktick_1600ns);
-	  // a_gg_ctw.tree_dump(std::clog, "INFO : ", "My gg ctw ");
-	}
+      // Add only 1 of 2 gg ctw data due to data transfer limitation (CB to TB)
+      for (unsigned int i = 0; i < geiger_ctw_data_.get_geiger_ctws().size(); i++)
+      	{
+      	  const snemo::digitization::geiger_ctw & a_gg_ctw = geiger_ctw_data_.get_geiger_ctws()[i].get();
+      	  if (a_gg_ctw.get_clocktick_800ns() % 2 == 0) // Add only even CT 800
+      	    {
+      	      snemo::digitization::geiger_ctw & to_add_gg_ctw = geiger_ctw_data_1600ns.add();
+      	      to_add_gg_ctw = a_gg_ctw;
+      	      // Convert CT 800 into CT 1600 :
+      	      uint32_t gg_ctw_clocktick_1600ns = clock_utils::INVALID_CLOCKTICK;
+      	      _clock_manager_->compute_clocktick_800ns_to_1600ns(a_gg_ctw.get_clocktick_800ns(),
+      								 gg_ctw_clocktick_1600ns);
+      	      to_add_gg_ctw.set_clocktick_800ns(gg_ctw_clocktick_1600ns);
+      	    }
+      	}
 
       // Process the calorimeter algorithm at 25 ns to create calo record at 25 ns
       _calo_algo_.process(calo_ctw_data_,
@@ -690,10 +675,6 @@ namespace snemo {
 	{
 	  _rescale_calo_records_at_1600ns(_calo_records_25ns_,
 	  				  _coincidence_calo_records_1600ns_);
-	  for (unsigned int ict = 0; ict <_coincidence_calo_records_1600ns_.size(); ict++)
-	    {
-	      // _coincidence_calo_records_1600ns_[ict].display();
-	    }
 
 	  // Calculate the ct 1600 minimum and ct 1600 maximum :
 	  uint32_t calorimeter_ct_min_1600 = clock_utils::INVALID_CLOCKTICK;
@@ -917,7 +898,6 @@ namespace snemo {
       // 	{
       // 	  it_circ -> display();
       // 	}
-
 
       // std::clog << "********* Size of Finale structures for one event *********" << std::endl;
       // std::clog << "Calo collection size @ 25 ns            : " << _calo_records_25ns_.size() << std::endl;
