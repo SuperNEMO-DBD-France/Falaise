@@ -356,9 +356,9 @@ int main( int  argc_ , char **argv_  )
 	if (number_of_calo_in_event != 0 || number_of_geiger_in_event != 0)
 	  {
 	    collection_of_events.push_back(event_signals);
-	    std::clog << "Event #" << event_counter
-	    	      << " Number of calo in event   : " << number_of_calo_in_event
-	    	      << " Number of geiger in event : " << number_of_geiger_in_event << std::endl;
+	    // std::clog << "Event #" << event_counter
+	    // 	      << " Number of calo in event   : " << number_of_calo_in_event
+	    //	      << " Number of geiger in event : " << number_of_geiger_in_event << std::endl;
 	    event_counter++;
 	  }
       } // end of for

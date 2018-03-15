@@ -219,7 +219,7 @@ int main( int  argc_ , char **argv_  )
 
     // Multi properties to configure trigger algorithm :
     datatools::multi_properties trigger_config("name", "type", "Trigger parameters multi section configuration");
-    if (trigger_config_filename.empty()) trigger_config_filename = "$FALAISE_DIGITIZATION_RESOURCES_DIR/config/snemo/common/1.0/trigger_parameters.conf";
+    if (trigger_config_filename.empty()) trigger_config_filename = "$FALAISE_DIGITIZATION_DIR/resources/config/snemo/common/1.0/trigger_parameters.conf";
 
     // Read trigger config from file
     datatools::fetch_path_with_env(trigger_config_filename);
