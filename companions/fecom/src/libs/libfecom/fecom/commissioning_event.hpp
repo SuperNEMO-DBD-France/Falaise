@@ -101,6 +101,12 @@ namespace fecom {
 		/// Check if has calorimeter hits
 		bool has_calo_hits() const;
 
+		/// Get the calo hit collection
+		void get_calo_ht_hit_collection(commissioning_event::calo_hit_collection & chc_) const;
+
+		/// Check if has calorimeter hits
+		bool has_calo_ht_hits() const;
+
 		/// Get the tracker channel hit collection
 		const commissioning_event::tracker_channel_hit_collection & get_tracker_channel_hit_collection() const;
 
@@ -131,14 +137,14 @@ namespace fecom {
 		/// Check if calo and tracker
 		bool is_calo_tracker() const;
 
-		/// Build a tracker hit from channels (anodic, bot cathode and top cathode max)
+		/// Build a tracker hit from channels (anodic, bot cathode and top cathode max) SNDER p.30-31 for channel / cell association
     void build_tracker_hit_from_channels();
 
 		/// Reset
     virtual void reset();
 
 		/// Print succinct contained calo and tracker hits
-		virtual void print(std::ostream & out_);
+		virtual void print(std::ostream & out_) const;
 
 		/// Smart print
     virtual void tree_dump(std::ostream & out_,
@@ -161,12 +167,7 @@ namespace fecom {
 		datatools::event_id _event_id_; ///< Datatools event ID
 		double _time_start_ns_; ///< Time start of the commissioning event in ns
 		std::bitset<4> _traits_; ///< Traits for data quality of the commissioning event of data
-		/*
-			BIT 0 : Tracker only Event
-			BIT 1 : UNDEFINED (ftm)
-			BIT 2 : UNDEFINED (ftm)
-			BIT 3 : UNDEFINED (ftm)
-		*/
+
 		calo_hit_collection _calo_hit_collection_; ///< Calo hit collection for a trigger id
 		tracker_channel_hit_collection _tracker_channel_hit_collection_; ///< Tracker hit collection for a trigger id
 		tracker_hit_collection _tracker_hit_collection_; ///< Tracker hit collection for a trigger id

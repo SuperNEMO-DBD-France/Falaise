@@ -192,7 +192,7 @@ int main(int argc_, char ** argv_)
 
     // Default output path in input path :
     if (output_path.empty()) {
-      output_path = ".";
+      output_path = "/tmp/";
       DT_LOG_WARNING(logging, "The output path is empty, did you forget it in the option ? Default directory for output :" + output_path);
     }
     datatools::fetch_path_with_env(output_path);
@@ -262,7 +262,13 @@ int main(int argc_, char ** argv_)
       if (deserializer.record_tag_is(fecom::calo_hit::SERIAL_TAG)) {
         DT_LOG_DEBUG(logging, "Entering record tag is calo_hit...");
         deserializer.load(chit);
-        // chit.tree_dump(std::clog, "A Calo Hit");
+
+	// Add in auxiliaries the fecom 'GID' associated to the 'EID'
+	const geomtools::geom_id calo_EID = chit.electronic_id;
+	geomtools::geom_id calo_GID;
+	my_channel_mapping.get_geometric_id_from_electronic_id(calo_EID, calo_GID);
+	chit.fecom_geom_id = calo_GID;
+
         DT_THROW_IF(!chit.is_valid(), std::logic_error,
                     "The deserialized calo_hit is not valid ! ");
         deserialized_hit = "calo";

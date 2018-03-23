@@ -156,7 +156,7 @@ int main(int argc_, char ** argv_)
 
     // Default output path in input path :
     if (output_path.empty()){
-      output_path = ".";
+      output_path = "/tmp/";
       DT_LOG_WARNING(logging, "The output path is empty, did you forget it in the option ? Default directory for output :" + output_path);
     }
     datatools::fetch_path_with_env(output_path);
@@ -233,7 +233,7 @@ int main(int argc_, char ** argv_)
           hl.tchit().reset();
         }
       } else {
-        DT_LOG_INFORMATION(logging, "Invalid entry!");
+        DT_LOG_DEBUG(logging, "Invalid entry!");
       }
 
       if (max_hits > 0 && (hit_counter >= max_hits)) {
@@ -242,26 +242,21 @@ int main(int argc_, char ** argv_)
       }
     } // end of while reader
     // List -> [C][T][T][T][C][C][T][T][!C][T][!T]
-    std::clog << "Number of entries      = " << entry_counter << std::endl;
-    std::clog << "Size of the list       = " << hl.hits.size() << std::endl;
-    std::clog << "Number of bad hits     = " << bad_hit_counter << std::endl;
 
     // Remove unvalid calo / tracker hits
     std::size_t nb_removed_hits = hl.remove_bad_hits();
-    std::clog << "Number of removed hits = " << nb_removed_hits << std::endl;
-    std::clog << "Final number of hits   = " << hl.hits.size() << std::endl;
+    DT_LOG_DEBUG(logging, "Number of removed hits = " << nb_removed_hits);
 
-    DT_LOG_INFORMATION(logging, "Sorting...");
+    DT_LOG_DEBUG(logging, "Sorting...");
     hl.sort();
-    DT_LOG_INFORMATION(logging, "Sorting success...");
+    DT_LOG_DEBUG(logging, "Sorting success...");
 
-    DT_LOG_INFORMATION(logging, "Begin hits serialization...");
+    DT_LOG_DEBUG(logging, "Begin hits serialization...");
     std::size_t serial_counter = 0;
     for (auto it_list = hl.hits.begin();
          it_list != hl.hits.end();
          it_list++) {
       // it_list->get()->tree_dump(std::clog, "Hit number #" + std::to_string(serial_counter));
-
       if ((serial_counter % modulo) == 0) {
         DT_LOG_INFORMATION(logging, "Serialized hit #" << serial_counter);
       }
@@ -282,7 +277,6 @@ int main(int argc_, char ** argv_)
 
     DT_LOG_INFORMATION(logging, "Number of commissioning hits serialized : " + std::to_string(serial_counter));
 
-    DT_LOG_INFORMATION(logging, "Output file : " << output_filename);
     DT_LOG_INFORMATION(logging, "End of reader file...");
     reader.reset();
     DT_LOG_INFORMATION(logging, "The end.");

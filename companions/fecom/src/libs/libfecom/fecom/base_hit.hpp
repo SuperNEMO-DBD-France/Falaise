@@ -60,12 +60,15 @@ namespace fecom {
     virtual ~base_hit();
 
 		/// Check if the base hit has geom_id
-		bool has_geom_id() const;
+		bool has_electronic_id() const;
+
+		/// Check if the base hit has geom_id
+		bool has_fecom_geom_id() const;
 
 		/// Check if the base hit is valid
     virtual bool is_valid() const;
 
-		///
+		/// Get hit timestamp
 		virtual double get_timestamp() const = 0;
 
 		/// Reset
@@ -85,6 +88,7 @@ namespace fecom {
     uint64_t     hit_id;     ///< The hit ID
     hitmode_type hitmode;    ///< The hitmode (CALO or TRACKER ftm)
 		geomtools::geom_id electronic_id; ///< The electronic channel ID
+		geomtools::geom_id fecom_geom_id; ///< The fecom GID
 		uint64_t     trigger_id; ///< Hit trigger ID
 
 		DATATOOLS_SERIALIZATION_DECLARATION()

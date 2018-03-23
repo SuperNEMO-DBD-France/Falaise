@@ -12,18 +12,18 @@
 
 // - Bayeux:
 #include <bayeux/datatools/utils.h>
-#include <bayeux/datatools/i_serializable.h>
+// #include <bayeux/datatools/i_serializable.h>
 
 // This project:
+#include <fecom/base_hit.hpp>
 #include <fecom/tracker_constants.hpp>
 #include <fecom/tracker_channel_hit.hpp>
-#include <fecom/utils.hpp>
 
 namespace fecom {
 
 	//! \brief commissioning tracker hit, inherit from base
   struct tracker_hit
-		: public datatools::i_serializable
+    : public base_hit
   {
 		/// Default constructor
     tracker_hit();
@@ -52,10 +52,11 @@ namespace fecom {
                            const std::string & indent_ = "",
                            bool inherit_ = false) const;
 
-
+		/// Get hit timestamp (based on anode R0)
+		double get_timestamp() const;
 
 		/// Check if tracker hit has geom id
-		bool has_geom_id() const;
+		// bool has_geom_id() const;
 
     /// Check if has anodic time 0
     bool has_anodic_t0() const;
@@ -161,11 +162,6 @@ namespace fecom {
 
   public:
 
-		uint64_t trigger_id; ///< Tracker hit trigger ID
-
-		// SNDER p.30-31 for channel / cell association
-		geomtools::geom_id cell_geometric_id; ///< Cell ID [Type:layer,row]
-
     // DATA
     // 7 geiger timing
     uint64_t anodic_timestamp_t0; ///< Anodic timestamp R0
@@ -183,6 +179,7 @@ namespace fecom {
 		double anodic_t4_ns; ///< Anodic time 4 in implicit ns
 		double bot_cathodic_time_ns; ///< Bottom cathodic time implicit ns
 		double top_cathodic_time_ns; ///< Top cathodic time in implicit ns
+
 		DATATOOLS_SERIALIZATION_DECLARATION()
 
   };

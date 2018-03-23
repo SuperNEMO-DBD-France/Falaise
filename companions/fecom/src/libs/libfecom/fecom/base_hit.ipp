@@ -34,6 +34,7 @@ namespace fecom {
     ar & boost::serialization::make_nvp("hit_id",  hit_id);
     ar & boost::serialization::make_nvp("hitmode", hitmode);
     ar & boost::serialization::make_nvp("electronic_id", electronic_id);
+    ar & boost::serialization::make_nvp("fecom_geom_id", fecom_geom_id);
     ar & boost::serialization::make_nvp("trigger_id", trigger_id);
     return;
   }

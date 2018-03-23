@@ -384,15 +384,15 @@ int main(int argc_, char ** argv_)
 	    for (auto itrack = CE.get_tracker_hit_collection().begin();
 		 itrack != CE.get_tracker_hit_collection().end();
 		 itrack++) {
-	      geomtools::geom_id the_actual_cell_gid = itrack->cell_geometric_id;
+	      geomtools::geom_id the_actual_cell_gid = itrack->fecom_geom_id;
 
-	      if (itrack->cell_geometric_id.is_valid()) {
-		unsigned int layer = itrack->cell_geometric_id.get(fecom::tracker_constants::LAYER_INDEX);
-		unsigned int row = itrack->cell_geometric_id.get(fecom::tracker_constants::ROW_INDEX);
+	      if (itrack->fecom_geom_id.is_valid()) {
+		unsigned int layer = itrack->fecom_geom_id.get(fecom::tracker_constants::LAYER_INDEX);
+		unsigned int row = itrack->fecom_geom_id.get(fecom::tracker_constants::ROW_INDEX);
 		// hit_tracker_count_total_TH2F->Fill(row, layer);
 
 		// Fill raw data calo in root tree :
-		cell_gid.push_back(itrack->cell_geometric_id);
+		cell_gid.push_back(itrack->fecom_geom_id);
 		cell_layer.push_back(layer);
 		cell_row.push_back(row);
 		if (itrack->has_anodic_t0()) anodic_t0_ns.push_back(itrack->anodic_t0_ns);
@@ -480,11 +480,11 @@ int main(int argc_, char ** argv_)
 	      for (auto itrack = CE.get_tracker_hit_collection().begin();
 		   itrack != CE.get_tracker_hit_collection().end();
 		   itrack++) {
-		geomtools::geom_id the_actual_cell_gid = itrack->cell_geometric_id;
+		geomtools::geom_id the_actual_cell_gid = itrack->fecom_geom_id;
 
-		if (itrack->cell_geometric_id.is_valid()) {
-		  unsigned int layer = itrack->cell_geometric_id.get(fecom::tracker_constants::LAYER_INDEX);
-		  unsigned int row = itrack->cell_geometric_id.get(fecom::tracker_constants::ROW_INDEX);
+		if (itrack->fecom_geom_id.is_valid()) {
+		  unsigned int layer = itrack->fecom_geom_id.get(fecom::tracker_constants::LAYER_INDEX);
+		  unsigned int row = itrack->fecom_geom_id.get(fecom::tracker_constants::ROW_INDEX);
 		  cts.tracker_distrib_TH2F->Fill(row, layer);
 
 		  if (CE.is_only_tracker()) cts.tracker_only_distrib_TH2F->Fill(row, layer);
@@ -584,11 +584,11 @@ int main(int argc_, char ** argv_)
 	  	 itrack != CE.get_tracker_hit_collection().end();
 	  	 itrack++) {
 
-	      geomtools::geom_id the_actual_cell_gid = itrack->cell_geometric_id;
+	      geomtools::geom_id the_actual_cell_gid = itrack->fecom_geom_id;
 
-	      if (itrack->cell_geometric_id.is_valid()) {
-		unsigned int layer = itrack->cell_geometric_id.get(fecom::tracker_constants::LAYER_INDEX);
-		unsigned int row = itrack->cell_geometric_id.get(fecom::tracker_constants::ROW_INDEX);
+	      if (itrack->fecom_geom_id.is_valid()) {
+		unsigned int layer = itrack->fecom_geom_id.get(fecom::tracker_constants::LAYER_INDEX);
+		unsigned int row = itrack->fecom_geom_id.get(fecom::tracker_constants::ROW_INDEX);
 
 		cts.cell_registers_if_calo_tracker[layer].hit_counter++;
 		if (itrack->has_anodic_t0()) cts.cell_registers_if_calo_tracker[layer].R0_count++;

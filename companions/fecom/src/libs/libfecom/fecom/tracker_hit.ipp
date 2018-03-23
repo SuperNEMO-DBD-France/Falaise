@@ -28,8 +28,8 @@ namespace fecom {
   void tracker_hit::serialize(Archive & ar,
 			      const unsigned int /* version */)
   {
-    ar & DATATOOLS_SERIALIZATION_I_SERIALIZABLE_BASE_OBJECT_NVP;
-    ar & boost::serialization::make_nvp("cell_geometric_id", cell_geometric_id);
+    // ar & DATATOOLS_SERIALIZATION_I_SERIALIZABLE_BASE_OBJECT_NVP;
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(base_hit);
     ar & boost::serialization::make_nvp("anodic_timestamp_t0", anodic_timestamp_t0);
     ar & boost::serialization::make_nvp("anodic_timestamp_t1", anodic_timestamp_t1);
     ar & boost::serialization::make_nvp("anodic_timestamp_t2", anodic_timestamp_t2);

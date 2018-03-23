@@ -29,7 +29,6 @@
 #include <dpp/base_module.h>
 
 // - Falaise:
-#include <falaise/snemo/datamodels/mock_raw_tracker_hit.h>
 #include <falaise/snemo/processing/geiger_regime.h>
 #include <falaise/snemo/datamodels/calibrated_data.h>
 
@@ -62,12 +61,6 @@ namespace fecom {
 
     /// Destructor
     virtual ~mock_hc2cd_module();
-
-    /// Set the channel mapping
-    void set_channel_mapping(const fecom::channel_mapping & chmap_);
-
-    /// Getting geometry manager
-    const fecom::channel_mapping & get_channel_mapping() const;
 
     /// Set the geometry manager
     void set_geom_manager(const geomtools::manager & gmgr_);
@@ -109,7 +102,6 @@ namespace fecom {
 
   private:
 
-    const fecom::channel_mapping * _channel_mapping_; //!< The channel mapping
     const geomtools::manager * _geom_manager_;        //!< The geometry manager
     std::string   _module_category_;                  //!< The geometry category of the SuperNEMO module
     snemo::processing::geiger_regime _geiger_;        //!< Geiger regime tools
@@ -118,7 +110,6 @@ namespace fecom {
     std::string   _Geo_label_;                        //!< The label of the geometry service
     double _tracker_clock_tick_;
     std::unique_ptr<std::ofstream> _fout_;
-
 
     // Macro to automate the registration of the module :
     // DPP_MODULE_REGISTRATION_INTERFACE(mock_hc2cd_module)

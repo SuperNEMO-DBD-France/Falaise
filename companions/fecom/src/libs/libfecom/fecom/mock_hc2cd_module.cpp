@@ -51,24 +51,6 @@ namespace fecom {
     return;
   }
 
-  void mock_hc2cd_module::set_channel_mapping(const fecom::channel_mapping & chmap_)
-  {
-    DT_THROW_IF(is_initialized(),
-		std::logic_error,
-		"Module '" << get_name() << "' is already initialized ! ");
-    _channel_mapping_ = &chmap_;
-
-    return;
-  }
-
-  const fecom::channel_mapping & mock_hc2cd_module::get_channel_mapping() const
-  {
-    DT_THROW_IF(! is_initialized(),
-		std::logic_error,
-		"Module '" << get_name() << "' is not initialized ! ");
-    return *_channel_mapping_;
-  }
-
   void mock_hc2cd_module::set_geom_manager(const geomtools::manager & gmgr_)
   {
     DT_THROW_IF(is_initialized(),
@@ -113,7 +95,6 @@ namespace fecom {
 	falaise_geom_id_.set(2, layer);
 	falaise_geom_id_.set(3, row);
       }
-
 
     return;
   }
@@ -339,15 +320,9 @@ namespace fecom {
 	}
 
 	// Convert electronic ID into falaise geometric ID
-	geomtools::geom_id fecom_geometric_id;
+	geomtools::geom_id fecom_geometric_id = icalo->fecom_geom_id;
+	if (!fecom_geometric_id.is_valid()) break;
 
-	// Check if the calo electronic mapping is in the bimap
-	if (_channel_mapping_->is_calo_channel_in_map(icalo->electronic_id))
-	  {
-	    _channel_mapping_->get_geometric_id_from_electronic_id(icalo->electronic_id, fecom_geometric_id);
-	  }
-	// If no, skip the hit
-	else break;
 	geomtools::geom_id falaise_geometric_id;
 	convert_gid_to_falaise_gid(fecom_geometric_id,
 				   falaise_geometric_id);
@@ -409,7 +384,7 @@ namespace fecom {
       {
 	if (itracker->is_valid()) {
 	  // Convert electronic ID into falaise geometric ID
-	  geomtools::geom_id fecom_geometric_id = itracker->cell_geometric_id;
+	  geomtools::geom_id fecom_geometric_id = itracker->fecom_geom_id;
 
 	  geomtools::geom_id falaise_geometric_id;
 	  convert_gid_to_falaise_gid(fecom_geometric_id,

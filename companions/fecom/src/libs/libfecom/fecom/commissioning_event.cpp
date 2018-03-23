@@ -87,6 +87,27 @@ namespace fecom {
     return _calo_hit_collection_.size() != 0;
   }
 
+  void commissioning_event::get_calo_ht_hit_collection(commissioning_event::calo_hit_collection & chc_) const
+  {
+    if (has_calo_hits()) {
+      for (auto icalo = get_calo_hit_collection().begin();
+	   icalo != get_calo_hit_collection().end();
+	   icalo++)
+	{
+	  if (icalo->high_threshold) chc_.insert(*icalo);
+	}
+    }
+
+    return;
+  }
+
+  bool commissioning_event::has_calo_ht_hits() const
+  {
+    commissioning_event::calo_hit_collection calo_ht_hit_coll;
+    get_calo_ht_hit_collection(calo_ht_hit_coll);
+    return calo_ht_hit_coll.size() != 0;
+  }
+
   const commissioning_event::tracker_channel_hit_collection & commissioning_event::get_tracker_channel_hit_collection() const
   {
     return _tracker_channel_hit_collection_;
@@ -109,10 +130,7 @@ namespace fecom {
 	 icalo != get_calo_hit_collection().end();
 	 icalo++)
       {
-	geomtools::geom_id calo_eid = icalo->electronic_id;
-
-	// Check if the calo hit is in the bimap :
-	if (_my_channel_mapping_->is_calo_channel_in_map(calo_eid)) calo_counter++;
+	if (icalo->fecom_geom_id.is_valid()) calo_counter++;
       }
 
     return calo_counter;
@@ -125,10 +143,7 @@ namespace fecom {
 	 icalo != get_calo_hit_collection().end();
 	 icalo++)
       {
-	geomtools::geom_id calo_eid = icalo->electronic_id;
-
-	// Check if the calo hit is in the bimap :
-	if (_my_channel_mapping_->is_calo_channel_in_map(calo_eid)) if (icalo->high_threshold) calo_ht_counter++;
+	if (icalo->fecom_geom_id.is_valid() && icalo->high_threshold) calo_ht_counter++;
       }
 
     return calo_ht_counter;
@@ -140,8 +155,7 @@ namespace fecom {
     for (auto itrack = get_tracker_hit_collection().begin();
 	 itrack != get_tracker_hit_collection().end();
 	 itrack++) {
-      geomtools::geom_id the_actual_cell_gid = itrack->cell_geometric_id;
-      if (itrack->cell_geometric_id.is_valid()) tracker_cell_counter++;
+      if (itrack->fecom_geom_id.is_valid()) tracker_cell_counter++;
     }
     return tracker_cell_counter;
   }
@@ -183,7 +197,7 @@ namespace fecom {
 	  } else {
 	    // Create a new tracker hit and search his associated channels
 	    fecom::tracker_hit a_tracker_hit;
-
+	    a_tracker_hit.hitmode = fecom::base_hit::SIG_TRACKER;
 	    a_tracker_hit.trigger_id = ichan->trigger_id;
 
 	    geomtools::geom_id electronic_channel_id = ichan -> electronic_id;
@@ -195,11 +209,11 @@ namespace fecom {
 
 	    if (associated_geometric_id.is_valid()) {
 
-	      geomtools::geom_id cell_geometric_id(tracker_constants::GEOMETRIC_CELL_TYPE,
-						   associated_geometric_id.get(tracker_constants::LAYER_INDEX),
-						   associated_geometric_id.get(tracker_constants::ROW_INDEX));
+	      geomtools::geom_id fecom_geom_id(tracker_constants::GEOMETRIC_CELL_TYPE,
+					       associated_geometric_id.get(tracker_constants::LAYER_INDEX),
+					       associated_geometric_id.get(tracker_constants::ROW_INDEX));
 
-	      a_tracker_hit.cell_geometric_id = cell_geometric_id;
+	      a_tracker_hit.fecom_geom_id = fecom_geom_id;
 	      geomtools::geom_id anodic_id;
 	      geomtools::geom_id bot_cathodic_id;
 	      geomtools::geom_id top_cathodic_id;
@@ -262,6 +276,8 @@ namespace fecom {
 
 	    } // if GID is valid
 
+	    // a_tracker_hit.tree_dump(std::clog, "A tracker hit in CE");
+
 	    // Add the tracker hit to the collection :
 	    // even if the tracker hit is not valid because the building is not here to filter raw data.
 	    // Concrete example : tracker channel exist in the data but not mapped (happens during commissioning runs)
@@ -295,8 +311,10 @@ namespace fecom {
     return;
   }
 
-  void commissioning_event::print(std::ostream & out_)
+  void commissioning_event::print(std::ostream & out_) const
   {
+    // Useless method ? Display is not really user friendly and tree_dump can do the job
+
     // Search tracker min and max :
     double tracker_min_time = 0;
     double tracker_max_time = 0;
@@ -338,7 +356,7 @@ namespace fecom {
 	 itrack++) {
 
       out_ << "Tracker_hit TRIG_ID=" << itrack->trigger_id
-	   << " GID=" << itrack->cell_geometric_id;
+	   << " GID=" << itrack->fecom_geom_id;
 
       if (itrack->has_anodic_t0()) {
 	out_  << " DT_Calo=" << itrack->anodic_t0_ns - _time_start_ns_

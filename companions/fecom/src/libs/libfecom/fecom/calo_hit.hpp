@@ -32,7 +32,7 @@ namespace fecom {
 		/// Check if the calo hit is valid
 		bool is_valid() const;
 
-		///
+		/// Get hit timestamp
 		double get_timestamp() const;
 
 		/// Reset

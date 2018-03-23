@@ -21,7 +21,7 @@ namespace fecom {
 
   bool tracker_hit::is_valid() const
   {
-    if (!has_geom_id()
+    if (!has_fecom_geom_id()
 	|| (!has_anodic_t0()
 	    && !has_anodic_t1()
 	    && !has_anodic_t2()
@@ -97,7 +97,6 @@ namespace fecom {
 
   void tracker_hit::_reset_()
   {
-    cell_geometric_id.invalidate();
     reset_anodic_t0();
     reset_anodic_t1();
     reset_anodic_t2();
@@ -105,13 +104,12 @@ namespace fecom {
     reset_anodic_t4();
     reset_bot_cathodic_time();
     reset_top_cathodic_time();
-    trigger_id = 0xFFFFFFFF;
     return;
   }
-
-  bool tracker_hit::has_geom_id() const
+  double tracker_hit::get_timestamp() const
   {
-    return cell_geometric_id.is_valid();
+    if (has_anodic_t0()) return anodic_t0_ns;
+    else return -1;
   }
 
   bool tracker_hit::has_anodic_t0() const
@@ -312,15 +310,7 @@ namespace fecom {
 			      const std::string & indent_,
 			      bool inherit_) const
   {
-    if (!title_.empty()) {
-      out_ << indent_ << title_ << std::endl;
-    }
-
-    out_ << indent_ << io::tag()
-         << "Trigger ID                : " << trigger_id << std::endl;
-
-    out_ << indent_ << io::tag()
-         << "Cell geometric ID         : " << (geomtools::geom_id) cell_geometric_id << std::endl;
+    this->base_hit::tree_dump(out_, title_, indent_, true);
 
     out_ << indent_ << io::tag()
          << "Anodic timestamp 0        : " << anodic_timestamp_t0 << std::endl;

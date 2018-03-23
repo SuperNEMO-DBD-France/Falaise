@@ -28,6 +28,7 @@ namespace fecom {
     hit_id = 0xFFFF;
     trigger_id = 0xFFFFFFFF;
     electronic_id.invalidate();
+    fecom_geom_id.invalidate();
   }
 
   base_hit::base_hit(const hitmode_type hm_)
@@ -41,12 +42,17 @@ namespace fecom {
 
   bool base_hit::is_valid() const
   {
-    return hitmode != SIG_INVALID && has_geom_id() && electronic_id.get(tracker_constants::SLOT_INDEX) < 20;
+    return hitmode != SIG_INVALID && has_electronic_id() && electronic_id.get(tracker_constants::SLOT_INDEX) < 20;
   }
 
-  bool base_hit::has_geom_id() const
+  bool base_hit::has_electronic_id() const
   {
     return electronic_id.is_valid();
+  }
+
+  bool base_hit::has_fecom_geom_id() const
+  {
+    return fecom_geom_id.is_valid();
   }
 
   void base_hit::reset()
@@ -72,8 +78,15 @@ namespace fecom {
     out_ << indent_ << io::tag()
          << "Hit mode   : '" << hitmode_to_label(hitmode) << "'" << std::endl;
 
-    out_ << indent_ << io::tag()
-         << "Electronic ID   : '" << electronic_id << "'" << std::endl;
+    if (electronic_id.is_valid()) {
+      out_ << indent_ << io::tag()
+	   << "Electronic ID   : '" << electronic_id << "'" << std::endl;
+    }
+
+    if (fecom_geom_id.is_valid()) {
+      out_ << indent_ << io::tag()
+	   << "FECOM GID   : '" << fecom_geom_id << "'" << std::endl;
+    }
 
     out_ << indent_ << io::tag()
          << "Trigger ID     : " << trigger_id << std::endl;
