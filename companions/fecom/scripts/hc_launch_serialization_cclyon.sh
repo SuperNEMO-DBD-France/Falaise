@@ -3,11 +3,6 @@
 APP_NAME=hc_launch_serialization_cclyon.sh
 debug=1
 
-SW_PATH="/sps/nemo/scratch/golivier/software/Falaise/build/BuildProducts/bin/"
-
-DECODE_SW=fecom-decode_sort_serialize
-BUILDER_SW=fecom-hc_event_builder
-
 function usage(){
 echo "--------------"
 echo "Goal : Launch serialization for HC raw data at CCLyon"
@@ -36,6 +31,10 @@ echo " "
 }
 
 #### ->MAIN<- #####
+
+SW_PATH="/sps/nemo/scratch/golivier/software/Falaise/build/BuildProducts/bin/"
+DECODE_SW=fecom-decode_sort_serialize
+BUILDER_SW=fecom-hc_event_builder
 
 START_DATE=`date "+%Y-%m-%d"`
 nb_event=10
@@ -87,11 +86,17 @@ TRACKER_MAPPING_FILE=mapping_tracker.csv
 OUTPUT_PATH=/sps/nemo/scratch/golivier/data_half_commissioning
 SERIALIZED_OUTPUT_PATH=${OUTPUT_PATH}/serialized/
 SERIALIZED_RUN_PATH=${SERIALIZED_OUTPUT_PATH}/Run_${run_number}
-
 SERIALIZED_DECODED_PATH=${SERIALIZED_RUN_PATH}/decoded
 SERIALIZED_BUILDED_PATH=${SERIALIZED_RUN_PATH}/builded
 SERIALIZED_SETTING_PATH=${SERIALIZED_RUN_PATH}/settings
 SERIALIZED_LOG_PATH=${SERIALIZED_RUN_PATH}/log_files.d
+
+echo "SERIALIZED_OUTPUT_PATH ${SERIALIZED_OUTPUT_PATH}" 2>&1 
+echo "SERIALIZED_RUN_PATH ${SERIALIZED_RUN_PATH}" 2>&1 
+echo "SERIALIZED_DECODED_PATH ${SERIALIZED_DECODED_PATH}" 2>&1 
+echo "SERIALIZED_BUILDED_PATH ${SERIALIZED_BUILDED_PATH}" 2>&1 
+echo "SERIALIZED_SETTING_PATH ${SERIALIZED_SETTING_PATH}" 2>&1 
+echo "SERIALIZED_LOG_PATH ${SERIALIZED_LOG_PATH}" 2>&1 
 
 DECODE_OUTPUT_FILENAME=decode_sort-output.data.bz2
 DECODE_OUTPUT_SUFFIX=decode.data.bz2
@@ -112,9 +117,13 @@ do
     short_name=`basename ${cutted_file}`
     OUTPUT_DECODE_FILE=${SERIALIZED_DECODED_PATH}/${short_name}_${file_counter}_${DECODE_OUTPUT_SUFFIX}
     DECODE_LOG_FILE=${short_name}_${file_counter}_decode.log
+
+    echo "DECODE_LOG_FILE ${DECODE_LOG_FILE}" >> ${SERIALIZED_LOG_PATH}/${DECODE_LOG_FILE} 2>&1
+    echo "OUTPUT_DECODE_FILE ${OUTPUT_DECODE_FILE}" >> ${SERIALIZED_LOG_PATH}/${DECODE_LOG_FILE} 2>&1 
+
     echo "DEBUG : TRACE 1"
     
-    echo "INFO : Ready to ${SOFT_PATH}/${soft_convertor}"  > ${SERIALIZED_LOG_PATH}/${DECODE_LOG_FILE} 2>&1
+    echo "INFO : Ready to ${SW_PATH}/${DECODE_SW} -i ${file} -o ${SERIALIZED_DECODED_PATH} -M ${nb_event}"  > ${SERIALIZED_LOG_PATH}/${DECODE_LOG_FILE} 2>&1
     echo "----------------------------------------------"  >> ${SERIALIZED_LOG_PATH}/${DECODE_LOG_FILE} 2>&1
 
     ${SW_PATH}/${DECODE_SW} -i ${file} -o ${SERIALIZED_DECODED_PATH} -M ${nb_event} >> ${SERIALIZED_LOG_PATH}/${DECODE_LOG_FILE} 2>&1

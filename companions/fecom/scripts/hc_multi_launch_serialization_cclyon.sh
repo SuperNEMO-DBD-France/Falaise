@@ -4,9 +4,9 @@
 APP_NAME=hc_multi_launch_serialization_cclyon.sh
 debug=1
 
-echo "Are you sure to process ? "
-echo "If yes, edit this file and comment exit at the begining"
-exit 1
+# echo "Are you sure to process ? "
+# echo "If yes, edit this file ('hc_multi_launch_serialization_cclyon.sh') and comment 'exit 1' at the begining"
+# exit 1
 
 function usage(){
 echo "--------------"
@@ -54,7 +54,7 @@ SINGLE_SERIAL_SCRIPT=hc_launch_serialization_cclyon.sh
 
 # Change Run min / max 
 RUN_MIN=3
-RUN_MAX=55
+RUN_MAX=52
 
 
 for (( i=${RUN_MIN}; i <= ${RUN_MAX}; ++i ))
@@ -134,10 +134,12 @@ do
 	echo "ERROR : cannot copy ${HC_TRACKER_MAPPING_CONFIG_FILE} into ${SERIALIZED_SETTING_PATH} FAILED !" >> ${LOG_FILE}
 	exit
     fi
+    echo "HC_TRACKER_MAPPING_CONFIG_FILE ${HC_TRACKER_MAPPING_CONFIG_FILE}" >> ${LOG_FILE}
+    echo "HC_CALO_MAPPING_CONFIG_FILE ${HC_CALO_MAPPING_CONFIG_FILE}" >> ${LOG_FILE}
 
-    echo "LAUNCH JOB TO THE MOON !"
-    
-    qsub -V -P P_nemo -l h_cpu=12:00:00,s_cpu=11:30:00,fsize=8000M,sps=1 -e ${LOG_DIR} -o ${LOG_DIR} ${SCRIPT_DIR}/${SINGLE_SERIAL_SCRIPT} -r ${i} -n ${nb_event} -C ${HC_CALO_MAPPING_CONFIG_FILE} -T ${HC_TRACKER_MAPPING_CONFIG_FILE} >> ${LOG_FILE}
+    echo "QSUB command : qsub -V -P P_nemo -l h_cpu=12:00:00,fsize=12000M,sps=1 -q huge@@C6320IImc -e ${LOG_DIR} -o ${LOG_DIR} ${SCRIPT_DIR}/${SINGLE_SERIAL_SCRIPT} -r ${i} -n ${nb_event} -C ${HC_CALO_MAPPING_CONFIG_FILE} -T ${HC_TRACKER_MAPPING_CONFIG_FILE}" >> ${LOG_FILE}
+
+    qsub -V -P P_nemo -l h_cpu=12:00:00,fsize=12000M,sps=1 -q huge@@C6320IImc -e ${LOG_DIR} -o ${LOG_DIR} ${SCRIPT_DIR}/${SINGLE_SERIAL_SCRIPT} -r ${i} -n ${nb_event} -C ${HC_CALO_MAPPING_CONFIG_FILE} -T ${HC_TRACKER_MAPPING_CONFIG_FILE} >> ${LOG_FILE}
     if [ $? -eq 1 ];
     then    
 	echo "ERROR : qsub FAILED !" >> ${LOG_FILE}
