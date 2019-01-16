@@ -1,5 +1,7 @@
 # Falaise C++ Library and Applications for the SuperNEMO experiment
 
+[![Build Status](https://travis-ci.org/SuperNEMO-DBD/Falaise.svg?branch=develop)](https://travis-ci.org/SuperNEMO-DBD/Falaise)
+
 Falaise provides the main computational environment for the simulation,
 processing and analysis of data for the [SuperNEMO double beta decay search
 experiment](http://nemo.in2p3.fr). The three main components are
@@ -27,8 +29,7 @@ release of the software. Once installed, consult the [online documentation](http
 for a full guide to running the software and writing new plugin modules.
 
 ## Building, Testing and Installing from Source
-To build Falaise on your machine for use or development, the following requirements
-must be met:
+To build Falaise on your machine, the following requirements must be met:
 
 - Linux or macOS System
   - Supported Linux systems: CentOS6/7, Ubuntu 14.04/16.04LTS
@@ -65,6 +66,37 @@ $ cd Falaise.build
 $ cmake -DCMAKE_INSTALL_PREFIX=/where/you/want/to/install ../Falaise.git
 ...
 ```
+
+If you wish to enable `make test` after building, add the following option to cmake.
+
+```
+$ cmake -DFALAISE_ENABLE_TESTING=ON
+```
+
+Note: At this stage, if the following error is encountered;
+
+```
+  CMake Error at /home/<user>/CadfaelBrew/lib64/cmake/Bayeux-3.0.0/BayeuxConfig.cmake:130 (find_package):
+  By not providing "FindQt5Core.cmake" in CMAKE_MODULE_PATH this project has
+   asked CMake to find a package configuration file provided by "Qt5Core", but
+  CMake did not find one.
+
+  Could not find a package configuration file provided by "Qt5Core"
+   (requested version 5.8.0) with any of the following names:
+
+    Qt5CoreConfig.cmake
+    qt5core-config.cmake
+
+  ..
+```
+
+add the following options to the cmake command.
+
+```
+$ cmake -DCMAKE_PREFIX_PATH="$(brew --prefix);$(brew --prefix qt5-base)" <other options follow>
+```
+
+More info regarding Qt5Core and Falaise can be found at this address: (https://github.com/Homebrew/homebrew-core/issues/8392)
 
 Errors at this stage are likely to be due to missing/unfound packages. If this is the
 case, `cmake` can be directed to look in specific places using the `CMAKE_PREFIX_PATH`
@@ -135,7 +167,7 @@ any of its submodules, [raise an issue](https://supernemo-dbd.github.io/Falaise/
 
 # Contributing to Falaise
 
-Please see the [Contribution Guide](CONTRIBUTING.md)
+Please see the [Contribution Guide](https://github.com/SuperNEMO-DBD/Falaise/blob/develop/CONTRIBUTING.md#)
 
 
 # Naming
@@ -150,4 +182,4 @@ conditions of use of Falaise.
 
 ## Contributors
 
-Steven Calvez, Xavier Garrido, François Mauger, Ben Morgan, Guillaume Oliviero
+Many thanks go to Falaise's [contributors](https://github.com/SuperNEMO-DBD/Falaise/graphs/contributors)

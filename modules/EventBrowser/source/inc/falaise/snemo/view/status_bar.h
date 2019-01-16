@@ -2,9 +2,9 @@
 /* status_bar.h
  * Author (s) :   Xavier Garrido <<garrido@lal.in2p3.fr>>
  * Creation date: 2010-06-17
- * Last modified: 2014-07-14
+ * Last modified: 2017-06-28
  *
- * Copyright (C) 2011-2014 Xavier Garrido <garrido@lal.in2p3.fr>
+ * Copyright (C) 2011-2017 Xavier Garrido <garrido@lal.in2p3.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,87 +28,98 @@
  *
  * History:
  *
+ *   28/06/2017 : add "Goto event number" widget
+ *
  */
 
 #ifndef FALAISE_SNEMO_VISUALIZATION_VIEW_STATUS_BAR_H
 #define FALAISE_SNEMO_VISUALIZATION_VIEW_STATUS_BAR_H 1
 
+// - ROOT:
+#include <Rtypes.h>
+
+// - This project:
 #include <falaise/snemo/view/event_browser_signals.h>
 
+// Forward declaration
 class TGCompositeFrame;
 class TGComboBox;
 class TGPictureButton;
+class TGNumberEntryField;
 
 namespace snemo {
 
-  namespace visualization {
+namespace visualization {
 
-    namespace io {
-      class event_server;
-    }
+namespace io {
+class event_server;
+}
 
-    namespace view {
+namespace view {
 
-      /// \brief Status bar to display run information and navigate through
-      /// events
-      class status_bar
-      {
-      public:
+/// \brief Status bar to display run information and navigate through
+/// events
+class status_bar {
+ public:
+  /// Default constructor
+  status_bar();
 
-        /// Return initialization flag
-        bool is_initialized() const;
+  /// Destructor
+  virtual ~status_bar();
 
-        /// Set event server reference
-        void set_event_server(io::event_server * server_);
+  /// Set event server reference
+  void set_event_server(io::event_server* server_);
 
-        /// Default constructor
-        status_bar();
+  /// Return initialization flag
+  bool is_initialized() const;
 
-        /// Destructor
-        ~status_bar();
+  /// Initialize status bar
+  void initialize(TGCompositeFrame* main_);
 
-        /// Initialize status bar
-        void initialize(TGCompositeFrame * main_);
+  /// Update method
+  void update(const bool reset_ = false, const bool disable_ = false);
 
-        /// Update method
-        void update(const bool reset_ = false, const bool disable_ = false);
+  /// Reset method
+  void reset();
 
-        /// Reset method
-        void reset();
+  /// Update GUI buttons state
+  void update_buttons(const button_signals_type signal_ = UNDEFINED);
 
-        /// Update GUI buttons state
-        void update_buttons(const button_signals_type signal_ = UNDEFINED);
+  /// Reset GUI buttons state
+  void reset_buttons();
 
-        /// Reset GUI buttons state
-        void reset_buttons();
+  /// Process callback signals
+  void process();
 
-      private:
+ private:
+  /// Main initialization method
+  void _at_init_(TGCompositeFrame* main_);
 
-        /// Main initialization method
-        void _at_init_ (TGCompositeFrame * main_);
+ private:
+  bool _initialized_;  //!< Initialization flag
 
-      private:
+  io::event_server* _server_;  //!< Event server reference
 
-        bool _initialized_;                   //!< Initialization flag
+  TGComboBox* _event_list_;            //!< Event list combo box
+  TGNumberEntryField* _goto_event_;    //!< Goto event number box
+  TGPictureButton* _button_first_;     //!< First event button
+  TGPictureButton* _button_previous_;  //!< Previous event button
+  TGPictureButton* _button_next_;      //!< Next event button
+  TGPictureButton* _button_last_;      //!< Last event button
 
-        io::event_server * _server_;          //!< Event server reference
+  // No I/O so ClassDefVersionID = 0
+  ClassDef(status_bar, 0);
+};
 
-        TGComboBox       * _event_list_;      //!< Event list combo box
-        TGPictureButton  * _button_first_;    //!< First event button
-        TGPictureButton  * _button_previous_; //!< Previous event button
-        TGPictureButton  * _button_next_;     //!< Next event button
-        TGPictureButton  * _button_last_;     //!< Last event button
-      };
+}  // end of namespace view
 
-    } // end of namespace view
+}  // end of namespace visualization
 
-  } // end of namespace visualization
+}  // end of namespace snemo
 
-} // end of namespace snemo
+#endif  // FALAISE_SNEMO_VISUALIZATION_VIEW_EVENT_DISPLAY_H
 
-#endif // FALAISE_SNEMO_VISUALIZATION_VIEW_EVENT_DISPLAY_H
-
-// end of event_display.h
+// end of status_bar.h
 /*
 ** Local Variables: --
 ** mode: c++ --
