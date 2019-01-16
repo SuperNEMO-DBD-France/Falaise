@@ -63,7 +63,7 @@ namespace FLReconstruct {
   //! Print OCD help for supplied module name to given ostream
   void do_help_module(std::ostream& os, std::string module);
 
-  //! Print list of standard pipeline configurations to supplied ostream
+  //! Print list of official pipeline configurations to supplied ostream
   void do_help_pipeline_list(std::ostream& os);
 
   //! load all default plugins

@@ -20,9 +20,12 @@
 
 // Third Party
 // - Bayeux
-#include "bayeux/datatools/logger.h"
-#include "bayeux/datatools/multi_properties.h"
-#include "bayeux/datatools/configuration/variant_service.h"
+#include <bayeux/datatools/logger.h>
+#include <bayeux/datatools/multi_properties.h>
+#include <bayeux/datatools/configuration/variant_service.h>
+
+// This project:
+#include "falaise/app/metadata_utils.h"
 
 namespace FLReconstruct {
 
@@ -73,10 +76,11 @@ namespace FLReconstruct {
     std::string reconstructionPipelineModule;     //!< The reconstruction module
 
     // Metadata container:
-    datatools::multi_properties inputMetadata;    //!< Metadata imported from the input
+    datatools::multi_properties  inputMetadata;     //!< Metadata imported from the input
+    falaise::app::metadata_input inputFlatMetaData; //!< Flattened metadata imported from the input
 
      // Processing pipeline modules configuration:
-    datatools::multi_properties modulesConfig;    //!< Main configuration file for plugins loader
+    datatools::multi_properties modulesConfig;      //!< Main configuration file for loading the set of used reconstruction modules
 
     //! Build a default arguments set:
     static FLReconstructParams makeDefault();

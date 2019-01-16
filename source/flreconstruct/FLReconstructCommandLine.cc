@@ -116,14 +116,14 @@ namespace FLReconstruct {
     moduleDoc.print(os);
   }
 
-  //! Print list of standard pipeline configurations to supplied ostream
+  //! Print list of official pipeline configurations to supplied ostream
   void do_help_pipeline_list(std::ostream& os) {
     datatools::logger::priority logging = falaise::detail::falaise_sys::const_instance().get_logging();
     falaise::configuration_db cfgdb;
     std::vector<falaise::configuration_db::urn_entry> entries;
     if (cfgdb.find(entries,
                    "(urn:)([^:]*)(:)([^:]*)(:reconstruction:)([^:]*)(:pipeline)",
-                   "recsetup",
+                   falaise::configuration_db::category::reconstruction_setup_label(),
                    falaise::detail::falaise_sys::fl_setup_db_name()
                    )) {
       std::clog << "List of supported reconstruction pipeline:" << std::endl;
@@ -139,16 +139,17 @@ namespace FLReconstruct {
   //! Load all default plugins
   void do_load_plugins(datatools::library_loader& libLoader) {
     std::string pluginPath = falaise::get_plugin_dir();
-    // explicitly list for now...
-    // libLoader.load("Falaise_AnalogSignalBuilder", pluginPath);
-    // libLoader.load("Falaise_Digitization", pluginPath);
-    libLoader.load("Falaise_CAT", pluginPath);
-    libLoader.load("Falaise_ChargedParticleTracking", pluginPath);
-    libLoader.load("Falaise_MockTrackerClusterizer", pluginPath);
-    libLoader.load("TrackFit", pluginPath);
-    libLoader.load("Falaise_TrackFit", pluginPath);
-    libLoader.load("Falaise_VisuToy", pluginPath);
-    libLoader.load("Things2Root", pluginPath);
+    datatools::properties p;
+    // Explicitly list for now:
+    std::string filename = "@falaise:config/snemo/demonstrator/reconstruction/libraries/1.0/plugins.lis";
+    datatools::fetch_path_with_env(filename);
+    p.read_configuration(filename);
+    // p.tree_dump(std::cerr, "Plugins conf");
+    std::vector<std::string> plugins;
+    p.fetch("plugins", plugins);
+    for (const auto & plugin : plugins) {
+      libLoader.load(plugin, pluginPath);
+    }
   }
 
   FLDialogState do_cldialog(int argc, char *argv[], FLReconstructCommandLine& clArgs)

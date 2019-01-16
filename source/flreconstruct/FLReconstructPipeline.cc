@@ -24,6 +24,7 @@
 #include "falaise/resource.h"
 #include "falaise/snemo/processing/services.h"
 #include "falaise/configuration_db.h"
+#include "falaise/snemo/processing/services.h"
 #include "FLReconstructImpl.h"
 
 namespace FLReconstruct {
@@ -270,8 +271,6 @@ namespace FLReconstruct {
   {
     DT_LOG_TRACE_ENTERING(recParams.logLevel);
     falaise::configuration_db cfgdb;
-    // datatools::kernel & dtk = datatools::kernel::instance();
-    // const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
 
     // Geometry is a fundamental service, try to set one if missing:
     std::string geoServiceName = snemo::processing::service_info::default_geometry_service_label();
@@ -279,11 +278,9 @@ namespace FLReconstruct {
         !recServices.is_a<geomtools::geometry_service>(geoServiceName)) {
       std::string geometrySetupUrn;
       std::string geometrySetupConfig;
-      std::string dependee;
-      if (cfgdb.find_direct_unique_dependee_with_category_from(dependee,
+      if (cfgdb.find_direct_unique_dependee_with_category_from(geometrySetupUrn,
                                                                recParams.experimentalSetupUrn,
-                                                               "geometry")) {
-        geometrySetupUrn = dependee;
+                                                               falaise::configuration_db::category::geometry_setup_label())) {
         // Resolve geometry file:
         std::string conf_variants_category = "configuration";
         std::string conf_variants_mime;
@@ -299,16 +296,17 @@ namespace FLReconstruct {
         // We try to setup one with the proper configuration.
         datatools::multi_properties geoServiceConfig("name","type");
         std::string geoServicePath = geometrySetupConfig;
-        // "@falaise:config/snemo/demonstrator/geometry/4.0/geometry_service.conf";
         if (!geoServicePath.empty()) {
-          datatools::properties& gs = geoServiceConfig.add_section("geometry", "geomtools::geometry_service");
+          datatools::properties& gs
+            = geoServiceConfig.add_section(snemo::processing::service_info::default_geometry_service_label(),
+                                           "geomtools::geometry_service");
           gs.store("manager.configuration_file", geoServicePath);
           recServices.load(geoServiceConfig);
         }
       }
     }
 
-    // Electronics:
+    // Electronics/devices:
 
     // Database:
 

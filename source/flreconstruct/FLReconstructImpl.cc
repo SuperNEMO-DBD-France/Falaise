@@ -13,8 +13,6 @@
 #include "bayeux/datatools/logger.h"
 #include "bayeux/datatools/factory_macros.h"
 #include <bayeux/datatools/urn.h>
-// #include <bayeux/datatools/kernel.h>
-// #include <bayeux/datatools/urn_query_service.h>
 #include "bayeux/dpp/base_module.h"
 #include "bayeux/dpp/input_module.h"
 
@@ -42,13 +40,9 @@ namespace FLReconstruct {
     FLDialogState clDialogRet = DIALOG_OK;
     try {
       clDialogRet = do_cldialog(argc, argv, clArgs);
-      //DT_LOG_DEBUG(datatools::logger::PRIO_ALWAYS, "Command line dialog end with exit code=" << clDialogRet);
-
       if (clDialogRet == DIALOG_ERROR) {
-        //DT_LOG_DEBUG(datatools::logger::PRIO_ALWAYS, "Detected a dialog error!");
         throw FLConfigUserError {"bad command line input"};
       } else if (clDialogRet == DIALOG_QUERY) {
-        //DT_LOG_DEBUG(datatools::logger::PRIO_ALWAYS, "Detected a dialog query!");
         throw FLConfigHelpHandled();
       }
     } catch (FLConfigHelpHandled& e) {
@@ -332,8 +326,8 @@ namespace FLReconstruct {
       flRecParameters.inputMetadata.tree_dump(std::cerr, "Input metadata: ", "[debug] ");
     }
 
-    // Input metadata of interest:
-    falaise::app::metadata_input iMeta;
+    // Flattened input metadata of interest:
+    falaise::app::metadata_input & iMeta = flRecParameters.inputFlatMetaData;
 
     // Extract input metadata of interest:
     if (!flRecParameters.inputMetadata.empty()) {
@@ -346,12 +340,63 @@ namespace FLReconstruct {
     } // End of using input metadata
 
     if (!iMeta.experimentalSetupUrn.empty()) {
-      DT_LOG_NOTICE(flRecParameters.logLevel, "Input metadata from the experimental setup identifier (URN) is '" << iMeta.experimentalSetupUrn << "'.");
+      DT_LOG_NOTICE(flRecParameters.logLevel, "Experimental setup identifier (URN) from input metadata is '" << iMeta.experimentalSetupUrn << "'.");
     } else {
       DT_LOG_NOTICE(flRecParameters.logLevel, "No experimental setup identifier (URN) is set from input metadata.");
     }
 
+    if (!iMeta.userProfile.empty()) {
+      DT_LOG_NOTICE(flRecParameters.logLevel, "User profile from input metadata is '" << iMeta.userProfile << "'.");
+    } else {
+      DT_LOG_NOTICE(flRecParameters.logLevel, "No user profile is set from input metadata.");
+    }
+
+    // XXXXXXX
     // Checks:
+ // End of checks.
+
+    // Extract reconstruction parameters from metadata:
+    {
+      // if (flRecParameters.experimentalSetupUrn.empty() && ! iMeta.experimentalSetupUrn.empty()) {
+      //   // Force the experimental setup identifier from the value found in the input metadata
+      //   flRecParameters.experimentalSetupUrn = iMeta.experimentalSetupUrn;
+      //   DT_LOG_NOTICE(flRecParameters.logLevel, "The experimental setup identifier (URN) is set to '" << iMeta.experimentalSetupUrn << "' from input metadata.");
+      // }
+
+      // 2017-07-11, FM: TO BE INVESTIGATED:
+      // if (flRecParameters.variantConfigUrn.empty() && ! iMeta.variantConfigUrn.empty()) {
+      //   flRecParameters.variantConfigUrn = iMeta.variantConfigUrn;
+      //   DT_LOG_NOTICE(flRecParameters.logLevel, "The variant configuration identifier (URN) is set to '" << iMeta.variantConfigUrn << "' from input metadata.");
+      // }
+
+      // if (flRecParameters.variantProfileUrn.empty() && ! iMeta.variantProfileUrn.empty()) {
+      //   flRecParameters.variantProfileUrn = iMeta.variantProfileUrn;
+      //   DT_LOG_NOTICE(flRecParameters.logLevel, "The variant profile identifier (URN) is set to '" << iMeta.variantProfileUrn << "' from input metadata.");
+      // }
+
+      // if (flRecParameters.variantSubsystemParams.settings.size() == 0 && iMeta.variantSettings.size() > 0) {
+      //   flRecParameters.variantSubsystemParams.settings = iMeta.variantSettings;
+      //   DT_LOG_NOTICE(flRecParameters.logLevel, "The variant profile settings are set from input metadata.");
+      // }
+
+    } // End of extract.
+    // XXXXXXX
+
+    DT_LOG_TRACE_EXITING(flRecParameters.logLevel);
+    return;
+  }
+
+  void do_postprocess(FLReconstructParams & flRecParameters)
+  {
+    DT_LOG_TRACE_ENTERING(flRecParameters.logLevel);
+    falaise::configuration_db cfgdb;
+
+    // Process input metadata:
+    do_postprocess_input_metadata(flRecParameters);
+
+    // Handle to the flattened input metadata:
+    const falaise::app::metadata_input & iMeta = flRecParameters.inputFlatMetaData;
+
     {
       // Check the user profile:
       if (flRecParameters.userProfile == "production") {
@@ -363,45 +408,14 @@ namespace FLReconstruct {
                     "User profile '" << flRecParameters.userProfile << "' "
                     << "is not compatible with input metadata production user profile '" << iMeta.userProfile << "'!");
       }
-
-      // Check the experimental setup identifier:
-      if (! flRecParameters.experimentalSetupUrn.empty()) {
-        DT_THROW_IF(!iMeta.experimentalSetupUrn.empty() &&
-                    (iMeta.experimentalSetupUrn != flRecParameters.experimentalSetupUrn),
-                    std::logic_error,
-                    "Experimental setup URN='" << flRecParameters.experimentalSetupUrn << "' conflicts with experimental setup URN='"
-                    << iMeta.experimentalSetupUrn << "' extracted from input metadata!");
-      }
-    } // End of checks.
-
-    // Settings:
-    {
-      if (flRecParameters.experimentalSetupUrn.empty()) {
-        // Force the experimental setup identifier from the value found int the input metadata
-        flRecParameters.experimentalSetupUrn = iMeta.experimentalSetupUrn;
-        DT_LOG_NOTICE(flRecParameters.logLevel, "The experimental setup identifier (URN) is set to '" << iMeta.experimentalSetupUrn << "' from input metadata.");
-      }
-    } // End of settings.
-
-    DT_LOG_TRACE_EXITING(flRecParameters.logLevel);
-    return;
-  }
-
-  void do_postprocess(FLReconstructParams & flRecParameters)
-  {
-    DT_LOG_TRACE_ENTERING(flRecParameters.logLevel);
-    falaise::configuration_db cfgdb;
-    // datatools::kernel & dtk = datatools::kernel::instance();
-    // const datatools::urn_query_service & dtkUrnQuery = dtk.get_urn_query();
-
-    // Process input metadata:
-    do_postprocess_input_metadata(flRecParameters);
+    }
 
     if (!flRecParameters.reconstructionPipelineUrn.empty()) {
       // Check URN registration from the system URN query service:
-      DT_THROW_IF(!cfgdb.check_with_category(flRecParameters.reconstructionPipelineUrn, "recsetup"),
+      DT_THROW_IF(!cfgdb.check_with_category(flRecParameters.reconstructionPipelineUrn,
+                                             falaise::configuration_db::category::reconstruction_setup_label()),
                   std::logic_error,
-                  "Cannot query reconstruction setup URN='" << flRecParameters.reconstructionPipelineUrn << "'!");
+                  "Cannot check reconstruction setup URN='" << flRecParameters.reconstructionPipelineUrn << "'!");
       // Resolve reconstruction config file path:
       std::string conf_rec_category = "configuration";
       std::string conf_rec_mime;
@@ -433,9 +447,33 @@ namespace FLReconstruct {
     }
 
     if (flRecParameters.experimentalSetupUrn.empty()) {
-      // If experimental setup URN is not set..
+      // If experimental setup URN is not set:
       DT_LOG_NOTICE(flRecParameters.logLevel, "No experimental setup identifier (URN) is set.");
+      if (!flRecParameters.reconstructionPipelineUrn.empty()) {
+        // We try to determine the experimental setup from the reconstruction setup:
+        std::string expsetup_dependee;
+        if (cfgdb.find_direct_unique_dependee_with_category_from(expsetup_dependee,
+                                                                 flRecParameters.reconstructionPipelineUrn,
+                                                                 falaise::configuration_db::category::experimental_setup_label())) {
+          flRecParameters.experimentalSetupUrn = expsetup_dependee;
+        }
+      }
+    }
 
+    if (!flRecParameters.experimentalSetupUrn.empty()) {
+      // Check if experimental setup is compatible with the one from s
+      DT_THROW_IF(!iMeta.experimentalSetupUrn.empty() &&
+                  (iMeta.experimentalSetupUrn != flRecParameters.experimentalSetupUrn),
+                  std::logic_error,
+                  "Experimental setup URN='" << flRecParameters.experimentalSetupUrn
+                  << "' conflicts with experimental setup URN='"
+                  << iMeta.experimentalSetupUrn << "' extracted from input metadata!");
+    } else {
+      // Import the experimental setup URN from the input metadata:
+      flRecParameters.experimentalSetupUrn = iMeta.experimentalSetupUrn;
+    }
+
+    if (flRecParameters.experimentalSetupUrn.empty()) {
       // Variants service configuration can be hardcoded:
       if (!flRecParameters.variantSubsystemParams.config_filename.empty()) {
         DT_LOG_NOTICE(flRecParameters.logLevel, "Using a manually set variant service configuration file.");
@@ -447,21 +485,18 @@ namespace FLReconstruct {
                   "Missing services configuration file!");
     }
 
-    // The experimental setup URN is set, we try to extract automatically the path of the
-    // components associated to it (variants, services...)
+    // The experimental setup URN is set, we try to extract automatically the path
+    // of the components associated to it (variants, services...)
     if (! flRecParameters.experimentalSetupUrn.empty()) {
       // Check URN registration from the system URN query service:
       {
-        std::string conf_category = "expsetup";
+        std::string conf_category = falaise::configuration_db::category::experimental_setup_label();
         DT_THROW_IF(!cfgdb.check_with_category(flRecParameters.experimentalSetupUrn, conf_category),
                     std::logic_error,
-                    "Cannot find URN='" << flRecParameters.experimentalSetupUrn << "' with category '" << conf_category << "'!");
+                    "Cannot find experimental setup with URN='" << flRecParameters.experimentalSetupUrn << "'!");
       }
-      // const datatools::urn_info & expSetupUrnInfo =
-      //   dtkUrnQuery.get_urn_info(flRecParameters.experimentalSetupUrn);
 
       // Variants:
-      // XXX
       std::string variantConfigUrn;
       {
         // Automatically determine the variants configuration component:
@@ -498,7 +533,7 @@ namespace FLReconstruct {
       // Services:
       if (!flRecParameters.servicesSubsystemConfig.empty()) {
         // Cannot explicitely set the services config path which must be resolved
-        // through the Urn:
+        // through the URN:
         DT_THROW_IF(!flRecParameters.servicesSubsystemConfigUrn.empty(),
                     std::logic_error,
                     "Service configuration URN='" << flRecParameters.servicesSubsystemConfigUrn << "' "
@@ -538,7 +573,7 @@ namespace FLReconstruct {
           flRecParameters.servicesSubsystemConfig = conf_services_path;
         }
       }
-    }
+    } // if (! flRecParameters.experimentalSetupUrn.empty())
 
     // Variants profile:
     if (!flRecParameters.variantSubsystemParams.profile_load.empty()) {
@@ -548,7 +583,40 @@ namespace FLReconstruct {
                   "Required variants profile URN='" << flRecParameters.variantProfileUrn << "' "
                   << "conflicts with required variants profile path='"
                   << flRecParameters.variantSubsystemParams.profile_load << "'!");
-    } else if (!flRecParameters.variantProfileUrn.empty()) {
+    } else {
+      DT_LOG_DEBUG(flRecParameters.logLevel, "No variant profile path is set.");
+      /*
+      if (flRecParameters.variantProfileUrn.empty()) {
+        // No variant profile URN is set:
+        DT_LOG_DEBUG(flRecParameters.logLevel, "No variant profile URN is set.");
+        // We try to find a default one from the list of variant profiles attached on the variant service:
+        std::set<std::string> varprofile_dependers;
+        // First we extract this list of depender variant profiles:
+        if (cfgdb.find_direct_dependers_with_category_from(varprofile_dependers,
+                                                           flRecParameters.variantConfigUrn,
+                                                           falaise::configuration_db::category::variants_profile_label())) {
+          // Scan dependers variant profiles and search for one which has an alias dependee used as the default one:
+          for (auto vp : varprofile_dependers) {
+            std::string vdpef;
+            if (cfgdb.find_direct_unique_depender_with_category_from(vdpef,
+                                                                     vp,
+                                                                     falaise::configuration_db::category::variants_profile_label())) {
+              if (cfgdb.is_alias_of(vdpef, vp)) {
+                if (boost::algorithm::ends_with(vdpef,
+                                                falaise::configuration_db::category::default_urn_suffix())) {
+                  // Pickup the real URN, not the alias:
+                  flSimParameters.variantProfileUrn = vp;
+                  // std::cerr << "[devel] flSimParameters.variantProfileUrn = " << flSimParameters.variantProfileUrn << std::endl;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+      */
+    }
+    if (!flRecParameters.variantProfileUrn.empty()) {
       // Determine the variant profile path from a blessed variant profile URN:
       std::string conf_variantsProfile_category = "configuration";
       std::string conf_variantsProfile_mime;

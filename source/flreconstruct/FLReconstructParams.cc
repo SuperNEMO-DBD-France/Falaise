@@ -16,10 +16,10 @@ namespace FLReconstruct {
     FLReconstructParams params;
 
     // Application specific parameters:
-    params.logLevel     = datatools::logger::PRIO_ERROR;
-    params.userProfile  = "normal";
+    params.logLevel       = datatools::logger::PRIO_ERROR;
+    params.userProfile    = "normal";
     params.numberOfEvents = 0; // 0 == no limit on event loop
-    params.moduloEvents = 0; // 0 == no print
+    params.moduloEvents   = 0; // 0 == no print
 
     // Experimental setup:
     params.experimentalSetupUrn = "";  // "urn:snemo:demonstrator:setup:1.0";
@@ -48,6 +48,7 @@ namespace FLReconstruct {
     params.inputMetadata.reset();
     params.inputMetadata.set_key_label("name");
     params.inputMetadata.set_meta_label("type");
+    params.inputFlatMetaData.reset();
 
     // // Additional informations:
     // params.dataType              = "";
