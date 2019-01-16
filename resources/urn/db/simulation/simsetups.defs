@@ -25,6 +25,14 @@ topic.dependency.components : string[1] = "urn:snemo:demonstrator:geometry:4.0"
 description : string = "Decay generation setup (version 1.2) for SuperNEMO demonstrator simulation"
 
 
+######################################################################
+[urn="urn:snemo:demonstrator:simulation:geant4:2.1" category="geant4"]
+
+#@config URN registration of Geant4 session setup (version 2.1) for SuperNEMO demonstrator simulation
+
+description : string = "Geant4 session setup (version 2.1) for SuperNEMO demonstrator simulation"
+
+
 ###############################################################################################
 [urn="urn:snemo:demonstrator:simulation:vertexes:4.1:variants:registry" category="varregistry"]
 
@@ -41,12 +49,20 @@ description : string = "SuperNEMO demonstrator vertex generation variants regist
 description : string = "SuperNEMO demonstrator primary event generation variants registry (version 1.2)"
 
 
-######################################################################################
-[urn="urn:snemo:demonstrator:simulation:2.1:variants:registry" category="varregistry"]
+#############################################################################################
+[urn="urn:snemo:demonstrator:simulation:geant4:2.1:variants:registry" category="varregistry"]
 
-#@config URN registration of SuperNEMO demonstrator Geant4 session event generation variants registry (version 2.1)
+#@config URN registration of SuperNEMO demonstrator Geant4 session variants registry (version 2.1)
 
 description : string = "SuperNEMO demonstrator Geant4 session variants registry (version 2.1)"
+
+
+# ######################################################################################
+# [urn="urn:snemo:demonstrator:simulation:2.1:variants:registry" category="varregistry"]
+
+# #@config URN registration of SuperNEMO demonstrator Geant4 session event generation variants registry (version 2.1)
+
+# description : string = "SuperNEMO demonstrator Geant4 session variants registry (version 2.1)"
 
 
 ##########################################################################
@@ -60,7 +76,7 @@ topic.dependency.components : string[4] = \
   "urn:snemo:demonstrator:geometry:4.0:variants:registry" \
   "urn:snemo:demonstrator:simulation:vertexes:4.1:variants:registry" \
   "urn:snemo:demonstrator:simulation:decays:1.2:variants:registry" \
-  "urn:snemo:demonstrator:simulation:2.1:variants:registry"
+  "urn:snemo:demonstrator:simulation:geant4:2.1:variants:registry"
 
 
 #############################################################################################
@@ -106,15 +122,16 @@ topic.dependency.components : string[1] = "urn:snemo:demonstrator:geometry:4.0"
 
 description : string = "SuperNEMO demonstrator simulation setup (version 2.1)"
 
-topics : string[2] = "context" "dependency"
+topics : string[1] = "dependency"
 
-topic.context.component     : string    = "urn:snemo:demonstrator"
-topic.dependency.components : string[5] = \
-			      "urn:snemo:demonstrator:setup:1.0" \
-			      "urn:snemo:demonstrator:simulation:vertexes:4.1" \
-			      "urn:snemo:demonstrator:simulation:decays:1.2" \
-			      "urn:snemo:demonstrator:simulation:2.1:variants" \
-			      "urn:snemo:demonstrator:simulation:2.1:services"
+topic.dependency.components : string[7] = \
+			    "urn:snemo:demonstrator" \
+		            "urn:snemo:demonstrator:setup:1.0" \
+			    "urn:snemo:demonstrator:simulation:2.1:variants" \
+			    "urn:snemo:demonstrator:simulation:2.1:services" \
+			    "urn:snemo:demonstrator:simulation:vertexes:4.1" \
+			    "urn:snemo:demonstrator:simulation:decays:1.2" \
+			    "urn:snemo:demonstrator:simulation:geant4:2.1"
 
 
 # end

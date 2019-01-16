@@ -81,20 +81,20 @@ topics : string[1] = "alias"
 topic.alias.component: string = "urn:snemo:demonstrator:setup:1.0:variants:profiles:basic-1.0.0"
 
 
-#########
-# BiPo3 #
-#########
+# #########
+# # BiPo3 #
+# #########
 
-########################################################
-[urn="urn:bipo3:detector:setup:1.0" category="expsetup"]
+# ########################################################
+# [urn="urn:bipo3:detector:setup:1.0" category="expsetup"]
 
-#@config URN registration of the BiPo3 detector setup (version 1.0)
+# #@config URN registration of the BiPo3 detector setup (version 1.0)
 
-description : string = "BiPo3 detector setup (version 1.0)"
+# description : string = "BiPo3 detector setup (version 1.0)"
 
-topics : string[1] = "context"
+# topics : string[1] = "context"
 
-topic.context.component : string = "urn:bipo3:detector"
+# topic.context.component : string = "urn:bipo3:detector"
 
 
 # end

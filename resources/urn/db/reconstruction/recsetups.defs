@@ -33,10 +33,10 @@
 
 description : string = "SuperNEMO Demonstrator reconstruction setup (version 1.0.0)"
 
-topics : string[2] = "context" "dependency"
+topics : string[1] = "dependency"
 
-topic.context.component     : string    = "urn:snemo:demonstrator"
-topic.dependency.components : string[2] = \
+topic.dependency.components : string[3] = \
+			    "urn:snemo:demonstrator" \
 			    "urn:snemo:demonstrator:setup:1.0" \
 			    "urn:snemo:demonstrator:reconstruction:1.0.0:pipeline"
 

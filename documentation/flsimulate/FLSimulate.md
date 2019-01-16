@@ -461,14 +461,13 @@ The  FLSimulate's  script  contains  up   to  five  sections  of  type
   - `profileUrn`  :  the configuration  tag  for  the variant  profile
 	chosen by the  user to perform the  simulation (string, optional).
 	If not set, it may  be automatically resolved from the `configUrn`
-	tag is the variant configuration has a registered default profile.
+	tag if the variant configuration has a registered *default profile*.
   - `profile` : the path to the  variant profile chosen by the user to
 	perform the simulation (string/path,optional).   If not set, it is
 	automatically resolved from the `profileUrn` tag.
-  - `settings` :  a list  of explicit  setting for  variant parameters
+  - `settings` :  a list  of explicit  settings for  variant parameters
 	chosen by  the user to  perform the simulation (array  of strings,
-	optional).   If not  set, it  is automatically  resolved from  the
-	`profileUrn` tag.
+	optional).
 
   See [this section](@ref usingflsimulate_variants) for details.
 
@@ -481,9 +480,9 @@ The  FLSimulate's  script  contains  up   to  five  sections  of  type
   - the  *geometry*   service  :  it  describes   the  geometry  model
 	associated  to  the  experimental  setup   on  top  of  which  the
 	simulation setup is built.
-  - the  *electronics*  service (not  used  yet)  : it  describes  the
-    electronics model associated  to the experimental setup  on top of
-    which the simulation setup is built.
+  - the  *devices/electronics*  service (not  used  yet)  : it  describes  the
+    model of electronics.readout devices associated  to the experimental setup
+    on top of which the simulation setup is built.
 
   Parameters of interest are:
 
